@@ -1,0 +1,18 @@
+{
+	"folders": [
+		{
+			"name": "Src",
+			"path": "Src"
+		},
+		{
+			"name": "Old",
+			"path": "Old"
+		},
+		{
+			"path": "Tmp"
+		}
+	],
+	"settings": {
+		"makefile.extensionOutputFolder": "./.vscode"
+	}
+}

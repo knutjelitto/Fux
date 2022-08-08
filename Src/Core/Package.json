@@ -1,0 +1,20 @@
+{
+    "name": "Core",
+    "summary": "Core library",
+    "exposed-modules": {
+        "Primitives": [
+            "Prelude",
+            "Boolean",
+            "Integer"
+        ],
+        "Collections": [
+            "List"
+        ]
+    },
+    "waiting-modules": {
+        "Collections": [
+            "List"
+        ]
+    },
+    "dependencies": {}
+}

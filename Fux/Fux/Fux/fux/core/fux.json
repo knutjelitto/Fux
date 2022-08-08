@@ -1,0 +1,27 @@
+{
+    "type": "package",
+    "name": "fux/core",
+    "summary": "Fux core library",
+    "exposed-modules": {
+        "Primitives": [
+            "Basics",
+            "Int",
+            "Float",
+            "Bool",
+            "String",
+            "Char",
+            "Compare",
+            "Order",
+            "Bitwise",
+            "Maybe",
+            "Result",
+            "Tuple"
+        ],
+        "Collections": [
+            "List",
+            "Dict",
+            "Set"
+        ]
+    },
+    "dependencies": {}
+}
