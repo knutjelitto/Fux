@@ -25,6 +25,7 @@ hidden double   __tan(double,double,int);
 hidden double   __expo2(double,double);
 
 hidden double   __math_invalid(double);
+hidden double   __math_xflow(uint32_t sign, double y);
 hidden double   __math_uflow(uint32_t);
 hidden double   __math_oflow(uint32_t);
 

@@ -1,3 +1,5 @@
+package Core library Prelude api
+
 module Prelude
   ( (+), (-), (*), (/), (^)
   , (==), (!=)

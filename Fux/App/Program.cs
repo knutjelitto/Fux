@@ -1,7 +1,6 @@
 ﻿using Fux;
 using Fux.Files;
 using Fux.Input;
-using Fux.Tools;
 
 namespace App
 {
@@ -18,6 +17,7 @@ namespace App
             Console.WriteLine($"src: {src}");
             Console.WriteLine($"tmp: {tmp}");
 
+            var packages = new List<PackageFile>();
             foreach (var packageFile in src.EnumerateFiles(PackageFile.File))
             {
                 var package = new PackageFile(src, packageFile.Directory);

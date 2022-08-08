@@ -1,6 +1,9 @@
 #pragma once
 
 #define __math_invalid      core_math___math_invalid
+#define __math_xflow        core_math___math_xflow
+#define __math_oflow        core_math___math_oflow
+#define __math_uflow        core_math___math_uflow
 
 #define __cos               core_math___cos
 #define __fpclassify        core_math___fpclassify
@@ -8,6 +11,7 @@
 #define __rem_pio2_large    core_math___rem_pio2_large
 #define __sin               core_math___sin
 #define __tan               core_math___tan
+#define __math_xflow        core_math___math_xflow
 
 #define acos                core_math_acos
 #define asin                core_math_asin
