@@ -1,6 +1,4 @@
-﻿using Fux.Errors;
-
-namespace Fux.Input
+﻿namespace Fux.Input
 {
     public sealed class LexerErrors : InputErrors
     {
@@ -12,11 +10,11 @@ namespace Fux.Input
 
         public Lexer Lexer { get; }
 
-        public DiagnosticException Unexpected(int rune, string? context = null)
+        public DiagnosticException UnexpectedCharacter(Location location, int rune, string? context = null)
         {
             context = context == null ? string.Empty : $" (in {context})";
             return Add(
-                new LexerError(Location, $"unexpected character `{(char)rune}´{context}")
+                new LexerError(location, $"unexpected character `{(char)rune}´{context}")
             );
         }
 

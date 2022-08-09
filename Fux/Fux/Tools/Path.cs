@@ -34,6 +34,13 @@ namespace Fux.Tools
 
         public bool FileExists => IO.File.Exists(Text);
 
+        public Path EnshureDirectory()
+        {
+            IO.Directory.CreateDirectory(Directory);
+
+            return this;
+        }
+
         public string ReadText()
         {
             return IO.File.ReadAllText(Text, Encoding.UTF8);

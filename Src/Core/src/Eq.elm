@@ -1,4 +1,4 @@
-package Core module Equality api
+package Core module Eq
 
 {-| Core of the List type.
 
@@ -13,10 +13,7 @@ package Core module Equality api
 
 -}
 
-interface Equateable<a>
-    fn Equals(x: a, y: a) : Bool
-    fn NotEquals(x: List, y: List) : Bool
+fn Equal<a, b = a>(x : a, y : b) : bool
 
-
-equals = fn(x: List, y: List) : Bool
-notEquals = fn(x: List, y: List) : Bool
+fn NotEqual<a, b = a>(x : a, y : b) bool
+    not Equal(x, y))

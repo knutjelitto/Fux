@@ -1,14 +1,5 @@
-package Core library Prelude api
+package Core
 
-module Prelude
-  ( (+), (-), (*), (/), (^)
-  , (==), (!=)
-  , (<), (>), (<=), (>=)
-  , (||), (^^), (&&)
-  , (++)
-  , negate, abs, clamp
-  , identity, always, (<|), (|>), (<<), (>>), Never, never
-  )
 
 {-| Tons of useful functions that get imported by default.
 
@@ -37,22 +28,13 @@ things.
 -}
 
 
-import Core.Boolean
+import Core.Eq
+import Core.Ord
+
 import Core.Integer
-
-class number
-
-Integer.int : number
-
-(+)<num: Number> = fn(x: num, y: num)
-
-(+)<Integer.int> = Integer.add
-
-
-import Compare exposing(..)
-import Int exposing(..)
-import Bool exposing(..)
-import String exposing(..)
+import Core.Float
+import Core.Boolean
+import Core.String
 
 
 -- INFIX OPERATORS
@@ -78,58 +60,6 @@ infix left  9 (<<) = composeL
 infix right 9 (>>) = composeR
 
 
--- TYPE CLASSES
-
-class Eq a where
-    (==) : a -> a -> Bool
-    (!=) : a -> a -> Bool
-
-class Ord a : Eq a where
-    (<=) : a -> a -> Bool
-    (<) : a -> a -> Bool
-    (>=) : a -> a -> Bool
-    (>) : a -> a -> Bool
-
-class Append a where
-    (++) : a -> a -> a
-
-
-instance Eq Int where
-    (==) = Int.eq
-    (!=) = Int.neq
-
-instance Append (List a) where
-    (++) = List.append
-
-instance Append String where
-    (++) = String.append
-
-
--- APPEND
-
-{-| Put two appendable things together. This includes strings and lists.
-
-    "hello" ++ "world" == "helloworld"
-    [1,1,2] ++ [3,5,8] == [1,1,2,3,5,8]
--}
-append : appendable -> appendable -> appendable
-append =
-    Fux.Core.Utils.append
-
-
--- FANCIER MATH
-
-{-| Negate a number.
-
-    negate 42 == -42
-    negate -42 == 42
-    negate 0 == 0
--}
-negate : number -> number
-negate =
-    Fux.Core.Basics.negate
-
-
 {-| Get the [absolute value][abs] of a number.
 
     abs 16   == 16
@@ -139,9 +69,8 @@ negate =
 
 [abs]: https://en.wikipedia.org/wiki/Absolute_value
 -}
-abs : number -> number
-abs n =
-    if lt n 0 then -n else n
+fn abs<a>(x: a) : a
+    if n < 0 then -n else n
 
 
 {-| Clamps a number within a given range. With the expression
@@ -151,14 +80,13 @@ abs n =
      x      if 100 <= x < 200
     200     if 200 <= x
 -}
-clamp : number -> number -> number -> number
-clamp low high number =
-    if lt number low then
+fn clamp<a>(low: a, high: a, x: a) : a
+    if x < low then
         low
-    else if gt number high then
+    else if x > high then
         high
     else
-        number
+        x
 
 
 -- FUNCTION HELPERS
