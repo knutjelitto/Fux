@@ -10,12 +10,12 @@ namespace App
         static void Main(string[] args)
         {
             var top = new Root();
+            Console.WriteLine($"top: {top}");
 
             var src = top.Sub("Src").EnshureFolder();
-            var tmp = top.Sub("Tmp").EnshureFolder();
-
-            Console.WriteLine($"top: {top}");
             Console.WriteLine($"src: {src}");
+
+            var tmp = top.Sub("Tmp").EnshureFolder();
             Console.WriteLine($"tmp: {tmp}");
 
             var loaded = new Loaded();
