@@ -1,5 +1,6 @@
 ﻿using Fux;
 using Fux.Building;
+using Fux.Errors;
 using Fux.Files;
 using Fux.Input;
 
@@ -34,13 +35,26 @@ namespace App
             {
                 foreach (var module in package.Modules)
                 {
-                    var name = tmp / "All" / package.File.Path / module.File.Path;
+                    Path? name = tmp / "All" / package.File.Path / module.File.Path;
 
                     Console.WriteLine($"{package.File.Name} / {module.File.Name}");
 
-                    using (var writer = new Writer(name))
+                    using (var writer = new Writer(name.EnshureDirectory()))
                     {
-                        Lexx(writer, module.Source);
+                        try
+                        {
+                            Lexx(writer, module.Source);
+                        }
+                        catch (DiagnosticException diagnostics)
+                        {
+                            foreach (var diagnostic in diagnostics.Diagnostics)
+                            {
+                                foreach (var line in diagnostic.Report())
+                                {
+                                    Console.WriteLine(line);
+                                }
+                            }
+                        }
                     }
                 }
             }

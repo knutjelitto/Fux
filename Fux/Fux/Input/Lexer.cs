@@ -153,8 +153,10 @@ namespace Fux.Input
                     break;
             }
 
-            throw Error.Unexpected(Current);
+            throw Error.UnexpectedCharacter(Location, Current);
         }
+
+        private Location Location => new(Source, Offset, 1);
 
         private Token LeftParentOrSymbol()
         {
@@ -323,7 +325,7 @@ namespace Fux.Input
                             {
                                 throw new NotImplementedException("unexpected end in string literal");
                             }
-                            throw Error.Unexpected(Current, "string literal");
+                            throw Error.UnexpectedCharacter(Location, Current, "string literal");
                         }
                         break;
                 }
@@ -456,7 +458,7 @@ namespace Fux.Input
                 return current;
             }
 
-            throw Error.Unexpected(Current);
+            throw Error.UnexpectedCharacter(Location, Current);
         }
 
         private int Match(int rune)

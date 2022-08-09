@@ -1,19 +1,4 @@
-module Integer
-    ( int
-    , negate
-    , add
-    , sub
-    , mul
-    , div
-    , mod
-    , rem
-    , eq
-    , ne
-    , lt
-    , le
-    , gt
-    , ge
-    )
+package Core module Integer
 
 {-| Core of the int type.
 
@@ -30,19 +15,19 @@ module Integer
 
 struct int
 
-negate = fn(x: int) : int
+fn Negate(int x) : int
 
-add = fn(x: int, y: int) : int
-sub = fn(x: int, y: int) : int
-mul = fn(x: int, y: int) : int
-div = fn(x: int, y: int) : int
-mod = fn(x: int, y: int) : int
-rem = fn(x: int, y: int) : int
+fn Add(int x, int y) : int
+fn Sub(int x, int y) : int
+fn Mul(int x, int y) : int
+fn Div(int x, int y) : int
+fn Mod(int x, int y) : int
+fn Rem(int x, int y) : int
 
-eq = fn(x: int, y: int) : Bool
-ne = fn(x: int, y: int) : Bool
+fn Equals(int x, int y) : bool
+fn NotEquals(int x, int y) : bool
 
-lt = fn(x: int, y: int) : Bool
-le = fn(x: int, y: int) : Bool
-gt = fn(x: int, y: int) : Bool
-ge = fn(x: int, y: int) : Bool
+fn LessThan(x: int, y: int) : bool
+fn LessEqual(x: int, y: int) : Bool
+fn GreateThan(x: int, y: int) : Bool
+fn GreateEqual(x: int, y: int) : Bool
