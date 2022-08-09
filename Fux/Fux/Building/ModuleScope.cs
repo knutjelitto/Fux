@@ -216,23 +216,7 @@ namespace Fux.Building
 
                 foreach (var importModule in FindModules(importName))
                 {
-                    if (importModule.IsBuiltin)
-                    {
-                        if (!importModule.Scope.LookupNative(memberName, out var native))
-                        {
-                            Assert(importName.Text.StartsWith("Fux.Core."));
-                            native = new A.Decl.Native(Module, importName, memberName);
-                            native.Span = identifier.Span;
-                            native.InModule = importModule;
-                            Assert(native.Location.Source != null);
-                            Collector.Instance.Add(native);
-                            importModule.Scope.AddNative(native);
-                        }
-
-                        decl = native;
-                        return true;
-                    }
-                    else if (importModule.Scope.Resolve(memberName, out var resolved))
+                    if (importModule.Scope.Resolve(memberName, out var resolved))
                     {
                         decl = resolved;
                         return true;

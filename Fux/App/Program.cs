@@ -1,4 +1,5 @@
 ﻿using Fux;
+using Fux.Building;
 using Fux.Files;
 using Fux.Input;
 
@@ -17,18 +18,37 @@ namespace App
             Console.WriteLine($"src: {src}");
             Console.WriteLine($"tmp: {tmp}");
 
-            var packages = new List<PackageFile>();
-            foreach (var packageFile in src.EnumerateFiles(PackageFile.File))
-            {
-                var package = new PackageFile(src, packageFile.Directory);
+            var loaded = new Loaded();
 
-                package.Dump(Writer.Console());
+            foreach (var filePath in src.EnumerateFiles(PackageFile.File))
+            {
+                var file = new PackageFile(src, filePath.Directory);
+                var package = new Package(file);
+
+                package.File.Dump(Writer.Console());
+
+                loaded.Register(file);
+            }
+
+            foreach (var package in loaded)
+            {
+                foreach (var module in package.Modules)
+                {
+                    var name = tmp / "All" / package.File.Path / module.File.Path;
+
+                    Console.WriteLine($"{package.File.Name} / {module.File.Name}");
+
+                    using (var writer = new Writer(name))
+                    {
+                        Lexx(writer, module.Source);
+                    }
+                }
             }
 
             WaitKey();
         }
 
-        static void Lexx(IO.TextWriter writer, Source source)
+        static void Lexx(Writer writer, Source source)
         {
             Console.WriteLine($"  .. {source.Count} characters");
 

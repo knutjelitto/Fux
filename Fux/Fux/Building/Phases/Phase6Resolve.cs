@@ -17,11 +17,6 @@ namespace Fux.Building.Phases
             {
                 Terminal.Write(".");
 
-                if (module.IsBuiltin)
-                {
-                    continue;
-                }
-
                 Make(module);
             }
         }
@@ -236,35 +231,6 @@ namespace Fux.Building.Phases
                                         for (var i = 0; i < customType.Arguments.Count; i++)
                                         {
                                             customType.Arguments[i] = ResolveType(scope, customType.Arguments[i]);
-                                        }
-
-                                        if (resolved.InModule.IsCore)
-                                        {
-                                            if (customType.Arguments.Count == 0)
-                                            {
-                                                switch (customType.Name.Text)
-                                                {
-                                                    case Lex.Primitive.Int:
-                                                        return new A.Type.Integer(customType.Name).With(resolved);
-                                                    case Lex.Primitive.Float:
-                                                        return new A.Type.Float(customType.Name).With(resolved);
-                                                    case Lex.Primitive.Bool:
-                                                        return new A.Type.Bool(customType.Name).With(resolved);
-                                                    case Lex.Primitive.String:
-                                                        return new A.Type.String(customType.Name).With(resolved);
-                                                    case Lex.Primitive.Char:
-                                                        return new A.Type.Char(customType.Name).With(resolved);
-                                                }
-                                            }
-                                            else if (customType.Arguments.Count == 1)
-                                            {
-                                                switch (customType.Name.Text)
-                                                {
-                                                    case Lex.Primitive.List:
-                                                        return new A.Type.List(customType.Name, customType.Arguments[0])
-                                                            .With(resolved);
-                                                }
-                                            }
                                         }
 
                                         //customType.Resolver = () => custom.Type;

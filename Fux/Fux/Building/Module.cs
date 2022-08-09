@@ -6,10 +6,12 @@ namespace Fux.Building
 {
     public class Module
     {
+        private Source? source = null;
         public Module(Package package, ModuleFile file)
         {
             Package = package;
             File = file;
+            Name = File.Name;
 
             Scope = new ModuleScope(this);
         }
@@ -17,11 +19,8 @@ namespace Fux.Building
         public Package Package { get; }
         public ModuleFile File { get; }
         public string Name { get; } = string.Empty;
-        public bool IsBuiltin { get; } = false;
-        public bool IsFux => !IsBuiltin;
-        public bool IsCore => false;
 
-        public Source? Source { get; set; } = null;
+        public Source Source => source ??= GetSource();
         public List<Tokens> Lines { get; } = new();
         public A.ModuleAst? Ast { get; set; } = null;
         public ModuleScope Scope { get; }

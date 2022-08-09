@@ -13,6 +13,7 @@
             File = file;
         }
 
+        public PackageFile File { get; }
         public string Name => File.Name;
         public string FullFileName => File.FullPackageFileName;
         public string FileName => File.Path;
@@ -22,7 +23,6 @@
         public IReadOnlyList<Module> Intern => intern;
         public IEnumerable<Module> Modules => exposed.Concat(intern);
 
-        public PackageFile File { get; }
 
         public Path FullPath(Module module)
         {

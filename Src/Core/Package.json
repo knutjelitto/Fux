@@ -5,7 +5,8 @@
         "Primitives": [
             "Prelude",
             "Boolean",
-            "Integer"
+            "Integer",
+            "Float"
         ],
         "Collections": [
             "List"

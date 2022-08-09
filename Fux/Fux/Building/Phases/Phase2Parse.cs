@@ -29,12 +29,9 @@ namespace Fux.Building.Phases
 
         private void Make(Module module)
         {
-            if (module.IsFux)
-            {
-                Collector.ParseTime.Start();
-                Parse(module);
-                Collector.ParseTime.Stop();
-            }
+            Collector.ParseTime.Start();
+            Parse(module);
+            Collector.ParseTime.Stop();
         }
 
         private void Parse(Module module)

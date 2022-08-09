@@ -15,11 +15,6 @@ namespace Fux.Building.Phases
             {
                 Terminal.Write(".");
 
-                if (module.IsBuiltin)
-                {
-                    continue;
-                }
-
                 Make(module);
             }
         }

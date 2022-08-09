@@ -32,11 +32,6 @@ namespace Fux.Building.Phases
 
         private void Imports(Module module)
         {
-            if (module.IsBuiltin)
-            {
-                return;
-            }
-
             Assert(module.Ast != null);
             var ast = module.Ast ?? throw new InvalidOperationException();
 
