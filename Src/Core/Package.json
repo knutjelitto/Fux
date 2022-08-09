@@ -9,12 +9,13 @@
             "Float"
         ],
         "Collections": [
-            "List"
+            "List",
+            "Array"
         ]
     },
     "waiting-modules": {
         "Collections": [
-            "List"
+            "snoopdog"
         ]
     },
     "dependencies": {}

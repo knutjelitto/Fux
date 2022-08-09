@@ -1,4 +1,4 @@
-package Core module List api
+package Core module List
 
 {-| Core of the List type.
 
