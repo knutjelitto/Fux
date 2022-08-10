@@ -1,17 +1,17 @@
-package Core module Integer
-
 {-| Core of the int type.
 
 # Arithmethics
-@docs negate, add, sub, mul, div, mod, rem
+@docs Negate, Add, Sub, Mul, Div, Mod, Rem
 
 # Equality
-@docs eq, ne
+@docs Equal, NoEqual
 
 # Comparison
-@docs lt, le, gt, ge
+@docs LessThan, LessEqual, GreaterThan, GreaterEqual
 
 -}
+
+package Core module Integer
 
 struct int
 

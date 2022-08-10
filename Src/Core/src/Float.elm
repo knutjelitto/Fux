@@ -1,44 +1,31 @@
-module Float
-    ( float
-    , negate
-    , add
-    , sub
-    , mul
-    , div
-    , eq
-    , ne
-    , lt
-    , le
-    , gt
-    , ge
-    )
-
 {-| Core of the float type.
 
 # Arithmethics
-@docs negate, add, sub, mul, div
+@docs Negate, Add, Sub, Mul, Div
 
 # Equality
-@docs eq, ne
+@docs Equal, NotEqual
 
 # Comparison
-@docs lt, le, gt, ge
+@docs LessThan, LessEqual, GreaterThan, GreaterEqual
 
 -}
 
+package Core module Float
+
 struct float
 
-negate = fn(x: float) : float
+fn Negate(x: float) : float
 
-add = fn(x: float, y: float) : float
-sub = fn(x: float, y: float) : float
-mul = fn(x: float, y: float) : float
-div = fn(x: float, y: float) : float
+fn Add(x: float, y: float) : float
+fn Sub(x: float, y: float) : float
+fn Mul(x: float, y: float) : float
+fn Div(x: float, y: float) : float
 
-eq = fn(x: float, y: float) : Bool
-ne = fn(x: float, y: float) : Bool
+fn Equal(x: float, y: float) : bool
+fn NotEqual(x: float, y: float) : bool
 
-lt = fn(x: float, y: float) : Bool
-le = fn(x: float, y: float) : Bool
-gt = fn(x: float, y: float) : Bool
-ge = fn(x: float, y: float) : Bool
+fn LessThan(x: float, y: float) : bool
+fn LessEqual(x: float, y: float) : bool
+fn Greater(x: float, y: float) : bool
+fn GreaterEqual(x: float, y: float) : bool

@@ -26,7 +26,7 @@
             return this;
         }
 
-        public Path Enshure(Path relative)
+        public Path EnshureFolder(Path relative)
         {
             var absolute = this / relative;
             IO.Directory.CreateDirectory(IO.Path.GetDirectoryName(absolute)!);

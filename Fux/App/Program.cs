@@ -31,6 +31,7 @@ namespace App
                 loaded.Register(file);
             }
 
+            var exit = false;
             foreach (var package in loaded)
             {
                 foreach (var module in package.Modules)
@@ -54,8 +55,20 @@ namespace App
                                     Console.WriteLine(line);
                                 }
                             }
+
+                            exit = true;
                         }
                     }
+
+                    if (exit)
+                    {
+                        break;
+                    }
+                }
+
+                if (exit)
+                {
+                    break;
                 }
             }
 
@@ -99,7 +112,7 @@ namespace App
                 }
             }
 
-            Console.WriteLine($"  .. {elements.Count} elements");
+            Console.WriteLine($"  .. {elements.Count - 1} elements");
 
             foreach (var element in elements)
             {

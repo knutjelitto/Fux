@@ -2,6 +2,10 @@
     "name": "Core",
     "summary": "Core library",
     "exposed-modules": {
+        "Basics": [
+            "Eq",
+            "Ord"
+        ],
         "Primitives": [
             "Prelude",
             "Boolean",
@@ -14,8 +18,8 @@
         ]
     },
     "waiting-modules": {
-        "Collections": [
-            "snoopdog"
+        "SnoopDog": [
+            "SnoopDog"
         ]
     },
     "dependencies": {}

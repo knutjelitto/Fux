@@ -1,63 +1,67 @@
-module Boolean
-    (   bool(..)
-    ,   negate
-    ,   and
-    ,   or
-    ,   xor
-    ,   eq
-    ,   ne
-    )
-
 {-| Basic bool type.
 
+# Type
+@docs bool
+
 # Operations
-@docs bool, negate, and, or, xor
+@docs Flip, And, Or, Xor
 
 # Equality
-@docs eq, ne
+@docs Equal, NotEqual
+
+# Ordering
+@docs 
 
 -}
 
-{-| A “Boolean” value. It can either be `True` or `False`.
+package Core module Boolean
+
+{-| A bool” value. It can either be `true` or `false`.
 -}
 enum bool
     false
     true
 
 
-{-| Negate a boolean value.
+{-| Flip a boolean value.
 
-    not True == False
-    not False == True
+    Mapped to prefix operator `^`
+
+    Flip(True) == False
+    Flip(False) == True
 -}
-negate = fn (x: bool) -> bool
-    case x in
+fn Flip(x: bool): bool
+    case x of
         False => True
         True => False
 
 
 {-| The logical AND operator. `True` if both inputs are `True`.
 
+    Mapped to infix operator `&`
+
     True  && True  == True
     True  && False == False
     False && True  == False
     False && False == False
 -}
-and = fn(x: bool, y: bool) -> bool
-    case x in
+fn And(x: bool, y: bool): bool
+    case x of
         False => False
         _ => y
 
 
-{-| The logical OR operator. `True` if one or both inputs are `True`.
+{-| The logical OR operator. `true` if one or both inputs are `true`.
 
+    Mapped to infix operator '|'
+    
     True  || True  == True
     True  || False == True
     False || True  == True
     False || False == False
 
 -}
-or = fn(x: bool, y: bool) -> bool
+fn Or(x: bool, y: bool) -> bool
     case x in
         False => y
         _ => True
