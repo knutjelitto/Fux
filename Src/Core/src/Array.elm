@@ -1,4 +1,4 @@
-package Core module Array
+namespace Core.Array
 
 {-| Core of the Array type.
 

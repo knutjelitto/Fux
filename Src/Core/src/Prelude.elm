@@ -1,4 +1,4 @@
-package Core
+namespace Core
 
 
 {-| Tons of useful functions that get imported by default.
@@ -31,6 +31,7 @@ things.
 import Core.Eq
 import Core.Ord
 
+import Core.Int
 import Core.Integer
 import Core.Float
 import Core.Boolean

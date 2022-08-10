@@ -27,13 +27,17 @@
 
 LLVM_ROOT   = C:/dev/knut/scoop/apps/llvm/current/bin
 CLANG      	= clang
+AR			= llvm-ar
 WASMLD		= wasm-ld
 WASMOPT     = wasm-opt
 WASM2WAT	= wasm-dis
 WASM2C		= wasm2c
 
 EXPORTS = square sum
-SOURCES = $(wildcard *.c) $(wildcard src/kernel/math/*.c) src/Object.cpp src/kernel/core/core.c
+MATH_SOURCES = $(wildcard src/kernel/math/*.c)
+OTHER_SOURCES = $(wildcard *.c) src/tester.c src/kernel/core/core.c
+ALL_SOURCES = $(MATH_SOURCES) $(OTHER_SOURCES)
+SOURCES = $(ALL_SOURCES)
 BUILD   = DEBUG
 
 #------------------------------------------------------------------------------------------------------
@@ -86,7 +90,7 @@ CC  := "$(CLANG)"
 CXX := "$(CLANG)" -x c++
 LD  := "$(WASMLD)"
 
-all: $(OUTDIR)/output.wasm $(OUTDIR)/output.wat $(OUTDIR)/output.c
+all: $(OUTDIR)/output.wasm $(OUTDIR)/output.wat $(OUTDIR)/output.c 
 .PHONY: clean cleanall run analyze
 
 clean:
@@ -94,19 +98,24 @@ clean:
 	@$(if $(wildcard $(OUTDIR)),$(if $(ISWIN),rmdir /S /Q,rm -rf) "$(OUTDIR)" $(PIPETONULL))
 
 # Generate a list of .o files to build, include dependency rules for source files, then compile files
-OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(SOURCES))))
+OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(ALL_SOURCES))))
+MATH_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(MATH_SOURCES))))
+OTHER_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(OTHER_SOURCES))))
+
 
 -include $(OBJS:%.o=%.d)
 
 MAKEOBJ = $(OUTDIR)/$(basename $(1)).o: $(1) ; $$(call COMPILE,$$@,$$<,$(2),$(3) $$(FLAGS))
 
-$(foreach F,$(filter %.cpp,$(SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CXX),$$(CXXFLAGS))))
+$(foreach F,$(filter %.cpp,$(OTHER_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CXX),$$(CXXFLAGS))))
+$(foreach F,$(filter %.cpp,$(MATH_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CXX),$$(CXXFLAGS))))
 
-$(foreach F,$(filter %.c  ,$(SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CC),$$(CCFLAGS))))
+$(foreach F,$(filter %.c  ,$(OTHER_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CC),$$(CCFLAGS))))
+$(foreach F,$(filter %.c  ,$(MATH_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CC),$$(CCFLAGS))))
 
-$(OUTDIR)/output.wasm : Makefile $(OBJS)
-	$(info Linking $@ ... $(OBJS))
-	@$(LD) $(LDFLAGS) -o $@ $(OBJS)
+$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) $(OUTDIR)/libmath.a
+	$(info Linking $@ ... $(OTHER_OBJS) $(OUTDIR)/libmath.a)
+	@$(LD) $(LDFLAGS) -L$(OUTDIR) -lmath -o $@ $(OTHER_OBJS)
 	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
 
 $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm Makefile $(OBJS) 
@@ -116,6 +125,10 @@ $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm Makefile $(OBJS)
 $(OUTDIR)/output.c: $(OUTDIR)/output.wasm Makefile $(OBJS) 
 	$(info Wasm->C+H $@ ...)
 	@"$(WASM2C)" $(OUTDIR)/output.wasm -o $@
+
+$(OUTDIR)/libmath.a: Makefile $(MATH_OBJS)
+	$(info Archive $@ ... $(MATH_OBJS))
+	$(AR) r $@ $(MATH_OBJS)
 
 define COMPILE
 	$(info $2)

@@ -1,33 +1,39 @@
-{-| Core of the int type.
+{-| Core of the Integer (big integer) type.
 
 # Arithmethics
 @docs Negate, Add, Sub, Mul, Div, Mod, Rem
 
 # Equality
-@docs Equal, NoEqual
+@docs Equal, NotEqual
 
 # Comparison
 @docs LessThan, LessEqual, GreaterThan, GreaterEqual
 
+# Conversion
+@doce ImplicitFrom
+
 -}
 
-package Core module Integer
+namespace Core.Integer
 
-struct int
+struct Integer
 
-fn Negate(int x) : int
+fn Negate(Integer x) : int
 
-fn Add(int x, int y) : int
-fn Sub(int x, int y) : int
-fn Mul(int x, int y) : int
-fn Div(int x, int y) : int
-fn Mod(int x, int y) : int
-fn Rem(int x, int y) : int
+fn Add(Integer x, Integer y) : Integer
+fn Sub(Integer x, Integer y) : Integer
+fn Mul(Integer x, Integer y) : Integer
+fn Div(Integer x, Integer y) : Integer
+fn Mod(Integer x, Integer y) : Integer
+fn Rem(Integer x, Integer y) : Integer
 
-fn Equals(int x, int y) : bool
-fn NotEquals(int x, int y) : bool
+fn Equals(Integer x, Integer y) : bool
+fn NotEquals(Integer x, Integer y) : bool
 
-fn LessThan(x: int, y: int) : bool
-fn LessEqual(x: int, y: int) : Bool
-fn GreateThan(x: int, y: int) : Bool
-fn GreateEqual(x: int, y: int) : Bool
+fn LessThan(x: Integer, y: Integer) : bool
+fn LessEqual(x: Integer, y: Integer) : Bool
+fn GreateThan(x: Integer, y: Integer) : Bool
+fn GreateEqual(x: Integer, y: Integer) : Bool
+
+fn ImplicitFrom(x : int): Integer
+fn ImplicitFrom(x : string): Integer
