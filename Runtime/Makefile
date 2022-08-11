@@ -33,7 +33,7 @@ WASMOPT     = wasm-opt
 WASM2WAT	= wasm-dis
 WASM2C		= wasm2c
 
-EXPORTS = square sum
+EXPORTS = 
 MATH_SOURCES = $(wildcard src/kernel/math/*.c)
 OTHER_SOURCES = $(wildcard *.c) src/tester.c src/kernel/core/core.c
 ALL_SOURCES = $(MATH_SOURCES) $(OTHER_SOURCES)
@@ -70,6 +70,7 @@ LDFLAGS += -allow-undefined
 #LDFLAGS += -import-memory
 LDFLAGS += -initial-memory=1048576
 LDFLAGS += -max-memory=1048576
+LDFLAGS += -no-gc-sections
 LDFLAGS += -export-all
 LDFLAGS += $(addprefix -export=,$(patsubst _%,%,$(strip $(EXPORTS))))
 
@@ -98,40 +99,40 @@ clean:
 	@$(if $(wildcard $(OUTDIR)),$(if $(ISWIN),rmdir /S /Q,rm -rf) "$(OUTDIR)" $(PIPETONULL))
 
 # Generate a list of .o files to build, include dependency rules for source files, then compile files
-OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(ALL_SOURCES))))
 MATH_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(MATH_SOURCES))))
 OTHER_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(OTHER_SOURCES))))
-
+OBJS := $(MATH_OBJS) $(OTHER_OBJS)
 
 -include $(OBJS:%.o=%.d)
 
-MAKEOBJ = $(OUTDIR)/$(basename $(1)).o: $(1) ; $$(call COMPILE,$$@,$$<,$(2),$(3) $$(FLAGS))
-
-$(foreach F,$(filter %.cpp,$(OTHER_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CXX),$$(CXXFLAGS))))
-$(foreach F,$(filter %.cpp,$(MATH_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CXX),$$(CXXFLAGS))))
-
-$(foreach F,$(filter %.c  ,$(OTHER_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CC),$$(CCFLAGS))))
-$(foreach F,$(filter %.c  ,$(MATH_SOURCES)),$(eval $(call MAKEOBJ,$(F),$$(CC),$$(CCFLAGS))))
-
-$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) $(OUTDIR)/libmath.a
-	$(info Linking $@ ... $(OTHER_OBJS) $(OUTDIR)/libmath.a)
-	@$(LD) $(LDFLAGS) -L$(OUTDIR) -lmath -o $@ $(OTHER_OBJS)
-	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
-
-$(OUTDIR)/output.wat: $(OUTDIR)/output.wasm Makefile $(OBJS) 
-	$(info Wasm->Wat $@ ...)
-	@"$(WASM2WAT)" $(OUTDIR)/output.wasm -o $@
-
-$(OUTDIR)/output.c: $(OUTDIR)/output.wasm Makefile $(OBJS) 
-	$(info Wasm->C+H $@ ...)
-	@"$(WASM2C)" $(OUTDIR)/output.wasm -o $@
-
-$(OUTDIR)/libmath.a: Makefile $(MATH_OBJS)
-	$(info Archive $@ ... $(MATH_OBJS))
-	$(AR) r $@ $(MATH_OBJS)
+define MAKE_OBJ
+$(OUTDIR)/$(basename $(1)).o: $(1) Makefile
+	$$(call COMPILE, $$@, $$<, $(2), $(3) $$(FLAGS))
+endef
 
 define COMPILE
-	$(info $2)
+	$(info Compile $(strip $2))
 	@$(if $(wildcard $(dir $1)),,$(shell mkdir "$(dir $1)"))
 	@$3 $4 $(CLANGFLAGS) -MMD -MP -MF $(patsubst %.o,%.d,$1) -o $1 -c $2
 endef
+
+$(foreach F,$(filter %.cpp,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CXX),$$(CXXFLAGS))))
+$(foreach F,$(filter %.c  ,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CC),$$(CCFLAGS))))
+
+
+$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) $(OUTDIR)/libmath.a
+	$(info Link $@ ...)
+	@$(LD) $(LDFLAGS) -L$(OUTDIR) -lmath -o $@ $(OTHER_OBJS)
+	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
+
+$(OUTDIR)/output.wat: $(OUTDIR)/output.wasm
+	$(info Wasm->Wat $@ ...)
+	@"$(WASM2WAT)" $(OUTDIR)/output.wasm -o $@
+
+$(OUTDIR)/output.c: $(OUTDIR)/output.wasm
+	$(info Wasm->C+H $@ ...)
+	@"$(WASM2C)" $(OUTDIR)/output.wasm -o $@
+
+$(OUTDIR)/libmath.a: $(MATH_OBJS)
+	$(info Archive $@ ...)
+	@$(AR) r $@ $(MATH_OBJS)

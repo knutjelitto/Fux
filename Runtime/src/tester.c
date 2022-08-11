@@ -2,7 +2,7 @@
 
 #include "libm.h"
 
-double adder(int x, int y)
+double tester(int x, int y)
 {
     double a = x;
     double b = y;

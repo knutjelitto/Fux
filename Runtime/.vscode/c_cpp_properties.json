@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "Wasm",
             "includePath": [
                 "${workspaceFolder}/**"
             ],
@@ -11,11 +11,10 @@
                 "_UNICODE",
                 "DEBUG"
             ],
-            "windowsSdkVersion": "10.0.22000.0",
-            "compilerPath": "clang.exe",
+            "compilerPath": "C:/Users/knutj/scoop/apps/llvm/current/bin/clang.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "${default}",
+            "intelliSenseMode": "clang-x64",
             "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
