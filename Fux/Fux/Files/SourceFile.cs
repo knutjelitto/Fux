@@ -1,8 +1,8 @@
 ﻿namespace Fux.Files
 {
-    public sealed class ModuleFile
+    public sealed class SourceFile
     {
-        public ModuleFile(PackageFile packageFile, string name)
+        public SourceFile(PackageFile packageFile, string name)
         {
             PackageFile = packageFile;
             Name = name;
@@ -12,7 +12,7 @@
         public PackageFile PackageFile { get; }
         public string Name { get; }
         public Path Path { get; }
-        public Path FullPath => PackageFile.FullModuleFileName(this);
+        public Path FullPath => PackageFile.FullSourceFileName(this);
 
         public bool Exists => FullPath.FileExists;
 

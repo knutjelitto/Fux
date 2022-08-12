@@ -82,55 +82,9 @@ static const double lnhuge = 0x1.6602b15b7ecf2p9;
 static const double lntiny = -0x1.77af8ebeae354p9;
 static const double invln2 = 0x1.71547652b82fep0;
 
-#if 0
-OLM_DLLEXPORT double exp(x)
-double x;
-{
-	double  z,hi,lo,c;
-	int k;
-
-#if !defined(vax)&&!defined(tahoe)
-	if(x!=x) return(x);	/* x is NaN */
-#endif	/* !defined(vax)&&!defined(tahoe) */
-	if( x <= lnhuge ) {
-		if( x >= lntiny ) {
-
-		    /* argument reduction : x --> x - k*ln2 */
-
-			k=invln2*x+copysign(0.5,x);	/* k=NINT(x/ln2) */
-
-		    /* express x-k*ln2 as hi-lo and let x=hi-lo rounded */
-
-			hi=x-k*ln2hi;
-			x=hi-(lo=k*ln2lo);
-
-		    /* return 2^k*[1+x+x*c/(2+c)]  */
-			z=x*x;
-			c= x - z*(p1+z*(p2+z*(p3+z*(p4+z*p5))));
-			return  scalb(1.0+(hi-(lo-(x*c)/(2.0-c))),k);
-
-		}
-		/* end of x > lntiny */
-
-		else
-		     /* exp(-big#) underflows to zero */
-		     if(finite(x))  return(scalb(1.0,-5000));
-
-		     /* exp(-INF) is zero */
-		     else return(0.0);
-	}
-	/* end of x < lnhuge */
-
-	else
-	/* exp(INF) is INF, exp(+big#) overflows to INF */
-	    return( finite(x) ?  scalb(1.0,5000)  : x);
-}
-#endif
-
 /* returns exp(r = x + c) for |c| < |x| with no overlap.  */
 
-double __exp__D(x, c)
-double x, c;
+double __exp__D(double x, double c)
 {
 	double  z,hi,lo;
 	int k;

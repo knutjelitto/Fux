@@ -9,11 +9,8 @@ namespace Fux.Building
 {
     public sealed class Builder
     {
-        private readonly Loaded loaded;
-
         public Builder()
         {
-            loaded = new Loaded();
             Ambience = new Ambience(new ErrorBag())
             {
                 Config = new Config
@@ -26,15 +23,8 @@ namespace Fux.Building
         public ErrorBag Errors => Ambience.Errors;
         public Ambience Ambience { get; }
 
-        public IEnumerable<Package> Packages => loaded;
-        public IEnumerable<Module> Modules => loaded.SelectMany(p => p.Modules);
 
-        public void Load(PackageFile pack)
-        {
-            var _ = loaded.Register(pack);
-        }
-
-        public void Build()
+        public void Build(List<Package> packages)
         {
             const int rwidth = 5;
             const int lwidth = -rwidth;
@@ -42,17 +32,17 @@ namespace Fux.Building
             Terminal.ClearHome();
 
             var prefix = $"{"pars",lwidth}";
-            Build(prefix, package => new Phase2Parse(Ambience, package));
+            Build(prefix, packages, package => new Phase2Parse(Ambience, package));
             prefix = $"{prefix}{"decl",lwidth}";
-            Build(prefix, package => new Phase3Declare(Ambience, package));
+            Build(prefix, packages, package => new Phase3Declare(Ambience, package));
             prefix = $"{prefix}{"expo",lwidth}";
-            Build(prefix, package => new Phase4Expose(Ambience, package));
+            Build(prefix, packages, package => new Phase4Expose(Ambience, package));
             prefix = $"{prefix}{"impo",lwidth}";
-            Build(prefix, package => new Phase5Import(Ambience, package));
+            Build(prefix, packages, package => new Phase5Import(Ambience, package));
             prefix = $"{prefix}{"reso",lwidth}";
-            Build(prefix, package => new Phase6Resolve(Ambience, package));
+            Build(prefix, packages, package => new Phase6Resolve(Ambience, package));
             prefix = $"{prefix}{"type",lwidth}";
-            Build(prefix, package => new Phase7Typing(Ambience, package));
+            Build(prefix, packages, package => new Phase7Typing(Ambience, package));
 
             Terminal.Write($"{"",53}");
             Terminal.Write($"{$"{Collector.Instance.ScanTime.ElapsedMilliseconds} ",rwidth}");
@@ -67,7 +57,7 @@ namespace Fux.Building
             Collector.Instance.Write();
         }
 
-        private void Build(string prefix, Func<Package, Phase> phase)
+        private static void Build(string prefix, List<Package> loaded, Func<Package, Phase> phase)
         {
             Terminal.GoHome();
             var count = 0;

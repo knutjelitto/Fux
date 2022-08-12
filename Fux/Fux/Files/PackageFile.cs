@@ -1,54 +1,73 @@
 ﻿using System.Threading;
 
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+
 namespace Fux.Files
 {
     public sealed class PackageFile
     {
-        public const string File = "package.json";
+        public const string PackageFileName = "Package.json";
 
-        private FuxPackageJson? json = null;
-        private List<ModuleFile>? exposed = null;
-
-        public PackageFile(Root repo, Path path)
+        public PackageFile(PackageRepo repo, Path path)
         {
             Repo = repo;
             Path = path;
 
-            Name = Path.Text.Replace("/", ".");
+            Json = Bind();
         }
 
-        public string Name { get; }
-        public FuxPackageJson Json => json ??= GetJson();
-
-        public Root Repo { get; }
+        public PackageRepo Repo { get; }
         public Path Path { get; }
-        public Path FullPackageFileName => Repo / Path / File;
-        public Path FullModuleFileName(ModuleFile module) => Repo / Path / "src" / module.Path;
+        public string Name => Json.Name;
+        public PackageConfig Json { get; }
 
-        public IEnumerable<ModuleFile> Exposed => exposed ??= Json.ExposedModules;
+        public Path FullPath => Repo.Root / Path;
+        public Path FullPackageFileName => FullPath / PackageFileName;
+
+        public Path FullSourceFileName(SourceFile sourceFile) => FullPath / sourceFile.Path;
+
+        public void Glob()
+        {
+            var matcher = new Matcher();
+            foreach (var pattern in Json.Sources)
+            {
+                matcher.AddInclude(pattern);
+            }
+
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(FullPath)));
+
+            foreach (var sourceMatch in matches.Files.Select(sm => new SourceFile(this, sm.Path)))
+            {
+                Console.WriteLine($"file: {sourceMatch}");
+            }
+        }
+
+        private PackageConfig Bind()
+        {
+            var cfg = new ConfigurationBuilder()
+                .AddJsonFile(FullPackageFileName)
+                .Build();
+
+            return cfg.Get<PackageConfig>();
+        }
 
         public override string ToString()
         {
             return Name;
         }
 
-        public void Dump(Writer writer)
+        public void Dump(Writer writer, IEnumerable<SourceFile> files)
         {
             writer.WriteLine($"package {Name} ({FullPackageFileName})");
             writer.Indent(() =>
             {
-                foreach (var module in Exposed)
+                foreach (var module in files)
                 {
                     module.Dump(writer);
                 }
             });
-        }
-
-        private FuxPackageJson GetJson()
-        {
-            var jsonFile = Repo / Path / File;
-
-            return FuxJson.From(this, IO.File.ReadAllBytes(jsonFile));
         }
     }
 }

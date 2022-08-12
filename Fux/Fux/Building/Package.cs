@@ -16,7 +16,6 @@
         public PackageFile File { get; }
         public string Name => File.Name;
         public string FullFileName => File.FullPackageFileName;
-        public string FileName => File.Path;
 
         public IReadOnlyList<Package> Dependencies => dependencies;
         public IReadOnlyList<Module> Exposed => exposed;
@@ -26,7 +25,7 @@
 
         public Path FullPath(Module module)
         {
-            return File.Repo / module.File.Path;
+            return File.FullPath / module.File.Path;
         }
 
         public void AddDependency(Package dependency)
@@ -108,6 +107,6 @@
             return null;
         }
 
-        public override string ToString() => FileName;
+        public override string ToString() => File.Name;
     }
 }

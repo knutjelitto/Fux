@@ -122,7 +122,7 @@ $(foreach F,$(filter %.c  ,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CC),$$
 
 $(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) $(OUTDIR)/libmath.a
 	$(info Link $@ ...)
-	@$(LD) $(LDFLAGS) -L$(OUTDIR) -lmath -o $@ $(OTHER_OBJS)
+	@$(LD) $(LDFLAGS) -L../OpenLibm -lopenlibm -o $@ $(OTHER_OBJS)
 	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
 
 $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm

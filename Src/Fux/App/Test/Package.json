@@ -1,0 +1,10 @@
+{
+    "name": "Fux.App.Test",
+    "summary": "Fux testint application",
+    "sources": [
+        "src/**/*.elm"
+    ],
+    "dependencies": [
+        "Fux.Core"
+    ]
+}

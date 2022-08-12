@@ -45,8 +45,7 @@
  */
 #define	TRUNC(d)	(_b_trunc(&(d)))
 
-static __inline void
-_b_trunc(volatile double *_dp)
+static __inline void _b_trunc(volatile double *_dp)
 {
         //VBS
         //u_int32_t _lw;
@@ -56,7 +55,8 @@ _b_trunc(volatile double *_dp)
 	SET_LOW_WORD(*_dp, _lw & 0xf8000000);
 }
 
-struct Double {
+struct Double
+{
 	double	a;
 	double	b;
 };

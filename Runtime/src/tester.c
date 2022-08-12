@@ -2,10 +2,16 @@
 
 #include "libm.h"
 
-double tester(int x, int y)
-{
-    double a = x;
-    double b = y;
+#undef cos
 
-    return sqrt(a * b);
+double cos(double x);
+
+
+void mathlinker(int x, int y)
+{
+    cos(1.0);
+    sin(1.0);
+    tan(1.0);
+
+    sqrt(1.0);
 }

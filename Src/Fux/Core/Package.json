@@ -1,0 +1,8 @@
+{
+    "name": "Fux.Core",
+    "summary": "Fux Core library",
+    "sources": [
+        "src/**/*.elm"
+    ],
+    "dependencies": {}
+}

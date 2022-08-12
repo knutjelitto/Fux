@@ -13,6 +13,8 @@
 
         public Path Path { get; }
 
+        public static implicit operator string(Root root) => root.Path;
+
         public Root Sub(params string[] paths)
         {
             var sub = Path.Combine(paths);

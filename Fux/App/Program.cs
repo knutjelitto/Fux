@@ -1,14 +1,54 @@
 ﻿using Fux;
-using Fux.Building;
-using Fux.Errors;
 using Fux.Files;
 using Fux.Input;
+
+using Microsoft.Extensions.FileSystemGlobbing;
+using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
 namespace App
 {
     internal class Program
     {
         static void Main(string[] args)
+        {
+            BringUp();
+
+            return;
+
+            var top = new Root();
+            Console.WriteLine($"top: {top}");
+
+            var src = top.Sub("Src").EnshureFolder();
+            Console.WriteLine($"src: {src}");
+
+            var tmp = top.Sub("Tmp").EnshureFolder();
+            Console.WriteLine($"tmp: {tmp}");
+
+            var coreFolder = src.Sub("Core").EnshureFolder();
+            Console.WriteLine($"Core: {coreFolder}");
+
+            var repo = new PackageRepo(src);
+            repo.Glob();
+
+            var core = new PackageFile(repo, "Fux/Core");
+
+            var matcher = new Matcher();
+            foreach (var pattern in core.Json.Sources)
+            {
+                matcher.AddInclude(pattern);
+            }
+
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(coreFolder)));
+
+            foreach (var sourceMatch in matches.Files.Select(sm => new SourceFile(core, sm.Path)))
+            {
+                Console.WriteLine($"file: {sourceMatch}");
+            }
+
+            WaitKey();
+        }
+
+        static void BringUp()
         {
             var top = new Root();
             Console.WriteLine($"top: {top}");
@@ -19,58 +59,11 @@ namespace App
             var tmp = top.Sub("Tmp").EnshureFolder();
             Console.WriteLine($"tmp: {tmp}");
 
-            var loaded = new Loaded();
+            var coreFolder = src.Sub("Core").EnshureFolder();
+            Console.WriteLine($"Core: {coreFolder}");
 
-            foreach (var filePath in src.EnumerateFiles(PackageFile.File))
-            {
-                var file = new PackageFile(src, filePath.Directory);
-                var package = new Package(file);
-
-                package.File.Dump(Writer.Console());
-
-                loaded.Register(file);
-            }
-
-            var exit = false;
-            foreach (var package in loaded)
-            {
-                foreach (var module in package.Modules)
-                {
-                    Path? name = tmp / "All" / package.File.Path / module.File.Path;
-
-                    Console.WriteLine($"{package.File.Name} / {module.File.Name}");
-
-                    using (var writer = new Writer(name.EnshureDirectory()))
-                    {
-                        try
-                        {
-                            Lexx(writer, module.Source);
-                        }
-                        catch (DiagnosticException diagnostics)
-                        {
-                            foreach (var diagnostic in diagnostics.Diagnostics)
-                            {
-                                foreach (var line in diagnostic.Report())
-                                {
-                                    Console.WriteLine(line);
-                                }
-                            }
-
-                            exit = true;
-                        }
-                    }
-
-                    if (exit)
-                    {
-                        break;
-                    }
-                }
-
-                if (exit)
-                {
-                    break;
-                }
-            }
+            var repo = new PackageRepo(src);
+            repo.Glob();
 
             WaitKey();
         }

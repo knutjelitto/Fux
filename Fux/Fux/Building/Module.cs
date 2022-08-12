@@ -7,7 +7,7 @@ namespace Fux.Building
     public class Module
     {
         private Source? source = null;
-        public Module(Package package, ModuleFile file)
+        public Module(Package package, SourceFile file)
         {
             Package = package;
             File = file;
@@ -17,7 +17,7 @@ namespace Fux.Building
         }
 
         public Package Package { get; }
-        public ModuleFile File { get; }
+        public SourceFile File { get; }
         public string Name { get; } = string.Empty;
 
         public Source Source => source ??= GetSource();

@@ -1,0 +1,2 @@
+namespace Fux.App.Test
+
