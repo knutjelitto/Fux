@@ -10,13 +10,32 @@ bindir ?= $(prefix)/bin
 libdir ?= $(prefix)/lib
 includedir ?= $(prefix)/include
 
+BUILD   = DEBUG
+
+#------------------------------------------------------------------------------------------------------
+
+ifeq ($(BUILD),RELEASE)
+  OUTDIR    := Release
+  DBGCFLAGS := -DNDEBUG
+  LDFLAGS   := -strip-all -gc-sections
+  WOPTFLAGS := -O3
+else
+  OUTDIR    := Debug
+  DBGCFLAGS := -DDEBUG -D_DEBUG
+  LDFLAGS   :=
+  WOPTFLAGS := -g -O0
+endif
+
 AR = llvm-ar
 CC = clang
 
-CFLAGS_add  = -O3 -fno-builtin -fno-strict-aliasing -ffreestanding -nostdlib -nostdinc --target=wasm32-unknown-unknown
-LDFLAGS_add += $(LDFLAGS_arch)
+CFLAGS_add =
+CFLAGS_add += $(WOPTFLAGS)
+CFLAGS_add += $(DBGCFLAGS)
+CFLAGS_add += -fno-builtin -fno-strict-aliasing -ffreestanding -nostdlib -nostdinc --target=wasm32
+CFLAGS_add += -std=c99 -Wall -I. -I./include -I./wasm32 -I./src -D__BSD_VISIBLE -Wno-implicit-function-declaration
 
-CFLAGS_add += -std=c99 -Wall -I$(OPENLIBM_HOME) -I$(OPENLIBM_HOME)/include -I$(OPENLIBM_HOME)/wasm32 -I$(OPENLIBM_HOME)/src -DASSEMBLER -D__BSD_VISIBLE -Wno-implicit-function-declaration
+LDFLAGS_add += $(LDFLAGS_arch)
 
 # Determines whether `long double` is the same as `double` on this arch.
 # linux x86_64, for instance, `long double` is 80 bits wide, whereas on macOS aarch64,
@@ -28,45 +47,41 @@ LONG_DOUBLE_NOT_DOUBLE := 0
 print-%:
 	@echo '$*=$($*)'
 
-SUBDIRS = src wasm32 bsdsrc
+SUBDIRS = src
 
-define INC_template
-TEST=test
-override CUR_SRCS = $(1)_SRCS
-include $(1)/Make.files
-SRCS += $$(addprefix $(1)/,$$($(1)_SRCS))
-endef
+include src/Make.files
 
--include $(OBJS:%.o=%.c.d)
+SRCS := $(addprefix src/,$(SOURCEFILES))
+OBJS := $(patsubst %.c,%.c.o,$(SRCS))
+DEPS := $(patsubst %.c.o,%.c.d,$(OBJS))
 
-DIR=test
+.PHONY: all check clean test 
 
-$(foreach dir,$(SUBDIRS),$(eval $(call INC_template,$(dir))))
 
-DUPLICATE_NAMES = $(filter $(patsubst %.S,%,$(wasm32_SRCS)),$(patsubst %.c,%,$(src_SRCS)))
-DUPLICATE_SRCS = $(addsuffix .c,$(DUPLICATE_NAMES))
-
-OBJS =  $(patsubst %.f,%.f.o,\
-	$(patsubst %.S,%.S.o,\
-	$(patsubst %.c,%.c.o,$(filter-out $(addprefix src/,$(DUPLICATE_SRCS)),$(SRCS)))))
-
-.PHONY: all check test clean distclean install install-static install-headers
-
+-include $(DEPS)
 
 OLM_LIB := libopenlibm.a
 
 all : $(OLM_LIB)
 
+
+$(OLM_LIB): Makefile $(OBJS)
+	$(info Archive objects)
+	$(AR) -rcs libopenlibm.a $(OBJS)
+
+$(OBJS): Makefile
+
 %.c.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(CFLAGS_add) -MMD -MP -MF $(patsubst %.o,%.d,$@) -c $< -o $@
 
+clean:
+	rm -f src/*.o src/*.d
+	rm -f libopenlibm.a
+	$(MAKE) -C test clean
 
-check test: test/test-double test/test-float
+test: test/test-double test/test-float
 	test/test-double
 	test/test-float
-
-$(OLM_LIB): Makefile $(OBJS)
-	$(AR) -rcs libopenlibm.a $(OBJS)
 
 test/test-double: libopenlibm.$(OLM_MAJOR_MINOR_SHLIB_EXT)
 	$(MAKE) -C test test-double
@@ -74,18 +89,3 @@ test/test-double: libopenlibm.$(OLM_MAJOR_MINOR_SHLIB_EXT)
 test/test-float: libopenlibm.$(OLM_MAJOR_MINOR_SHLIB_EXT)
 	$(MAKE) -C test test-float
 
-clean:
-	rm -f bsdsrc/*.o src/*.o
-	rm -f libopenlibm.a libopenlibm.*$(SHLIB_EXT)*
-	$(MAKE) -C test clean
-
-install-static: libopenlibm.a
-	mkdir -p $(DESTDIR)$(libdir)
-	cp -RpP -f libopenlibm.a $(DESTDIR)$(libdir)/
-
-install-headers:
-	mkdir -p $(DESTDIR)$(includedir)/openlibm
-	cp -RpP -f include/*.h $(DESTDIR)$(includedir)/openlibm
-	cp -RpP -f src/*.h $(DESTDIR)$(includedir)/openlibm
-
-install: install-static install-headers

@@ -47,12 +47,9 @@
 #include <float.h>
 #include <openlibm_math.h>
 
-//#define INLINE_REM_PIO2
 #include "math_private.h"
-//#include "e_rem_pio2.c"
 
-OLM_DLLEXPORT double
-cos(double x)
+OLM_DLLEXPORT double cos(double x)
 {
 	double y[2],z=0.0;
 	int32_t n, ix;

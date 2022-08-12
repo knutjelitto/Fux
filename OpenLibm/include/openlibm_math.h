@@ -13,10 +13,10 @@
  * from: @(#)fdlibm.h 5.1 93/09/24
  * $FreeBSD: src/lib/msun/src/openlibm.h,v 1.82 2011/11/12 19:55:48 theraven Exp $
  */
-#include <openlibm_defs.h>
-
 #ifndef OPENLIBM_MATH_H
 #define	OPENLIBM_MATH_H
+
+#include <openlibm_defs.h>
 
 #ifndef __pure2
 #define __pure2
@@ -37,106 +37,67 @@ extern const union __nan_un
 	float		__uf;
 } __nan;
 
-//VBS begin
-#define __MATH_BUILTIN_CONSTANTS
-#define	__MATH_BUILTIN_RELOPS
-#ifndef __ISO_C_VISIBLE
-#define __ISO_C_VISIBLE 1999
-#endif
-//VBS end
-
-#ifdef __MATH_BUILTIN_CONSTANTS
 #define	HUGE_VAL	__builtin_huge_val()
-#else
-#define	HUGE_VAL	(__infinity.__ud)
-#endif
 
-#if __ISO_C_VISIBLE >= 1999
 #define	FP_ILOGB0	(-INT_MAX)
 #define	FP_ILOGBNAN	INT_MAX
 
-#ifdef __MATH_BUILTIN_CONSTANTS
 #define	HUGE_VALF	__builtin_huge_valf()
 #define	HUGE_VALL	__builtin_huge_vall()
 #define	INFINITY	__builtin_inff()
-#define	NAN		__builtin_nanf("")
-#else
-#define	HUGE_VALF	(float)HUGE_VAL
-#define	HUGE_VALL	(long double)HUGE_VAL
-#define	INFINITY	HUGE_VALF
-#define	NAN		(__nan.__uf)
-#endif /* __MATH_BUILTIN_CONSTANTS */
+#define	NAN		    __builtin_nanf("")
 
 #define	MATH_ERRNO	1
 #define	MATH_ERREXCEPT	2
 #define	math_errhandling	MATH_ERREXCEPT
 
 #define	FP_FAST_FMAF	1
-#ifdef __ia64__
-#define	FP_FAST_FMA	1
-#define	FP_FAST_FMAL	1
-#endif
 
 /* Symbolic constants to classify floating point numbers. */
-#define	FP_INFINITE	0x01
-#define	FP_NAN		0x02
-#define	FP_NORMAL	0x04
-#define	FP_SUBNORMAL	0x08
-#define	FP_ZERO		0x10
-#define	fpclassify(x) \
-    ((sizeof (x) == sizeof (float)) ? __fpclassifyf(x) \
-    : (sizeof (x) == sizeof (double)) ? __fpclassifyd(x) \
+#define	FP_INFINITE	    0x01
+#define	FP_NAN		    0x02
+#define	FP_NORMAL	    0x04
+#define	FP_SUBNORMAL    0x08
+#define	FP_ZERO		    0x10
+
+#define	fpclassify(x)                                       \
+    ((sizeof (x) == sizeof (float)) ? __fpclassifyf(x)      \
+    : (sizeof (x) == sizeof (double)) ? __fpclassifyd(x)    \
     : __fpclassifyl(x))
 
 #define	isfinite(x)					\
     ((sizeof (x) == sizeof (float)) ? __isfinitef(x)	\
     : (sizeof (x) == sizeof (double)) ? __isfinite(x)	\
     : __isfinitel(x))
-#define	isinf(x)					\
+
+#define	isinf(x)					                \
     ((sizeof (x) == sizeof (float)) ? __isinff(x)	\
     : (sizeof (x) == sizeof (double)) ? isinf(x)	\
     : __isinfl(x))
-#define	isnan(x)					\
+
+#define	isnan(x)					                \
     ((sizeof (x) == sizeof (float)) ? __isnanf(x)	\
     : (sizeof (x) == sizeof (double)) ? isnan(x)	\
     : __isnanl(x))
-#define	isnormal(x)					\
+
+#define	isnormal(x)					                    \
     ((sizeof (x) == sizeof (float)) ? __isnormalf(x)	\
     : (sizeof (x) == sizeof (double)) ? __isnormal(x)	\
     : __isnormall(x))
 
-#ifdef __MATH_BUILTIN_RELOPS
-#define	isgreater(x, y)		__builtin_isgreater((x), (y))
+#define	isgreater(x, y)		    __builtin_isgreater((x), (y))
 #define	isgreaterequal(x, y)	__builtin_isgreaterequal((x), (y))
-#define	isless(x, y)		__builtin_isless((x), (y))
-#define	islessequal(x, y)	__builtin_islessequal((x), (y))
-#define	islessgreater(x, y)	__builtin_islessgreater((x), (y))
-#define	isunordered(x, y)	__builtin_isunordered((x), (y))
-#else
-#define	isgreater(x, y)		(!isunordered((x), (y)) && (x) > (y))
-#define	isgreaterequal(x, y)	(!isunordered((x), (y)) && (x) >= (y))
-#define	isless(x, y)		(!isunordered((x), (y)) && (x) < (y))
-#define	islessequal(x, y)	(!isunordered((x), (y)) && (x) <= (y))
-#define	islessgreater(x, y)	(!isunordered((x), (y)) && \
-					((x) > (y) || (y) > (x)))
-#define	isunordered(x, y)	(isnan(x) || isnan(y))
-#endif /* __MATH_BUILTIN_RELOPS */
+#define	isless(x, y)		    __builtin_isless((x), (y))
+#define	islessequal(x, y)	    __builtin_islessequal((x), (y))
+#define	islessgreater(x, y)	    __builtin_islessgreater((x), (y))
+#define	isunordered(x, y)	    __builtin_isunordered((x), (y))
 
-#define	signbit(x)					\
-    ((sizeof (x) == sizeof (float)) ? __signbitf(x)	\
+#define	signbit(x)					                    \
+    ((sizeof (x) == sizeof (float)) ? __signbitf(x)	    \
     : (sizeof (x) == sizeof (double)) ? __signbit(x)	\
     : __signbitl(x))
 
-//VBS
-//typedef	__double_t	double_t;
-//typedef	__float_t	float_t;
-#endif /* __ISO_C_VISIBLE >= 1999 */
-
-/*
- * XOPEN/SVID
- */
-#if __BSD_VISIBLE
-#define	M_E		2.7182818284590452354	/* e */
+#define	M_E		    2.7182818284590452354	/* e */
 #define	M_LOG2E		1.4426950408889634074	/* log 2e */
 #define	M_LOG10E	0.43429448190325182765	/* log 10e */
 #define	M_LN2		0.69314718055994530942	/* log e2 */
@@ -155,11 +116,6 @@ extern const union __nan_un
 #ifndef OPENLIBM_ONLY_THREAD_SAFE
 OLM_DLLEXPORT extern int signgam;
 #endif
-#endif /* __BSD_VISIBLE */
-
-#if __BSD_VISIBLE
-#define	HUGE		MAXFLOAT
-#endif /* __BSD_VISIBLE */
 
 /*
  * Most of these functions depend on the rounding mode and have the side
@@ -167,9 +123,6 @@ OLM_DLLEXPORT extern int signgam;
  * as __pure2.  In C99, FENV_ACCESS affects the purity of these functions.
  */
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 /* Symbol present when OpenLibm is used. */
 int isopenlibm(void);
 
@@ -239,8 +192,8 @@ OLM_DLLEXPORT long long llround(double);
 OLM_DLLEXPORT double	log1p(double);
 OLM_DLLEXPORT double	log2(double);
 OLM_DLLEXPORT double	logb(double);
-OLM_DLLEXPORT long	lrint(double);
-OLM_DLLEXPORT long	lround(double);
+OLM_DLLEXPORT long	    lrint(double);
+OLM_DLLEXPORT long	    lround(double);
 OLM_DLLEXPORT double	nan(const char *) __pure2;
 OLM_DLLEXPORT double	nextafter(double, double);
 OLM_DLLEXPORT double	remainder(double, double);
@@ -369,78 +322,5 @@ OLM_DLLEXPORT float	lgammaf_r(float, int *);
  */
 OLM_DLLEXPORT void	sincosf(float, float *, float *);
 
-/*
- * long double versions of ISO/POSIX math functions
- */
-OLM_DLLEXPORT long double	acoshl(long double);
-OLM_DLLEXPORT long double	acosl(long double);
-OLM_DLLEXPORT long double	asinhl(long double);
-OLM_DLLEXPORT long double	asinl(long double);
-OLM_DLLEXPORT long double	atan2l(long double, long double);
-OLM_DLLEXPORT long double	atanhl(long double);
-OLM_DLLEXPORT long double	atanl(long double);
-OLM_DLLEXPORT long double	cbrtl(long double);
-OLM_DLLEXPORT long double	ceill(long double);
-OLM_DLLEXPORT long double	copysignl(long double, long double) __pure2;
-OLM_DLLEXPORT long double	coshl(long double);
-OLM_DLLEXPORT long double	cosl(long double);
-OLM_DLLEXPORT long double	erfcl(long double);
-OLM_DLLEXPORT long double	erfl(long double);
-OLM_DLLEXPORT long double	exp2l(long double);
-OLM_DLLEXPORT long double	expl(long double);
-OLM_DLLEXPORT long double	expm1l(long double);
-OLM_DLLEXPORT long double	fabsl(long double) __pure2;
-OLM_DLLEXPORT long double	fdiml(long double, long double);
-OLM_DLLEXPORT long double	floorl(long double);
-OLM_DLLEXPORT long double	fmal(long double, long double, long double);
-OLM_DLLEXPORT long double	fmaxl(long double, long double) __pure2;
-OLM_DLLEXPORT long double	fminl(long double, long double) __pure2;
-OLM_DLLEXPORT long double	fmodl(long double, long double);
-OLM_DLLEXPORT long double	frexpl(long double value, int *); /* fundamentally !__pure2 */
-OLM_DLLEXPORT long double	hypotl(long double, long double);
-OLM_DLLEXPORT int		ilogbl(long double) __pure2;
-OLM_DLLEXPORT long double	ldexpl(long double, int);
-OLM_DLLEXPORT long double	lgammal(long double);
-OLM_DLLEXPORT long long	llrintl(long double);
-OLM_DLLEXPORT long long	llroundl(long double);
-OLM_DLLEXPORT long double	log10l(long double);
-OLM_DLLEXPORT long double	log1pl(long double);
-OLM_DLLEXPORT long double	log2l(long double);
-OLM_DLLEXPORT long double	logbl(long double);
-OLM_DLLEXPORT long double	logl(long double);
-OLM_DLLEXPORT long		lrintl(long double);
-OLM_DLLEXPORT long		lroundl(long double);
-OLM_DLLEXPORT long double	modfl(long double, long double *); /* fundamentally !__pure2 */
-OLM_DLLEXPORT long double	nanl(const char *) __pure2;
-OLM_DLLEXPORT long double	nearbyintl(long double);
-OLM_DLLEXPORT long double	nextafterl(long double, long double);
-OLM_DLLEXPORT double		nexttoward(double, long double);
-OLM_DLLEXPORT float		nexttowardf(float, long double);
-OLM_DLLEXPORT long double	nexttowardl(long double, long double);
-OLM_DLLEXPORT long double	powl(long double, long double);
-OLM_DLLEXPORT long double	remainderl(long double, long double);
-OLM_DLLEXPORT long double	remquol(long double, long double, int *);
-OLM_DLLEXPORT long double	rintl(long double);
-OLM_DLLEXPORT long double	roundl(long double);
-OLM_DLLEXPORT long double	scalblnl(long double, long);
-OLM_DLLEXPORT long double	scalbnl(long double, int);
-OLM_DLLEXPORT long double	sinhl(long double);
-OLM_DLLEXPORT long double	sinl(long double);
-OLM_DLLEXPORT long double	sqrtl(long double);
-OLM_DLLEXPORT long double	tanhl(long double);
-OLM_DLLEXPORT long double	tanl(long double);
-OLM_DLLEXPORT long double	tgammal(long double);
-OLM_DLLEXPORT long double	truncl(long double);
 
-/* Reentrant version of lgammal. */
-OLM_DLLEXPORT long double	lgammal_r(long double, int *);
-
-/*
- * Single sine/cosine function.
- */
-OLM_DLLEXPORT void	sincosl(long double, long double *, long double *);
-
-#if defined(__cplusplus)
-}
-#endif
 #endif /* !OPENLIBM_MATH_H */

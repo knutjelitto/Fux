@@ -4231,8 +4231,7 @@ yn_test (void)
 
 
 
-static void
-initialize (void)
+static void initialize (void)
 {
   plus_zero = 0.0;
   nan_value = plus_zero / plus_zero;	/* Suppress GCC warning */

@@ -15,28 +15,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*							ccos()
+/*  ccos()
  *
  *	Complex circular cosine
  *
  *
  *
- * SYNOPSIS:
+ * 	SYNOPSIS:
  *
- * double complex ccos();
- * double complex z, w;
+ * 	double complex ccos();
+ * 	double complex z, w;
  *
- * w = ccos (z);
+ * 	w = ccos (z);
  *
  *
  *
- * DESCRIPTION:
+ * 	DESCRIPTION:
  *
- * If
+ * 	if
  *     z = x + iy,
- *
- * then
- *
+ * 	then
  *     w = cos x  cosh y  -  i sin x sinh y.
  *
  *
@@ -57,16 +55,17 @@
 
 /* calculate cosh and sinh */
 
-static void
-_cchsh(double x, double *c, double *s)
+static void _cchsh(double x, double *c, double *s)
 {
 	double e, ei;
 
-	if (fabs(x) <= 0.5) {
+	if (fabs(x) <= 0.5)
+	{
 		*c = cosh(x);
 		*s = sinh(x);
 	}
-	else {
+	else
+	{
 		e = exp(x);
 		ei = 0.5/e;
 		e = 0.5 * e;
@@ -75,17 +74,12 @@ _cchsh(double x, double *c, double *s)
 	}
 }
 
-double complex
-ccos(double complex z)
+double complex ccos(double complex z)
 {
 	double complex w;
-	double ch, sh;
+	double cosh, sinh;
 
-	_cchsh( cimag(z), &ch, &sh );
-	w = cos(creal (z)) * ch - (sin (creal (z)) * sh) * I;
+	_cchsh( cimag(z), &cosh, &sinh );
+	w = cos(creal (z)) * cosh - (sin (creal (z)) * sinh) * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(ccos, ccosl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

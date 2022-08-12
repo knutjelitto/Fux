@@ -9,37 +9,7 @@
 #define FP_SUBNORMAL 3
 #define FP_NORMAL    4
 
-#include <features.h>
-
-#define NAN       __builtin_nanf("")
-#define INFINITY  __builtin_inff()
-
-hidden int      __fpclassify(double);
-
-hidden int      __rem_pio2(double,double*);
-hidden int      __rem_pio2_large(double*,double*,int,int,int);
-
-hidden double   __sin(double,double,int);
-hidden double   __cos(double,double);
-hidden double   __tan(double,double,int);
-hidden double   __expo2(double,double);
-
-hidden double   __math_invalid(double);
-hidden double   __math_xflow(uint32_t sign, double y);
-hidden double   __math_uflow(uint32_t);
-hidden double   __math_oflow(uint32_t);
-
 bool         isnan(double);
-
-static inline double core_math_ceil(double x)
-{
-    return __builtin_ceil(x);
-}
-
-static inline double core_math_floor(double x)
-{
-    return __builtin_floor(x);
-}
 
 double      acos(double);
 double      acosh(double);

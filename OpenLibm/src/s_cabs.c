@@ -21,8 +21,7 @@
 
 #include "math_private.h"
 
-double
-cabs(double complex z)
+double cabs(double complex z)
 {
 	return hypot(__real__ z, __imag__ z);
 }

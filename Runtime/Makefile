@@ -34,27 +34,26 @@ WASM2WAT	= wasm-dis
 WASM2C		= wasm2c
 
 EXPORTS = 
-MATH_SOURCES = $(wildcard src/kernel/math/*.c)
 OTHER_SOURCES = $(wildcard *.c) src/tester.c src/kernel/core/core.c
-ALL_SOURCES = $(MATH_SOURCES) $(OTHER_SOURCES)
+ALL_SOURCES = $(OTHER_SOURCES)
 SOURCES = $(ALL_SOURCES)
 BUILD   = DEBUG
 
 #------------------------------------------------------------------------------------------------------
 
 ifeq ($(BUILD),RELEASE)
-  OUTDIR    := Release
-  DBGCFLAGS := -DNDEBUG
-  LDFLAGS   := -strip-all -gc-sections
-  WOPTFLAGS := -O3
+  	OUTDIR    := Release
+  	DBGCFLAGS := -DNDEBUG
+  	LDFLAGS   := -strip-all -gc-sections
+  	WOPTFLAGS := -O3
 else
-  OUTDIR    := Debug
-  DBGCFLAGS := -DDEBUG -D_DEBUG
-  LDFLAGS   :=
-  WOPTFLAGS := -g -O0
+  	OUTDIR    := Debug
+  	DBGCFLAGS := -DDEBUG -D_DEBUG
+  	LDFLAGS   :=
+  	WOPTFLAGS := -g -O0
 endif
 
-INCLUDES = -Isrc/include -Isrc/kernel/math
+INCLUDES = -Isrc/include
 
 # Global compiler flags
 CXXFLAGS := $(DBGCFLAGS) -Ofast -std=c++11 -fno-rtti -Wno-writable-strings -Wno-unknown-pragmas $(INCLUDES)
@@ -99,9 +98,8 @@ clean:
 	@$(if $(wildcard $(OUTDIR)),$(if $(ISWIN),rmdir /S /Q,rm -rf) "$(OUTDIR)" $(PIPETONULL))
 
 # Generate a list of .o files to build, include dependency rules for source files, then compile files
-MATH_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(MATH_SOURCES))))
 OTHER_OBJS := $(addprefix $(OUTDIR)/,$(patsubst %.c,%.o,$(patsubst %.cpp,%.o,$(OTHER_SOURCES))))
-OBJS := $(MATH_OBJS) $(OTHER_OBJS)
+OBJS := $(OTHER_OBJS)
 
 -include $(OBJS:%.o=%.d)
 
@@ -120,9 +118,9 @@ $(foreach F,$(filter %.cpp,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CXX),$
 $(foreach F,$(filter %.c  ,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CC),$$(CCFLAGS))))
 
 
-$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) $(OUTDIR)/libmath.a
+$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS)
 	$(info Link $@ ...)
-	@$(LD) $(LDFLAGS) -L../OpenLibm -lopenlibm -o $@ $(OTHER_OBJS)
+	@$(LD) $(LDFLAGS) -o $@ $(OTHER_OBJS)
 	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
 
 $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm
@@ -132,7 +130,3 @@ $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm
 $(OUTDIR)/output.c: $(OUTDIR)/output.wasm
 	$(info Wasm->C+H $@ ...)
 	@"$(WASM2C)" $(OUTDIR)/output.wasm -o $@
-
-$(OUTDIR)/libmath.a: $(MATH_OBJS)
-	$(info Archive $@ ...)
-	@$(AR) r $@ $(MATH_OBJS)

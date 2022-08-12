@@ -23,7 +23,19 @@
 #include "types-compat.h"
 #include "fpmath.h"
 #include <stdint.h>
-#include "math_private_openbsd.h"
+
+/*
+ * Common routine to process the arguments to nan(), nanf(), and nanl().
+ */
+void __scan_nan(uint32_t *__words, int __num_words, const char *__s);
+
+/*
+ * Functions internal to the math package, yet not static.
+ */
+double __exp__D(double, double);
+struct Double __log__D(double);
+long double __p1evll(long double, void *, int);
+long double __polevll(long double, void *, int);
 
 /*
  * The original fdlibm code used statements like:
@@ -43,25 +55,6 @@
  * ints.
  */
 
-#if __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__
-
-typedef union
-{
-  double value;
-  struct
-  {
-    u_int32_t msw;
-    u_int32_t lsw;
-  } parts;
-  struct
-  {
-    u_int64_t w;
-  } xparts;
-} ieee_double_shape_type;
-
-#endif
-
-#if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
 
 typedef union
 {
@@ -76,8 +69,6 @@ typedef union
     u_int64_t w;
   } xparts;
 } ieee_double_shape_type;
-
-#endif
 
 /* Get two 32 bit ints from a double.  */
 
@@ -203,27 +194,7 @@ do {								\
 } while (0)
 
 
-#ifndef __FreeBSD__
 #define	STRICT_ASSIGN(type, lval, rval)	((lval) = (rval))
-#else
-#ifdef FLT_EVAL_METHOD
-// Attempt to get strict C99 semantics for assignment with non-C99 compilers.
-#if FLT_EVAL_METHOD == 0 || __GNUC__ == 0
-#define	STRICT_ASSIGN(type, lval, rval)	((lval) = (rval))
-#else
-#define	STRICT_ASSIGN(type, lval, rval) do {	\
-	volatile type __lval;			\
-						\
-	if (sizeof(type) >= sizeof(long double))	\
-		(lval) = (rval);		\
-	else {					\
-		__lval = (rval);		\
-		(lval) = __lval;		\
-	}					\
-} while (0)
-#endif
-#endif
-#endif
 
 /*
  * Common routine to process the arguments to nan(), nanf(), and nanl().
@@ -247,36 +218,6 @@ void __scan_nan(u_int32_t *__words, int __num_words, const char *__s);
  * precision).
  */
 #define	nan_mix(x, y)	(((x) + 0.0L) + ((y) + 0))
-
-#ifdef __GNUCLIKE_ASM
-
-/* Asm versions of some functions. */
-
-#ifdef __amd64__
-static __inline int
-irint(double x)
-{
-	int n;
-
-	__asm__("cvtsd2si %1,%0" : "=r" (n) : "x" (x));
-	return (n);
-}
-#define	HAVE_EFFICIENT_IRINT
-#endif
-
-#ifdef __i386__
-static __inline int
-irint(double x)
-{
-	int n;
-
-	__asm__("fistl %0" : "=m" (n) : "t" (x));
-	return (n);
-}
-#define	HAVE_EFFICIENT_IRINT
-#endif
-
-#endif /* __GNUCLIKE_ASM */
 
 /*
  * ieee style elementary functions
@@ -334,38 +275,23 @@ irint(double x)
 #define	__ieee754_remainderf remainderf
 
 /* fdlibm kernel function */
-int	__kernel_rem_pio2(double*,double*,int,int,int);
+int	__kernel_rem_pio2(double*, double*, int, int, int);
 
 /* double precision kernel functions */
-#ifdef INLINE_REM_PIO2
-__inline
-#endif
-int	__ieee754_rem_pio2(double,double*);
-double	__kernel_sin(double,double,int);
-double	__kernel_cos(double,double);
-double	__kernel_tan(double,double,int);
-double	__ldexp_exp(double,int);
-double complex __ldexp_cexp(double complex,int);
+int	__ieee754_rem_pio2(double, double*);
+double	__kernel_sin(double, double, int);
+double	__kernel_cos(double, double);
+double	__kernel_tan(double, double, int);
+double	__ldexp_exp(double, int);
+double complex __ldexp_cexp(double complex, int);
 
-/* float precision kernel functions */
-#ifdef INLINE_REM_PIO2F
-__inline
-#endif
-int	__ieee754_rem_pio2f(float,double*);
-#ifdef INLINE_KERNEL_SINDF
-__inline
-#endif
+/* single precision kernel functions */
+int	__ieee754_rem_pio2f(float, double*);
 float	__kernel_sindf(double);
-#ifdef INLINE_KERNEL_COSDF
-__inline
-#endif
 float	__kernel_cosdf(double);
-#ifdef INLINE_KERNEL_TANDF
-__inline
-#endif
-float	__kernel_tandf(double,int);
+float	__kernel_tandf(double, int);
 float	__ldexp_expf(float,int);
-float complex __ldexp_cexpf(float complex,int);
+float complex __ldexp_cexpf(float complex, int);
 
 /* long double precision kernel functions */
 long double __kernel_sinl(long double, long double, int);

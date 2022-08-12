@@ -1,17 +1,14 @@
 #include <stdint.h>
 
-#include "libm.h"
+#include <math.h>
 
-#undef cos
-
-double cos(double x);
-
-
-void mathlinker(int x, int y)
+void mathlinker()
 {
-    cos(1.0);
-    sin(1.0);
-    tan(1.0);
+    double x = 1.0;
+    double y = 1.0;
 
-    sqrt(1.0);
+    cos(x);
+    sin(x);
+    tan(x);
+    sqrt(x);
 }

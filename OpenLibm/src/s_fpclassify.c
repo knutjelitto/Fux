@@ -29,70 +29,62 @@
 #include "math_private.h"
 #include "fpmath.h"
 
-OLM_DLLEXPORT int
-__fpclassifyd(double d)
+OLM_DLLEXPORT int __fpclassifyd(double d)
 {
 	union IEEEd2bits u;
 
 	u.d = d;
-	if (u.bits.exp == 2047) {
-		if (u.bits.manl == 0 && u.bits.manh == 0) {
+	if (u.bits.exp == 2047)
+	{
+		if (u.bits.manl == 0 && u.bits.manh == 0)
+		{
 			return FP_INFINITE;
-		} else {
+		} else
+		{
 			return FP_NAN;
 		}
-	} else if (u.bits.exp != 0) {
+	}
+	else if (u.bits.exp != 0)
+	{
 		return FP_NORMAL;
-	} else if (u.bits.manl == 0 && u.bits.manh == 0) {
+	}
+	else if (u.bits.manl == 0 && u.bits.manh == 0)
+	{
 		return FP_ZERO;
-	} else {
+	}
+	else
+	{
 		return FP_SUBNORMAL;
 	}
 }
 		
 
-OLM_DLLEXPORT int
-__fpclassifyf(float f)
+OLM_DLLEXPORT int __fpclassifyf(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
-	if (u.bits.exp == 255) {
-	   if (u.bits.man == 0) {
+	if (u.bits.exp == 255)
+	{
+	   if (u.bits.man == 0)
+	   {
 		   return FP_INFINITE;
-	   } else {
+	   }
+	   else
+	   {
 		   return FP_NAN;
 	   }
-	} else if (u.bits.exp != 0) {
+	}
+	else if (u.bits.exp != 0)
+	{
 		return FP_NORMAL;
-	} else if (u.bits.man == 0) {
+	}
+	else if (u.bits.man == 0)
+	{
 		return FP_ZERO;
-	} else {
+	}
+	else
+	{
 		return FP_SUBNORMAL;
 	}
 }
-
-#ifdef OLM_LONG_DOUBLE
-OLM_DLLEXPORT int
-__fpclassifyl(long double e)
-{
-	union IEEEl2bits u;
-
-	u.e = e;
-	mask_nbit_l(u);
-	if (u.bits.exp == 32767) {
-		if (u.bits.manl == 0 && u.bits.manh == 0) {
-			return FP_INFINITE;
-		} else {
-			return FP_NAN;
-		}
-	} else if (u.bits.exp != 0) {
-		return FP_NORMAL;
-	} else if (u.bits.manl == 0 && u.bits.manh == 0) {
-		return FP_ZERO;
-	} else {
-		return FP_SUBNORMAL;
-	}
-}
-#endif
-

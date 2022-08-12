@@ -52,51 +52,12 @@
  * and the second element is the imaginary part.
  */
 
-#ifdef __clang__
-#  define CMPLXF(x, y) ((float complex){x, y})
-#  define CMPLX(x, y) ((double complex){x, y})
-#  define CMPLXL(x, y) ((long double complex){x, y})
-#elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)) && !defined(__INTEL_COMPILER)
-#  define CMPLXF(x,y) __builtin_complex ((float) (x), (float) (y))
-#  define CMPLX(x,y) __builtin_complex ((double) (x), (double) (y))
-#  define CMPLXL(x,y) __builtin_complex ((long double) (x), (long double) (y))
-#else
-static inline float complex
-CMPLXF(float x, float y)
-{
-	union {
-		float a[2];
-		float complex f;
-	} z = {{ x, y }};
-
-	return (z.f);
-}
-
-static inline double complex
-CMPLX(double x, double y)
-{
-	union {
-		double a[2];
-		double complex f;
-	} z = {{ x, y }};
-
-	return (z.f);
-}
-
-static inline long double complex
-CMPLXL(long double x, long double y)
-{
-	union {
-		long double a[2];
-		long double complex f;
-	} z = {{ x, y }};
-
-	return (z.f);
-}
-#endif
+#define CMPLXF(x, y) ((float complex){x, y})
+#define CMPLX(x, y) ((double complex){x, y})
+#define CMPLXL(x, y) ((long double complex){x, y})
 
 /*
- * Double versions of C99 functions
+ * Double precision version of C99 functions
  */
 double complex cacos(double complex);
 double complex casin(double complex);
@@ -116,13 +77,13 @@ double cabs(double complex);
 double complex cpow(double complex, double complex);
 double complex csqrt(double complex);
 double carg(double complex);
+double creal(double complex);
 double cimag(double complex);
 double complex conj(double complex);
 double complex cproj(double complex);
-double creal(double complex);
 
 /*
- * Float versions of C99 functions
+ * Single precision versions of C99 functions
  */
 float complex cacosf(float complex);
 float complex casinf(float complex);
@@ -146,33 +107,6 @@ float cimagf(float complex);
 float complex conjf(float complex);
 float complex cprojf(float complex);
 float crealf(float complex);
-
-/*
- * Long double versions of C99 functions
- */
-long double complex cacosl(long double complex);
-long double complex casinl(long double complex);
-long double complex catanl(long double complex);
-long double complex ccosl(long double complex);
-long double complex csinl(long double complex);
-long double complex ctanl(long double complex);
-long double complex cacoshl(long double complex);
-long double complex casinhl(long double complex);
-long double complex catanhl(long double complex);
-long double complex ccoshl(long double complex);
-long double complex csinhl(long double complex);
-long double complex ctanhl(long double complex);
-long double complex cexpl(long double complex);
-long double complex clogl(long double complex);
-long double cabsl(long double complex);
-long double complex cpowl(long double complex,
-	long double complex);
-long double complex csqrtl(long double complex);
-long double cargl(long double complex);
-long double cimagl(long double complex);
-long double complex conjl(long double complex);
-long double complex cprojl(long double complex);
-long double creall(long double complex);
 
 #endif /* !OPENLIBM_COMPLEX_H */
 

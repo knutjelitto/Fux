@@ -31,8 +31,7 @@
 #include "fpmath.h"
 #include "math_private.h"
 
-OLM_DLLEXPORT int
-__isfinite(double d)
+OLM_DLLEXPORT int __isfinite(double d)
 {
 	union IEEEd2bits u;
 
@@ -40,22 +39,10 @@ __isfinite(double d)
 	return (u.bits.exp != 2047);
 }
 
-OLM_DLLEXPORT int
-__isfinitef(float f)
+OLM_DLLEXPORT int __isfinitef(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
 	return (u.bits.exp != 255);
 }
-
-#ifdef OLM_LONG_DOUBLE
-OLM_DLLEXPORT int
-__isfinitel(long double e)
-{
-	union IEEEl2bits u;
-
-	u.e = e;
-	return (u.bits.exp != 32767);
-}
-#endif

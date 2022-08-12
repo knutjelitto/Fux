@@ -83,8 +83,7 @@ __ldexp_exp(double x, int expt)
 	return (exp_x * scale);
 }
 
-OLM_DLLEXPORT double complex
-__ldexp_cexp(double complex z, int expt)
+OLM_DLLEXPORT double complex __ldexp_cexp(double complex z, int expt)
 {
 	double x, y, exp_x, scale1, scale2;
 	int ex_expt, half_expt;
@@ -103,6 +102,5 @@ __ldexp_cexp(double complex z, int expt)
 	half_expt = expt - half_expt;
 	INSERT_WORDS(scale2, (0x3ff + half_expt) << 20, 0);
 
-	return (CMPLX(cos(y) * exp_x * scale1 * scale2,
-	    sin(y) * exp_x * scale1 * scale2));
+	return (CMPLX(cos(y) * exp_x * scale1 * scale2, sin(y) * exp_x * scale1 * scale2));
 }
