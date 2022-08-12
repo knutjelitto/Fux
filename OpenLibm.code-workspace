@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "OpenLibm"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.sax": "ceylon",
+			"*.six": "ceylon",
+			"*.fux": "elm",
+			"math_private.h": "c",
+			"stdint.h": "c",
+			"openlibm_math.h": "c",
+			"openlibm_defs.h": "c",
+			"fpmath.h": "c"
+		}
+	}
+}

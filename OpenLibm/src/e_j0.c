@@ -368,8 +368,8 @@ static const double qS2[6] = {
  -5.31095493882666946917e+00, /* 0xC0153E6A, 0xF8B32931 */
 };
 
-	/* Note: This function is only called for ix>=0x40000000 (see above) */
-	static double qzero(double x)
+/* Note: This function is only called for ix>=0x40000000 (see above) */
+static double qzero(double x)
 {
 	const double *p,*q;
 	double s,r,z;

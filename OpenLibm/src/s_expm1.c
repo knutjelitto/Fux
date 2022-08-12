@@ -114,7 +114,7 @@
 #include "math_private.h"
 
 static const double
-one		= 1.0,
+one			= 1.0,
 huge		= 1.0e+300,
 tiny		= 1.0e-300,
 o_threshold	= 7.09782712893383973096e+02,/* 0x40862E42, 0xFEFA39EF */

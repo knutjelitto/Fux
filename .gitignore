@@ -353,3 +353,4 @@ MigrationBackup/
 /Tmp/All/Core
 /Runtime/musl
 /Runtime/nul.d
+/OpenLibm/**/*.c.d

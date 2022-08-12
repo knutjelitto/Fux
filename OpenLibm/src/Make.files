@@ -31,18 +31,6 @@ $(CUR_SRCS) = common.c \
 	s_trunc.c s_truncf.c s_cpow.c  s_cpowf.c \
 	w_cabs.c w_cabsf.c
 
-ifneq ($(ARCH), wasm32)
-
-$(CUR_SRCS) += \
-        s_fma.c s_fmaf.c s_lrint.c s_lrintf.c s_lround.c s_lroundf.c \
-	s_llrint.c s_llrintf.c s_llround.c s_llroundf.c s_nearbyint.c
-
-ifneq ($(OS), WINNT)
-$(CUR_SRCS) += s_nan.c
-endif
-
-endif
-
 # Add in long double functions for x86, x64 and aarch64
 ifeq ($(LONG_DOUBLE_NOT_DOUBLE),1)
 # C99 long double functions
