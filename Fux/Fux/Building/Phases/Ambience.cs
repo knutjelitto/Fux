@@ -1,14 +1,10 @@
-﻿namespace Fux.Building.Phases
+﻿namespace Fux.Building.Phases;
+
+public sealed class Ambience
 {
-    public sealed class Ambience
-    {
-        public Ambience(ErrorBag errors)
-        {
-            Errors = errors;
-        }
+    public Ambience(ErrorBag errors) => Errors = errors;
 
-        public ErrorBag Errors { get; set; }
+    public ErrorBag Errors { get; set; }
 
-        public Config Config { get; init; } = new();
-    }
+    public Config Config { get; init; } = new();
 }

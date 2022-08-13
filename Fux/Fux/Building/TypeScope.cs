@@ -1,37 +1,33 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Fux.Building
+namespace Fux.Building;
+
+public sealed class TypeScope : Scope
 {
-    public sealed class TypeScope : Scope
+    private readonly Dictionary<A.Identifier, A.Decl.TypeParameter> parameters = new();
+
+    public void Add(A.Decl.TypeParameter parameter)
     {
-        private readonly Dictionary<A.Identifier, A.Decl.TypeParameter> parameters = new();
+        var name = parameter.Name.SingleLower();
 
-        public void Add(A.Decl.TypeParameter parameter)
+        Assert(!parameters.ContainsKey(name));
+
+        parameters.Add(name, parameter);
+    }
+
+    public bool LookupParameter(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl.TypeParameter parameter) => parameters.TryGetValue(identifier.SingleLowerOrOp(), out parameter);
+
+    public override bool Resolve(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl expr)
+    {
+        if (identifier.IsSingleLower)
         {
-            var name = parameter.Name.SingleLower();
-
-            Assert(!parameters.ContainsKey(name));
-
-            parameters.Add(name, parameter);
-        }
-
-        public bool LookupParameter(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl.TypeParameter parameter)
-        {
-            return parameters.TryGetValue(identifier.SingleLowerOrOp(), out parameter);
-        }
-
-        public override bool Resolve(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl expr)
-        {
-            if (identifier.IsSingleLower)
+            if (LookupParameter(identifier, out var item))
             {
-                if (LookupParameter(identifier, out var item))
-                {
-                    expr = item;
-                    return true;
-                }
+                expr = item;
+                return true;
             }
-
-            return base.Resolve(identifier, out expr);
         }
+
+        return base.Resolve(identifier, out expr);
     }
 }

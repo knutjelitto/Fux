@@ -1,23 +1,17 @@
-﻿using Fux.Errors;
+﻿namespace Fux.Input;
 
-namespace Fux.Input
+public class InputErrors
 {
-    public class InputErrors
+    public InputErrors(ErrorBag errors) => Errors = errors;
+
+    public ErrorBag Errors { get; }
+
+    protected DiagnosticException Add(params Diagnostic[] diagnostics)
     {
-        public InputErrors(ErrorBag errors)
-        {
-            Errors = errors;
-        }
+        var exception = new DiagnosticException(diagnostics);
 
-        public ErrorBag Errors { get; }
+        Errors.Add(exception);
 
-        protected DiagnosticException Add(params Diagnostic[] diagnostics)
-        {
-            var exception = new DiagnosticException(diagnostics);
-
-            Errors.Add(exception);
-
-            return exception;
-        }
+        return exception;
     }
 }

@@ -1,102 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace FuxX.Pratt;
 
-namespace Fux.Pratt
+public sealed class Liner
 {
-    public sealed class Liner
+    private int current = 0;
+
+    private readonly TokenList tokens = new();
+
+    public Liner(Lexer lexer)
     {
-        private int current = 0;
+        Lexer = lexer;
+        CreateTokenList();
+    }
 
-        private readonly TokenList tokens = new();
+    public Lexer Lexer { get; }
 
-        public Liner(Lexer lexer)
+    public int Count => tokens.Count;
+
+    public Element GetElement()
+    {
+        if (current == tokens.Count - 1)
         {
-            Lexer = lexer;
-            CreateTokenList();
+            Assert(tokens[current].Lex == Lex.EOF);
+            return new Element(tokens, current, current + 1);
         }
 
-        public Lexer Lexer { get; }
+        return BuildElement(0);
+    }
 
-        public int Count => tokens.Count;
+    private Element BuildElement(int indent)
+    {
+        var starter = current;
 
-        public Element GetElement()
+        tokens[current].First = true;
+
+        while (current < tokens.Count && !tokens[current].EOF && tokens[current].Line == tokens[starter].Line)
         {
-            if (current == tokens.Count - 1)
-            {
-                Assert(tokens[current].Lex == Lex.EOF);
-                return new Element(tokens, current, current + 1);
-            }
-
-            return BuildElement(0);
+            current = Consume(indent);
         }
 
-        private Element BuildElement(int indent)
+        tokens[current - 1].Last = true;
+
+        if (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
         {
-            var starter = current;
+            indent++;
 
-            tokens[current].First = true;
+            _ = BuildElement(indent);
 
-            while (current < tokens.Count && !tokens[current].EOF && tokens[current].Line == tokens[starter].Line)
+            while (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
             {
-                current = Consume(indent);
-            }
-
-            tokens[current - 1].Last = true;
-
-            if (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
-            {
-                indent++;
-
                 _ = BuildElement(indent);
-
-                while (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
-                {
-                    _ = BuildElement(indent);
-                }
             }
-
-            Assert(current > starter);
-
-            return new Element(tokens, starter, current);
         }
 
-        private int Consume(int indent)
+        Assert(current > starter);
+
+        return new Element(tokens, starter, current);
+    }
+
+    private int Consume(int indent)
+    {
+        tokens[current++].Indent = indent;
+
+        return current;
+    }
+
+    private void CreateTokenList()
+    {
+        var current = Lexer.GetNext();
+
+        while (true)
         {
-            tokens[current++].Indent = indent;
+            var whites = new Whites();
 
-            return current;
-        }
-
-        private void CreateTokenList()
-        {
-            var current = Lexer.GetNext();
-
-            while (true)
+            while (current.White)
             {
-                var whites = new Whites();
+                whites.Add(current);
 
-                while (current.White)
-                {
-                    whites.Add(current);
-
-                    current = Lexer.GetNext();
-                }
-
-                current.TransferWhites(whites);
-
-                tokens.Add(current);
-
-                Assert(current.Index == tokens.Count - 1);
-
-                if (current.Lex == Lex.EOF)
-                {
-                    break;
-                }
                 current = Lexer.GetNext();
             }
+
+            _ = current.TransferWhites(whites);
+
+            _ = tokens.Add(current);
+
+            Assert(current.Index == tokens.Count - 1);
+
+            if (current.Lex == Lex.EOF)
+            {
+                break;
+            }
+            current = Lexer.GetNext();
         }
     }
 }

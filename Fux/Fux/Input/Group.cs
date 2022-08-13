@@ -1,8 +1,7 @@
-﻿namespace Fux.Input
+﻿namespace Fux.Input;
+
+public sealed class Group
 {
-    public sealed class Group
-    {
-        public Group(IReadOnlyList<Token> tokens, int start, int length)
-        { }
-    }
+    public Group(IReadOnlyList<Token> tokens, int start, int length)
+    { }
 }

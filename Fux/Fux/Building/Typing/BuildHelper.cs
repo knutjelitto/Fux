@@ -1,6 +1,5 @@
-﻿namespace Fux.Building.Typing
+﻿namespace Fux.Building.Typing;
+
+public static class BuildHelper
 {
-    public static class BuildHelper
-    {
-    }
 }

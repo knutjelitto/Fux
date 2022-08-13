@@ -1,10 +1,8 @@
 ﻿#pragma warning disable IDE1006 // Naming Styles
 
+namespace Fux.TypeSystem.Abstract;
 
-namespace Fux.TypeSystem.Abstract
+public abstract class Mono : WithFree
 {
-    public abstract class Mono : WithFree
-    {
-        public abstract ISet<MonoVariable> free();
-    }
+    public abstract ISet<MonoVariable> free();
 }

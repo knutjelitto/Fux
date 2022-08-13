@@ -1,256 +1,244 @@
-﻿namespace Fux.Input
+﻿namespace Fux.Input;
+
+public sealed class PatternParser
 {
-    public sealed class PatternParser
+    public PatternParser(Parser parser) => Parser = parser;
+
+    public Parser Parser { get; }
+    public ExprParser Expr => Parser.Expr;
+
+    public List<A.Pattern> LambdaParameters(Cursor cursor) => CollectAtomic(cursor);
+
+    public A.Pattern Pattern(Cursor cursor)
     {
-        public PatternParser(Parser parser)
+        var pattern = PatternX(cursor);
+
+        if (cursor.Is(Lex.Operator) && cursor.IsWeak(Lex.Symbol.Cons))
         {
-            Parser = parser;
+            _ = cursor.Swallow(Lex.Operator);
+
+            var rest = Pattern(cursor);
+
+            return new A.Pattern.Cons(pattern, rest);
         }
 
-        public Parser Parser { get; }
-        public ExprParser Expr => Parser.Expr;
+        return pattern;
+    }
 
-        public List<A.Pattern> LambdaParameters(Cursor cursor)
+    // ----- private -----
+
+    private A.Pattern PatternX(Cursor cursor)
+    {
+        var pattern = PatternY(cursor);
+
+        if (cursor.SwallowIf(Lex.KwAs))
         {
-            return CollectAtomic(cursor);
+            var alias = new A.Pattern.LowerId(Parser.SingleIdentifier(cursor).SingleLower());
+
+            pattern = new A.Pattern.WithAlias(pattern, alias);
         }
 
-        public A.Pattern Pattern(Cursor cursor)
+        return pattern;
+    }
+
+    private A.Pattern PatternY(Cursor cursor)
+    {
+        if (cursor.Is(Lex.LowerId))
         {
-            var pattern = PatternX(cursor);
-
-            if (cursor.Is(Lex.Operator) && cursor.IsWeak(Lex.Symbol.Cons))
-            {
-                cursor.Swallow(Lex.Operator);
-
-                var rest = Pattern(cursor);
-
-                return new A.Pattern.Cons(pattern, rest);
-            }
+            var pattern = SignPattern(cursor);
 
             return pattern;
         }
-
-        // ----- private -----
-
-        private A.Pattern PatternX(Cursor cursor)
+        else if (cursor.Is(Lex.UpperId))
         {
-            var pattern = PatternY(cursor);
-
-            if (cursor.SwallowIf(Lex.KwAs))
-            {
-                var alias = new A.Pattern.LowerId(Parser.SingleIdentifier(cursor).SingleLower());
-
-                pattern = new A.Pattern.WithAlias(pattern, alias);
-            }
+            var pattern = CtorPattern(cursor);
 
             return pattern;
         }
-
-        private A.Pattern PatternY(Cursor cursor)
+        else
         {
-            if (cursor.Is(Lex.LowerId))
-            {
-                var pattern = SignPattern(cursor);
+            var pattern = Atomic(cursor);
 
-                return pattern;
-            }
-            else if (cursor.Is(Lex.UpperId))
-            {
-                var pattern = CtorPattern(cursor);
+            return pattern;
+        }
+    }
 
-                return pattern;
-            }
-            else
-            {
-                var pattern = Atomic(cursor);
+    private A.Pattern Atomic(Cursor cursor)
+    {
+        if (cursor.Is(Lex.LowerId))
+        {
+            return new A.Pattern.LowerId(Parser.Identifier(cursor).SingleLower());
+        }
+        else if (cursor.Is(Lex.OperatorId))
+        {
+            return new A.Pattern.LowerId(Parser.Identifier(cursor).SingleOp());
+        }
+        else if (cursor.Is(Lex.UpperId))
+        {
+            return new A.Pattern.UpperId(Parser.Identifier(cursor).MultiUpper());
+        }
+        else if (cursor.Is(Lex.Wildcard))
+        {
+            _ = cursor.Swallow(Lex.Wildcard);
+            var pattern = new A.Pattern.Wildcard();
 
-                return pattern;
-            }
+            return pattern;
+        }
+        else if (cursor.Is(Lex.LeftRoundBracket))
+        {
+            return TupleOrCtorOrAliasPattern(cursor);
+        }
+        else if (cursor.Is(Lex.LeftCurlyBracket))
+        {
+            return RecordPattern(cursor);
+        }
+        else if (cursor.Is(Lex.LeftSquareBracket))
+        {
+            return ListPattern(cursor);
+        }
+        else if (cursor.Is(Lex.Integer))
+        {
+            return new A.Pattern.Literal.Integer(Expr.IntegerLiteral(cursor));
+        }
+        else if (cursor.Is(Lex.Float))
+        {
+            return new A.Pattern.Literal.Float(Expr.FloatLiteral(cursor));
+        }
+        else if (cursor.Is(Lex.String))
+        {
+            return new A.Pattern.Literal.String(Expr.StringLiteral(cursor));
+        }
+        else if (cursor.Is(Lex.Char))
+        {
+            return new A.Pattern.Literal.Char(Expr.CharLiteral(cursor));
+        }
+        else
+        {
+            Assert(false);
+            throw new NotImplementedException();
+        }
+    }
+
+    private List<A.Pattern> CollectAtomic(Cursor cursor)
+    {
+        var patterns = new List<A.Pattern>();
+
+        while (!cursor.TerminatesSomething && cursor.IsNot(Lex.KwAs) && !cursor.IsWeak(Lex.Symbol.Cons))
+        {
+            var pattern = Atomic(cursor);
+
+            patterns.Add(pattern);
         }
 
-        private A.Pattern Atomic(Cursor cursor)
-        {
-            if (cursor.Is(Lex.LowerId))
-            {
-                return new A.Pattern.LowerId(Parser.Identifier(cursor).SingleLower());
-            }
-            else if (cursor.Is(Lex.OperatorId))
-            {
-                return new A.Pattern.LowerId(Parser.Identifier(cursor).SingleOp());
-            }
-            else if (cursor.Is(Lex.UpperId))
-            {
-                return new A.Pattern.UpperId(Parser.Identifier(cursor).MultiUpper());
-            }
-            else if (cursor.Is(Lex.Wildcard))
-            {
-                cursor.Swallow(Lex.Wildcard);
-                var pattern = new A.Pattern.Wildcard();
+        return patterns;
+    }
 
-                return pattern;
-            }
-            else if (cursor.Is(Lex.LeftRoundBracket))
-            {
-                return TupleOrCtorOrAliasPattern(cursor);
-            }
-            else if (cursor.Is(Lex.LeftCurlyBracket))
-            {
-                return RecordPattern(cursor);
-            }
-            else if (cursor.Is(Lex.LeftSquareBracket))
-            {
-                return ListPattern(cursor);
-            }
-            else if (cursor.Is(Lex.Integer))
-            {
-                return new A.Pattern.Literal.Integer(Expr.IntegerLiteral(cursor));
-            }
-            else if (cursor.Is(Lex.Float))
-            {
-                return new A.Pattern.Literal.Float(Expr.FloatLiteral(cursor));
-            }
-            else if (cursor.Is(Lex.String))
-            {
-                return new A.Pattern.Literal.String(Expr.StringLiteral(cursor));
-            }
-            else if (cursor.Is(Lex.Char))
-            {
-                return new A.Pattern.Literal.Char(Expr.CharLiteral(cursor));
-            }
-            else
-            {
-                Assert(false);
-                throw new NotImplementedException();
-            }
+    private A.Pattern SignPattern(Cursor cursor)
+    {
+        var name = Parser.Identifier(cursor).SingleLower();
+
+        var atomics = CollectAtomic(cursor);
+
+        return atomics.Count == 0 ? new A.Pattern.LowerId(name) : new A.Pattern.Signature(name, atomics);
+    }
+
+    private A.Pattern CtorPattern(Cursor cursor)
+    {
+        var name = Parser.Identifier(cursor).MultiUpper();
+
+        var patterns = new List<A.Pattern>();
+
+        while (!cursor.TerminatesSomething && cursor.IsNot(Lex.KwAs) && !cursor.IsWeak(Lex.Symbol.Cons))
+        {
+            var pattern = Atomic(cursor);
+
+            patterns.Add(pattern);
         }
 
-        private List<A.Pattern> CollectAtomic(Cursor cursor)
+        var ctor = new A.Pattern.Ctor(name, patterns.ToArray());
+
+        return ctor;
+    }
+
+    private A.Pattern TupleOrCtorOrAliasPattern(Cursor cursor)
+    {
+        _ = cursor.Swallow(Lex.LeftRoundBracket);
+
+        if (cursor.SwallowIf(Lex.RightRoundBracket))
         {
-            var patterns = new List<A.Pattern>();
-
-            while (!cursor.TerminatesSomething && cursor.IsNot(Lex.KwAs) && !cursor.IsWeak(Lex.Symbol.Cons))
-            {
-                var pattern = Atomic(cursor);
-
-                patterns.Add(pattern);
-            }
-
-            return patterns;
+            return new A.Pattern.Unit();
         }
 
-        private A.Pattern SignPattern(Cursor cursor)
+        var p1 = Pattern(cursor);
+
+        if (cursor.SwallowIf(Lex.Comma))
         {
-            var name = Parser.Identifier(cursor).SingleLower();
-
-            var atomics = CollectAtomic(cursor);
-
-            if (atomics.Count == 0)
-            {
-                return new A.Pattern.LowerId(name);
-            }
-
-            return new A.Pattern.Signature(name, atomics);
-        }
-
-        private A.Pattern CtorPattern(Cursor cursor)
-        {
-            var name = Parser.Identifier(cursor).MultiUpper();
-
-            var patterns = new List<A.Pattern>();
-
-            while (!cursor.TerminatesSomething && cursor.IsNot(Lex.KwAs) && !cursor.IsWeak(Lex.Symbol.Cons))
-            {
-                var pattern = Atomic(cursor);
-
-                patterns.Add(pattern);
-            }
-
-            var ctor = new A.Pattern.Ctor(name, patterns.ToArray());
-
-            return ctor;
-        }
-
-        private A.Pattern TupleOrCtorOrAliasPattern(Cursor cursor)
-        {
-            cursor.Swallow(Lex.LeftRoundBracket);
-
-            if (cursor.SwallowIf(Lex.RightRoundBracket))
-            {
-                return new A.Pattern.Unit();
-            }
-
-            var p1 = Pattern(cursor);
+            var p2 = Pattern(cursor);
 
             if (cursor.SwallowIf(Lex.Comma))
             {
-                var p2 = Pattern(cursor);
+                var p3 = Pattern(cursor);
 
-                if (cursor.SwallowIf(Lex.Comma))
-                {
-                    var p3 = Pattern(cursor);
+                _ = cursor.Swallow(Lex.RightRoundBracket);
 
-                    cursor.Swallow(Lex.RightRoundBracket);
-
-                    return new A.Pattern.Tuple3(p1, p2, p3);
-                }
-                else
-                {
-                    cursor.Swallow(Lex.RightRoundBracket);
-
-                    return new A.Pattern.Tuple2(p1, p2);
-                }
+                return new A.Pattern.Tuple3(p1, p2, p3);
             }
             else
             {
-                cursor.Swallow(Lex.RightRoundBracket);
+                _ = cursor.Swallow(Lex.RightRoundBracket);
 
-                return p1;
+                return new A.Pattern.Tuple2(p1, p2);
             }
         }
-
-        private A.Pattern.List ListPattern(Cursor cursor)
+        else
         {
-            cursor.Swallow(Lex.LeftSquareBracket);
+            _ = cursor.Swallow(Lex.RightRoundBracket);
 
-            var patterns = new List<A.Pattern>();
-
-            if (cursor.IsNot(Lex.RightSquareBracket))
-            {
-                do
-                {
-                    var pattern = Pattern(cursor);
-
-                    patterns.Add(pattern);
-                }
-                while (cursor.SwallowIf(Lex.Comma));
-            }
-
-            cursor.Swallow(Lex.RightSquareBracket);
-
-            return new A.Pattern.List(patterns);
+            return p1;
         }
+    }
 
-        private A.Pattern RecordPattern(Cursor cursor)
+    private A.Pattern.List ListPattern(Cursor cursor)
+    {
+        _ = cursor.Swallow(Lex.LeftSquareBracket);
+
+        var patterns = new List<A.Pattern>();
+
+        if (cursor.IsNot(Lex.RightSquareBracket))
         {
-            cursor.Swallow(Lex.LeftCurlyBracket);
-
-            var patterns = new List<A.Pattern>();
-
-            if (cursor.IsNot(Lex.RCurlyBracket))
+            do
             {
-                do
-                {
-                    var pattern = Pattern(cursor);
+                var pattern = Pattern(cursor);
 
-                    patterns.Add(pattern);
-                }
-                while (cursor.SwallowIf(Lex.Comma));
+                patterns.Add(pattern);
             }
-
-            cursor.Swallow(Lex.RCurlyBracket);
-
-            return new A.Pattern.Record(patterns.ToArray());
+            while (cursor.SwallowIf(Lex.Comma));
         }
+
+        _ = cursor.Swallow(Lex.RightSquareBracket);
+
+        return new A.Pattern.List(patterns);
+    }
+
+    private A.Pattern RecordPattern(Cursor cursor)
+    {
+        _ = cursor.Swallow(Lex.LeftCurlyBracket);
+
+        var patterns = new List<A.Pattern>();
+
+        if (cursor.IsNot(Lex.RightCurlyBracket))
+        {
+            do
+            {
+                var pattern = Pattern(cursor);
+
+                patterns.Add(pattern);
+            }
+            while (cursor.SwallowIf(Lex.Comma));
+        }
+
+        _ = cursor.Swallow(Lex.RightCurlyBracket);
+
+        return new A.Pattern.Record(patterns.ToArray());
     }
 }

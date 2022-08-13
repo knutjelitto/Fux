@@ -1,74 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Fux.Input.Ast;
 
-namespace Fux.Input.Ast
+public abstract class Exposing : Expr.ExprImpl
 {
-    public abstract class Exposing : Expr.ExprImpl
+}
+
+public sealed class ExposingAll : Exposing
+{
+    public override void PP(Writer writer) => writer.Write($"{ToString()}");
+
+    public override string ToString() => $"{Lex.KwExposing} {Lex.Weak.ExposeAll}";
+}
+
+public sealed class ExposingSome : Exposing
+{
+    public ExposingSome(IEnumerable<Exposed> exposed) => Exposed = exposed.ToArray();
+
+    public ExposingSome(params Exposed[] exposed)
+        : this(exposed.AsEnumerable()) => Assert(Exposed.Count > 0);
+
+    public IReadOnlyList<Exposed> Exposed { get; }
+
+    public override void PP(Writer writer)
     {
-    }
-
-    public sealed class ExposingAll : Exposing
-    {
-        public override void PP(Writer writer)
+        if (Exposed.Count <= 6)
         {
-            writer.Write($"{ToString()}");
+            writer.WriteLine($"{ToString()}");
         }
-
-        public override string ToString()
+        else
         {
-            return $"{Lex.KwExposing} {Lex.Weak.ExposeAll}";
-        }
-    }
-
-    public sealed class ExposingSome : Exposing
-    {
-        public ExposingSome(IEnumerable<Exposed> exposed)
-        {
-            Exposed = exposed.ToArray();
-        }
-
-        public ExposingSome(params Exposed[] exposed)
-            : this(exposed.AsEnumerable())
-        {
-            Assert(Exposed.Count > 0);
-        }
-
-        public IReadOnlyList<Exposed> Exposed { get; }
-
-        public override void PP(Writer writer)
-        {
-            if (Exposed.Count <= 6)
+            writer.Indent(() =>
             {
-                writer.WriteLine($"{ToString()}");
-            }
-            else
-            {
-                writer.Indent(() =>
+                if (writer.LinePending)
                 {
-                    if (writer.LinePending)
-                    {
-                        writer.WriteLine();
-                    }
+                    writer.WriteLine();
+                }
 
-                    var prefix = "( ";
+                var prefix = "( ";
 
-                    foreach (Exposed exposed in Exposed)
-                    {
-                        writer.WriteLine($"{prefix}{exposed}");
-                        prefix = ", ";
-                    }
+                foreach (var exposed in Exposed)
+                {
+                    writer.WriteLine($"{prefix}{exposed}");
+                    prefix = ", ";
+                }
 
-                    writer.WriteLine(")");
-                });
-            }
-        }
-
-        public override string ToString()
-        {
-            return $"{Lex.KwExposing} ({string.Join(", ", Exposed)})";
+                writer.WriteLine(")");
+            });
         }
     }
+
+    public override string ToString() => $"{Lex.KwExposing} ({string.Join(", ", Exposed)})";
 }

@@ -1,14 +1,10 @@
-﻿namespace Fux.Errors
+﻿namespace Fux.Errors;
+
+public abstract class Diagnostic
 {
-    public abstract class Diagnostic
-    {
-        public Diagnostic(Level level)
-        {
-            Level = level;
-        }
+    public Diagnostic(Level level) => Level = level;
 
-        public Level Level { get; }
+    public Level Level { get; }
 
-        public abstract IEnumerable<string> Report();
-    }
+    public abstract IEnumerable<string> Report();
 }

@@ -1,12 +1,9 @@
-﻿using Fux.Input;
+﻿namespace Fux.Errors;
 
-namespace Fux.Errors
+public class LexerError : LocatedMessageError
 {
-    public class LexerError : LocatedMessageError
+    public LexerError(ILocation location, string message)
+        : base(location, message)
     {
-        public LexerError(ILocation location, string message)
-            : base(location, message)
-        {
-        }
     }
 }

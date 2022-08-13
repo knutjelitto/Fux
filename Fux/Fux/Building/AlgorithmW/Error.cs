@@ -1,18 +1,17 @@
-﻿namespace Fux.Building.AlgorithmW
+﻿namespace Fux.Building.AlgorithmW;
+
+public record Error(string Message)
 {
-    public record Error(string Message)
+    public override string ToString() => Message;
+}
+
+public class WError : Exception
+{
+    public WError(Error error) : base(error.Message)
     {
-        public override string ToString() => Message;
     }
 
-    public class WError : Exception
+    public WError(string message) : base(message)
     {
-        public WError(Error error) : base(error.Message)
-        {
-        }
-
-        public WError(string message) : base(message)
-        {
-        }
     }
 }

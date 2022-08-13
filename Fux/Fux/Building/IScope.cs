@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Fux.Building;
 
-namespace Fux.Building
+public interface IScope
 {
-    public interface IScope
-    {
-    }
 }

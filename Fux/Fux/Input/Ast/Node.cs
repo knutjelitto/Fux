@@ -1,49 +1,42 @@
 ﻿using Fux.Building;
 
-namespace Fux.Input.Ast
+namespace Fux.Input.Ast;
+
+public interface Node
 {
-    public interface Node
+    Tokens? Span { get; set; }
+
+    Module? InModule { get; set; }
+
+    ILocation Location { get; }
+
+    void PP(Writer writer);
+
+    string Protected(string text);
+
+    public abstract class NodeImpl : Node
     {
-        Tokens? Span { get; set; }
+        public Tokens? Span { get; set; } = null;
 
-        Module? InModule { get; set; }
+        public Module? InModule { get; set; } = null;
 
-        ILocation Location { get; }
-
-        void PP(Writer writer);
-
-        string Protected(string text);
-
-        public abstract class NodeImpl : Node
+        public ILocation Location
         {
-            public Tokens? Span { get; set; } = null;
-
-            public Module? InModule { get; set; } = null;
-
-            public ILocation Location
+            get
             {
-                get
+                Assert(InModule != null);
+                if (Span == null)
                 {
-                    Assert(InModule != null);
-                    if (Span == null)
-                    {
-                        return new Location(InModule.Source!, 0, 0);
-                    }
-
-                    Assert(Span != null);
-                    return Span[0].Location;
+                    return new Location(InModule.Source!, 0, 0);
                 }
-            }
 
-            public virtual void PP(Writer writer)
-            {
-                writer.Write($"{ToString()}");
-            }
-
-            public string Protected(string text)
-            {
-                return $"({text})";
+                Assert(Span != null);
+                return Span[0].Location;
             }
         }
+
+        public virtual void PP(Writer writer) => writer.Write($"{ToString()}");
+
+        public string Protected(string text) => $"({text})";
     }
 }

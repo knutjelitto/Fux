@@ -1,25 +1,22 @@
-﻿using System.Collections;
+﻿namespace Fux.Input;
 
-namespace Fux.Input
+public sealed class TokenList : IReadOnlyList<Token>
 {
-    public sealed class TokenList : IReadOnlyList<Token>
+    private readonly List<Token> items = new();
+
+    public Token Add(Token token)
     {
-        private readonly List<Token> items = new();
+        Assert(token.Index == -1);
 
-        public Token Add(Token token)
-        {
-            Assert(token.Index == -1);
+        token.Index = items.Count;
 
-            token.Index = items.Count;
+        items.Add(token);
 
-            items.Add(token);
-
-            return token;
-        }
-
-        public Token this[int index] => items[index];
-        public int Count => items.Count;
-        public IEnumerator<Token> GetEnumerator() => items.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        return token;
     }
+
+    public Token this[int index] => items[index];
+    public int Count => items.Count;
+    public IEnumerator<Token> GetEnumerator() => items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

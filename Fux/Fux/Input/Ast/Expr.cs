@@ -4,739 +4,643 @@ using Fux.Building;
 
 #pragma warning disable IDE1006 // Naming Styles
 
-namespace Fux.Input.Ast
+namespace Fux.Input.Ast;
+
+public interface Expr : Node
 {
-    public interface Expr : Node
+    Expr Resolved { get; set; }
+
+    public abstract class ExprImpl : NodeImpl, Expr
     {
-        Expr Resolved { get; set; }
+        protected const int WhatIsLong = 60;
 
-        public abstract class ExprImpl : NodeImpl, Expr
+        public ExprImpl()
         {
-            protected const int WhatIsLong = 60;
-
-            public ExprImpl()
-            {
-                Alias = null;
-                Resolved = this;
-            }
-
-            public Identifier? Alias { get; set; }
-
-            public Expr Resolved { get; set; }
+            Alias = null;
+            Resolved = this;
         }
 
-        public sealed class Arrow : ExprImpl
+        public Identifier? Alias { get; set; }
+
+        public Expr Resolved { get; set; }
+    }
+
+    public sealed class Arrow : ExprImpl
+    {
+        public Arrow(Expr lhs, Expr rhs)
         {
-            public Arrow(Expr lhs, Expr rhs)
-            {
-                Lhs = lhs;
-                Rhs = rhs;
-            }
-
-            public Expr Lhs { get; }
-            public Expr Rhs { get; }
-
-            public override string ToString()
-            {
-                return $"{Lhs} {Lex.Arrow} {Rhs}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                Lhs.PP(writer);
-                writer.Write($" {Lex.Arrow} ");
-                Rhs.PP(writer);
-            }
+            Lhs = lhs;
+            Rhs = rhs;
         }
 
-        public sealed class Dot : ExprImpl
+        public Expr Lhs { get; }
+        public Expr Rhs { get; }
+
+        public override string ToString() => $"{Lhs} {Lex.Arrow} {Rhs}";
+
+        public override void PP(Writer writer)
         {
-            public Dot(Expr rhs)
-            {
-                Rhs = rhs;
-            }
+            Lhs.PP(writer);
+            writer.Write($" {Lex.Arrow} ");
+            Rhs.PP(writer);
+        }
+    }
 
-            public Expr Rhs { get; }
+    public sealed class Dot : ExprImpl
+    {
+        public Dot(Expr rhs) => Rhs = rhs;
 
-            public override string ToString()
-            {
-                return $"{Lex.Dot}{Rhs}";
-            }
+        public Expr Rhs { get; }
 
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{Lex.Dot}{Rhs}");
-            }
+        public override string ToString() => $"{Lex.Dot}{Rhs}";
+
+        public override void PP(Writer writer) => writer.Write($"{Lex.Dot}{Rhs}");
+    }
+
+    public sealed class If : ExprImpl
+    {
+        public If(Expr condition, Expr ifTrue, Expr ifFalse)
+        {
+            Condition = condition;
+            IfTrue = ifTrue;
+            IfFalse = ifFalse;
         }
 
-        public sealed class If : ExprImpl
+        public Expr Condition { get; set; }
+        public Expr IfTrue { get; set; }
+        public Expr IfFalse { get; set; }
+
+        public override string ToString() => $"{Lex.KwIf} {Condition} {Lex.KwThen} {IfTrue} {Lex.KwElse} {IfFalse}";
+
+        public override void PP(Writer writer)
         {
-            public If(Expr condition, Expr ifTrue, Expr ifFalse)
+            var line = ToString();
+
+            if (ToString().Length > WhatIsLong)
             {
-                Condition = condition;
-                IfTrue = ifTrue;
-                IfFalse = ifFalse;
-            }
-
-            public Expr Condition { get; set; }
-            public Expr IfTrue { get; set; }
-            public Expr IfFalse { get; set; }
-
-            public override string ToString()
-            {
-                return $"{Lex.KwIf} {Condition} {Lex.KwThen} {IfTrue} {Lex.KwElse} {IfFalse}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                var line = ToString();
-
-                if (ToString().Length > WhatIsLong)
+                if (writer.LinePending)
                 {
-                    if (writer.LinePending)
-                    {
-                        writer.WriteLine();
-                        writer.Indent(Write);
-                    }
-                    else
-                    {
-                        Write();
-                    }
+                    writer.WriteLine();
+                    writer.Indent(Write);
                 }
                 else
                 {
-                    writer.Write(line);
-                }
-
-                void Write()
-                {
-                    writer.WriteLine($"{Lex.KwIf}");
-                    writer.Indent(() =>
-                    {
-                        Condition.PP(writer);
-                    });
-                    writer.EndLine();
-                    writer.WriteLine($"{Lex.KwThen}");
-                    writer.Indent(() =>
-                    {
-                        IfTrue.PP(writer);
-                    });
-                    writer.EndLine();
-                    writer.WriteLine($"{Lex.KwElse}");
-                    writer.Indent(() =>
-                    {
-                        IfFalse.PP(writer);
-                    });
-                    writer.EndLine();
+                    Write();
                 }
             }
-        }
-
-        public sealed class Infix : ExprImpl
-        {
-            public Infix(OperatorSymbol op, Expr lhs, Expr rhs)
+            else
             {
-                Op = op;
-                Lhs = lhs;
-                Rhs = rhs;
+                writer.Write(line);
             }
 
-            public OperatorSymbol Op { get; }
-            public Expr Lhs { get; }
-            public Expr Rhs { get; }
-
-            public override string ToString()
+            void Write()
             {
-                return Protected($"{Lhs} {Op.Text} {Rhs}");
-            }
-
-            public override void PP(Writer writer)
-            {
-                Lhs.PP(writer);
-                writer.Write($" {Op.Text} ");
-                Rhs.PP(writer);
-            }
-        }
-        public sealed class Lambda : ExprImpl
-        {
-            public Lambda(List<Pattern> parameters, Expr expr)
-            {
-                Parameters = parameters;
-                Expression = expr;
-            }
-
-            public List<Pattern> Parameters { get; set; }
-            public Expr Expression { get; set; }
-
-            public LetScope Scope { get; } = new();
-
-            public override string ToString()
-            {
-                var parameters = string.Join(" ", Parameters);
-                return Protected($"{Lex.Lambda}{parameters} {Lex.Arrow} {Expression}");
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write(ToString());
-            }
-        }
-
-        public sealed class Case : ExprImpl
-        {
-            public Case(Pattern pattern, Expr expression)
-            {
-                Pattern = pattern;
-                Expression = expression;
-
-                Collector.Instance.MatchPattern.Add(Pattern);
-            }
-
-            public Pattern Pattern { get; set; }
-            public Expr Expression { get; set; }
-
-            public LetScope Scope { get; } = new();
-
-            public override string ToString()
-            {
-                return $"{Pattern} {Lex.Arrow} {Expression}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{Pattern} {Lex.Arrow} ");
-                Expression.PP(writer);
+                writer.WriteLine($"{Lex.KwIf}");
+                writer.Indent(() => Condition.PP(writer));
+                writer.EndLine();
+                writer.WriteLine($"{Lex.KwThen}");
+                writer.Indent(() => IfTrue.PP(writer));
+                writer.EndLine();
+                writer.WriteLine($"{Lex.KwElse}");
+                writer.Indent(() => IfFalse.PP(writer));
                 writer.EndLine();
             }
         }
+    }
 
-        public sealed class Let : ExprImpl
+    public sealed class Infix : ExprImpl
+    {
+        public Infix(OperatorSymbol op, Expr lhs, Expr rhs)
         {
-            public Let(List<Decl> letExpressions, Expr inExpression)
-            {
-                LetDecls = letExpressions;
-                InExpression = inExpression;
-            }
-
-            public List<Decl> LetDecls { get; }
-            public Expr InExpression { get; set; }
-
-            public LetScope Scope { get; set; } = new();
-
-            public override string ToString()
-            {
-                string joined = string.Join(" ", LetDecls.Select(x => $"{Lex.GroupOpen} {x} {Lex.GroupClose}"));
-
-                return $"let {joined} in {InExpression}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                if (writer.LinePending)
-                {
-                    writer.WriteLine();
-                    writer.Indent(Write);
-                }
-                else
-                {
-                    Write();
-                }
-
-                void Write()
-                {
-                    writer.WriteLine(Lex.KwLet);
-                    writer.Indent(() =>
-                    {
-                        foreach (var expr in LetDecls)
-                        {
-                            expr.PP(writer);
-                            if (writer.LinePending)
-                            {
-                                writer.WriteLine();
-                            }
-                        }
-                    });
-                    writer.WriteLine(Lex.KwIn);
-                    writer.Indent(() =>
-                    {
-                        InExpression.PP(writer);
-                    });
-                    if (writer.LinePending)
-                    {
-                        writer.WriteLine();
-                    }
-                }
-            }
+            Op = op;
+            Lhs = lhs;
+            Rhs = rhs;
         }
 
-        public sealed class List : ListOf<Expr>
+        public OperatorSymbol Op { get; }
+        public Expr Lhs { get; }
+        public Expr Rhs { get; }
+
+        public override string ToString() => Protected($"{Lhs} {Op.Text} {Rhs}");
+
+        public override void PP(Writer writer)
         {
-            public List(IReadOnlyList<Expr> expressions)
-                : base(expressions)
-            {
-            }
-
-            public override string ToString()
-            {
-                var joined = string.Join(", ", this);
-                return $"{Lex.LeftSquareBracket}{joined}{Lex.RightSquareBracket}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{Lex.LeftSquareBracket}");
-                var more = false;
-                foreach (var expression in this)
-                {
-                    if (more)
-                    {
-                        writer.Write($"{Lex.Comma} ");
-                    }
-                    more = true;
-                    expression.PP(writer);
-                }
-                writer.Write($"{Lex.RightSquareBracket}");
-            }
+            Lhs.PP(writer);
+            writer.Write($" {Op.Text} ");
+            Rhs.PP(writer);
+        }
+    }
+    public sealed class Lambda : ExprImpl
+    {
+        public Lambda(List<Pattern> parameters, Expr expr)
+        {
+            Parameters = parameters;
+            Expression = expr;
         }
 
-        public sealed class Matcher : ExprImpl
+        public List<Pattern> Parameters { get; set; }
+        public Expr Expression { get; set; }
+
+        public LetScope Scope { get; } = new();
+
+        public override string ToString()
         {
-            public Matcher(Expr expression, List<Case> cases)
-            {
-                Expression = expression;
-                Cases = cases;
-            }
-
-            public Expr Expression { get; set; }
-            public List<Case> Cases { get; }
-
-            public override string ToString()
-            {
-                var cases = string.Join(" ", Cases.Select(@case => $"{Lex.GroupOpen} {@case} {Lex.GroupClose}"));
-                return $"case {Expression} of {cases}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                if (writer.LinePending)
-                {
-                    writer.WriteLine();
-                    writer.Indent(Write);
-                }
-                else
-                {
-                    Write();
-                }
-
-                void Write()
-                {
-                    writer.Write($"{Lex.KwCase} ");
-                    Expression.PP(writer);
-                    writer.WriteLine($" {Lex.KwOf}");
-                    writer.Indent(() =>
-                    {
-                        foreach (var casee in Cases)
-                        {
-                            casee.PP(writer);
-                            if (writer.LinePending)
-                            {
-                                writer.WriteLine();
-                            }
-                        }
-                    });
-                }
-            }
+            var parameters = string.Join(" ", Parameters);
+            return Protected($"{Lex.Lambda}{parameters} {Lex.Arrow} {Expression}");
         }
 
-        public sealed class Prefix : ExprImpl
+        public override void PP(Writer writer) => writer.Write(ToString());
+    }
+
+    public sealed class Case : ExprImpl
+    {
+        public Case(Pattern pattern, Expr expression)
         {
-            public Prefix(OperatorSymbol op, Expr rhs)
-            {
-                Op = op;
-                Rhs = rhs;
-            }
+            Pattern = pattern;
+            Expression = expression;
 
-            public OperatorSymbol Op { get; }
-            public Expr Rhs { get; set; }
-
-            public override string ToString()
-            {
-                return $"{Op.Text} {Rhs}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{this}");
-            }
+            Collector.Instance.MatchPattern.Add(Pattern);
         }
 
-        public sealed class Field : ExprImpl
+        public Pattern Pattern { get; set; }
+        public Expr Expression { get; set; }
+
+        public LetScope Scope { get; } = new();
+
+        public override string ToString() => $"{Pattern} {Lex.Arrow} {Expression}";
+
+        public override void PP(Writer writer)
         {
-            public Field(Identifier name, Expr? expression)
-            {
-                Name = name;
-                Expression = expression;
-            }
+            writer.Write($"{Pattern} {Lex.Arrow} ");
+            Expression.PP(writer);
+            writer.EndLine();
+        }
+    }
 
-            public Identifier Name { get; }
-            public Expr? Expression { get; set; }
-
-            public override string ToString() => Name.OptJoin(" = ", Expression);
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{this}");
-            }
+    public sealed class Let : ExprImpl
+    {
+        public Let(List<Decl> letExpressions, Expr inExpression)
+        {
+            LetDecls = letExpressions;
+            InExpression = inExpression;
         }
 
-        public sealed class Record : ExprImpl
+        public List<Decl> LetDecls { get; }
+        public Expr InExpression { get; set; }
+
+        public LetScope Scope { get; set; } = new();
+
+        public override string ToString()
         {
-            public Record(Identifier? baseRecord, IEnumerable<Field> fields)
+            var joined = string.Join(" ", LetDecls.Select(x => $"{Lex.GroupOpen} {x} {Lex.GroupClose}"));
+
+            return $"let {joined} in {InExpression}";
+        }
+
+        public override void PP(Writer writer)
+        {
+            if (writer.LinePending)
             {
-                Fields = fields.ToList();
-                BaseRecord = baseRecord;
+                writer.WriteLine();
+                writer.Indent(Write);
+            }
+            else
+            {
+                Write();
             }
 
-            public Identifier? BaseRecord { get; }
-            public List<Field> Fields { get; }
-
-            public LetScope Scope { get; } = new();
-
-            public override string ToString()
+            void Write()
             {
-                var joined = string.Join(", ", Fields);
-                var baser = BaseRecord == null ? "" : $" {BaseRecord}, ";
-                return $"{Lex.LeftCurlyBracket} {baser}{joined} {Lex.RCurlyBracket}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                var line = ToString();
-
-                if (line.Length > WhatIsLong)
+                writer.WriteLine(Lex.KwLet);
+                writer.Indent(() =>
                 {
-                    if (writer.LinePending)
+                    foreach (var expr in LetDecls)
                     {
-                        writer.WriteLine();
-                        writer.Indent(Write);
-                    }
-                    else
-                    {
-                        Write();
-                    }
-                }
-                else
-                {
-                    writer.Write(line);
-                }
-
-                void Write()
-                {
-                    writer.Write($"{Lex.LeftCurlyBracket} ");
-                    var more = false;
-                    if (BaseRecord != null)
-                    {
-                        writer.Write($"{BaseRecord}");
-                        more = true;
-                    }
-                    foreach (var expression in Fields)
-                    {
-                        if (more)
+                        expr.PP(writer);
+                        if (writer.LinePending)
                         {
                             writer.WriteLine();
-                            writer.Write($"{Lex.Comma} ");
                         }
-                        more = true;
-                        expression.PP(writer);
                     }
-                    writer.EndLine();
-                    writer.Write($"{Lex.RCurlyBracket}");
-                }
-            }
-        }
-
-        public sealed class Select : ExprImpl
-        {
-            public Select(Expr lhs, Expr rhs)
-            {
-                Lhs = lhs;
-                Rhs = rhs;
-            }
-
-            public Expr Lhs { get; set; }
-            public Expr Rhs { get; set; }
-
-            public override string ToString()
-            {
-                return $"{Lhs}{Lex.Dot}{Rhs}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                Lhs.PP(writer);
-                writer.Write($"{Lex.Dot}{Rhs}");
-            }
-        }
-
-        public sealed class Application : ListOf<Expr>
-        {
-            public Application(IEnumerable<Expr> expressions)
-                : base(expressions)
-            {
-                Assert(Count >= 1);
-            }
-
-            public Application(params Expr[] expressions)
-                : this(expressions.AsEnumerable())
-            {
-            }
-
-            public bool IsApplication => Count >= 2;
-            public bool IsSingle => Count == 1;
-
-            public Expr Single
-            {
-                get
+                });
+                writer.WriteLine(Lex.KwIn);
+                writer.Indent(() => InExpression.PP(writer));
+                if (writer.LinePending)
                 {
-                    Assert(IsSingle);
-                    return this[0];
+                    writer.WriteLine();
                 }
             }
+        }
+    }
 
-            public override string ToString()
-            {
-                var joined = string.Join(" ", this);
-
-                return Protected($"{joined}");
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write(ToString());
-            }
+    public sealed class List : ListOf<Expr>
+    {
+        public List(IReadOnlyList<Expr> expressions)
+            : base(expressions)
+        {
         }
 
-        public sealed class Ctor : ExprImpl
+        public override string ToString()
         {
-            public Ctor(Identifier name, IEnumerable<Expr> arguments)
-            {
-                Name = name.MultiUpper();
-                Arguments = arguments.ToList();
-            }
-
-            public Identifier Name { get; set; }
-            public List<Expr> Arguments { get; }
-
-            public override string ToString()
-            {
-                return $"{Name}{Arguments.SpaceJoin()}";
-            }
+            var joined = string.Join(", ", this);
+            return $"{Lex.LeftSquareBracket}{joined}{Lex.RightSquareBracket}";
         }
 
-        public sealed class Tuple : ListOf<Expr>
+        public override void PP(Writer writer)
         {
-            public Tuple(IEnumerable<Expr> expressions)
-                : base(expressions)
+            writer.Write($"{Lex.LeftSquareBracket}");
+            var more = false;
+            foreach (var expression in this)
             {
-                Assert(Count >= 1 && Count <= 3);
+                if (more)
+                {
+                    writer.Write($"{Lex.Comma} ");
+                }
+                more = true;
+                expression.PP(writer);
+            }
+            writer.Write($"{Lex.RightSquareBracket}");
+        }
+    }
+
+    public sealed class Matcher : ExprImpl
+    {
+        public Matcher(Expr expression, List<Case> cases)
+        {
+            Expression = expression;
+            Cases = cases;
+        }
+
+        public Expr Expression { get; set; }
+        public List<Case> Cases { get; }
+
+        public override string ToString()
+        {
+            var cases = string.Join(" ", Cases.Select(@case => $"{Lex.GroupOpen} {@case} {Lex.GroupClose}"));
+            return $"case {Expression} of {cases}";
+        }
+
+        public override void PP(Writer writer)
+        {
+            if (writer.LinePending)
+            {
+                writer.WriteLine();
+                writer.Indent(Write);
+            }
+            else
+            {
+                Write();
             }
 
-            public override string ToString()
+            void Write()
             {
-                return $"{Lex.LeftRoundBracket}{string.Join(", ", this)}{Lex.RightRoundBracket}";
+                writer.Write($"{Lex.KwCase} ");
+                Expression.PP(writer);
+                writer.WriteLine($" {Lex.KwOf}");
+                writer.Indent(() =>
+                {
+                    foreach (var casee in Cases)
+                    {
+                        casee.PP(writer);
+                        if (writer.LinePending)
+                        {
+                            writer.WriteLine();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    public sealed class Prefix : ExprImpl
+    {
+        public Prefix(OperatorSymbol op, Expr rhs)
+        {
+            Op = op;
+            Rhs = rhs;
+        }
+
+        public OperatorSymbol Op { get; }
+        public Expr Rhs { get; set; }
+
+        public override string ToString() => $"{Op.Text} {Rhs}";
+
+        public override void PP(Writer writer) => writer.Write($"{this}");
+    }
+
+    public sealed class Field : ExprImpl
+    {
+        public Field(Identifier name, Expr? expression)
+        {
+            Name = name;
+            Expression = expression;
+        }
+
+        public Identifier Name { get; }
+        public Expr? Expression { get; set; }
+
+        public override string ToString() => Name.OptJoin(" = ", Expression);
+
+        public override void PP(Writer writer) => writer.Write($"{this}");
+    }
+
+    public sealed class Record : ExprImpl
+    {
+        public Record(Identifier? baseRecord, IEnumerable<Field> fields)
+        {
+            Fields = fields.ToList();
+            BaseRecord = baseRecord;
+        }
+
+        public Identifier? BaseRecord { get; }
+        public List<Field> Fields { get; }
+
+        public LetScope Scope { get; } = new();
+
+        public override string ToString()
+        {
+            var joined = string.Join(", ", Fields);
+            var baser = BaseRecord == null ? "" : $" {BaseRecord}, ";
+            return $"{Lex.LeftCurlyBracket} {baser}{joined} {Lex.RightCurlyBracket}";
+        }
+
+        public override void PP(Writer writer)
+        {
+            var line = ToString();
+
+            if (line.Length > WhatIsLong)
+            {
+                if (writer.LinePending)
+                {
+                    writer.WriteLine();
+                    writer.Indent(Write);
+                }
+                else
+                {
+                    Write();
+                }
+            }
+            else
+            {
+                writer.Write(line);
             }
 
-            public override void PP(Writer writer)
+            void Write()
             {
-                writer.Write($"{Lex.LeftRoundBracket}");
+                writer.Write($"{Lex.LeftCurlyBracket} ");
                 var more = false;
-                foreach (var expression in this)
+                if (BaseRecord != null)
+                {
+                    writer.Write($"{BaseRecord}");
+                    more = true;
+                }
+                foreach (var expression in Fields)
                 {
                     if (more)
                     {
+                        writer.WriteLine();
                         writer.Write($"{Lex.Comma} ");
                     }
                     more = true;
                     expression.PP(writer);
                 }
-                writer.Write($"{Lex.RightRoundBracket}");
+                writer.EndLine();
+                writer.Write($"{Lex.RightCurlyBracket}");
             }
         }
+    }
 
-        public sealed class Unit : ExprImpl
+    public sealed class Select : ExprImpl
+    {
+        public Select(Expr lhs, Expr rhs)
         {
-            public override string ToString()
-            {
-                return "()";
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write("()");
-            }
+            Lhs = lhs;
+            Rhs = rhs;
         }
-        public abstract class Literal : ExprImpl
+
+        public Expr Lhs { get; set; }
+        public Expr Rhs { get; set; }
+
+        public override string ToString() => $"{Lhs}{Lex.Dot}{Rhs}";
+
+        public override void PP(Writer writer)
         {
-            public Literal(Token token)
-            {
-                Token = token;
-            }
-
-            public Token Token { get; }
-
-            public override string ToString()
-            {
-                return $"{Token}";
-            }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{Token}");
-            }
-
-            public sealed class Integer : Literal
-            {
-                public Integer(Token token)
-                    : base(token)
-                {
-                    Assert(token.Lex == Lex.Integer);
-
-                    var text = Token.Text;
-
-                    if (text.StartsWith("0x"))
-                    {
-                        Value = long.Parse(text[2..], NumberStyles.HexNumber);
-                    }
-                    else
-                    {
-                        Value = long.Parse(text, NumberStyles.Integer);
-                    }
-                }
-
-                public long Value { get; }
-            }
-
-            public sealed class Float : Literal
-            {
-                public Float(Token token)
-                    : base(token)
-                {
-                    Assert(token.Lex == Lex.Float);
-
-                    var text = token.Text;
-
-                    Value = double.Parse(text);
-                }
-
-                public double Value { get; }
-            }
-
-            public sealed class Char : Literal
-            {
-                public Char(Token token)
-                    : base(token)
-                {
-                    Assert(token.Lex == Lex.Char);
-                }
-            }
-
-            public sealed class String : Literal
-            {
-                public String(Token token)
-                    : base(token)
-                {
-                    Assert(token.Lex == Lex.String);
-
-                    var text = token.Text;
-
-                    Assert(text.StartsWith('\"') && !text.StartsWith("\"\"\""));
-                    Assert(text.EndsWith('\"') && !text.EndsWith("\"\"\""));
-
-                    Value = text[1..^1];
-                }
-
-                public string Value { get; }
-            }
-
-            public sealed class LongString : Literal
-            {
-                public LongString(Token token)
-                    : base(token)
-                {
-                    Assert(token.Lex == Lex.LongString);
-
-                    var text = token.Text;
-
-                    Assert(text.StartsWith("\"\"\""));
-                    Assert(text.EndsWith("\"\"\""));
-
-                    Value = text[3..^3];
-                }
-
-                public string Value { get; }
-            }
+            Lhs.PP(writer);
+            writer.Write($"{Lex.Dot}{Rhs}");
         }
+    }
 
-        public abstract class Ref : Expr.ExprImpl
+    public sealed class Application : ListOf<Expr>
+    {
+        public Application(IEnumerable<Expr> expressions)
+            : base(expressions) => Assert(Count >= 1);
+
+        public Application(params Expr[] expressions)
+            : this(expressions.AsEnumerable())
         {
-            public Ref(Decl decl)
+        }
+
+        public bool IsApplication => Count >= 2;
+        public bool IsSingle => Count == 1;
+
+        public Expr Single
+        {
+            get
             {
-                Declaration = decl;
-            }
-
-            public Decl Declaration { get; }
-
-            public override void PP(Writer writer)
-            {
-                writer.Write($"{Declaration}");
-            }
-
-            public abstract class RefImpl<T> : Ref
-                where T : Decl
-            {
-                public RefImpl(T declaration)
-                    : base(declaration)
-                {
-                }
-
-                public T Decl => (T)Declaration;
-            }
-
-            public sealed class Parameter : RefImpl<Decl.Parameter>
-            {
-                public Parameter(Decl.Parameter decl) : base(decl) { }
-            }
-
-            public sealed class Var : RefImpl<Decl.Var>
-            {
-                public Var(Decl.Var decl) : base(decl) { }
-            }
-
-            public sealed class Ctor : RefImpl<Decl.Ctor>
-            {
-                public Ctor(Decl.Ctor decl) : base(decl) { }
-            }
-
-            public sealed class Infix : RefImpl<Decl.Infix>
-            {
-                public Infix(Decl.Infix decl) : base(decl) { }
-            }
-
-            public sealed class Type : RefImpl<Decl.Custom>
-            {
-                public Type(Decl.Custom decl) : base(decl) { }
-            }
-
-            public sealed new class Alias : RefImpl<Decl.Alias>
-            {
-                public Alias(Decl.Alias decl) : base(decl) { }
-            }
-
-            public sealed class Native : RefImpl<Decl.Native>
-            {
-                public Native(Decl.Native decl) : base(decl) { }
+                Assert(IsSingle);
+                return this[0];
             }
         }
 
+        public override string ToString()
+        {
+            var joined = string.Join(" ", this);
+
+            return Protected($"{joined}");
+        }
+
+        public override void PP(Writer writer) => writer.Write(ToString());
+    }
+
+    public sealed class Ctor : ExprImpl
+    {
+        public Ctor(Identifier name, IEnumerable<Expr> arguments)
+        {
+            Name = name.MultiUpper();
+            Arguments = arguments.ToList();
+        }
+
+        public Identifier Name { get; set; }
+        public List<Expr> Arguments { get; }
+
+        public override string ToString() => $"{Name}{Arguments.SpaceJoin()}";
+    }
+
+    public sealed class Tuple : ListOf<Expr>
+    {
+        public Tuple(IEnumerable<Expr> expressions)
+            : base(expressions) => Assert(Count is >= 1 and <= 3);
+
+        public override string ToString() => $"{Lex.LeftRoundBracket}{string.Join(", ", this)}{Lex.RightRoundBracket}";
+
+        public override void PP(Writer writer)
+        {
+            writer.Write($"{Lex.LeftRoundBracket}");
+            var more = false;
+            foreach (var expression in this)
+            {
+                if (more)
+                {
+                    writer.Write($"{Lex.Comma} ");
+                }
+                more = true;
+                expression.PP(writer);
+            }
+            writer.Write($"{Lex.RightRoundBracket}");
+        }
+    }
+
+    public sealed class Unit : ExprImpl
+    {
+        public override string ToString() => "()";
+
+        public override void PP(Writer writer) => writer.Write("()");
+    }
+    public abstract class Literal : ExprImpl
+    {
+        public Literal(Token token) => Token = token;
+
+        public Token Token { get; }
+
+        public override string ToString() => $"{Token}";
+
+        public override void PP(Writer writer) => writer.Write($"{Token}");
+
+        public sealed class Integer : Literal
+        {
+            public Integer(Token token)
+                : base(token)
+            {
+                Assert(token.Lex == Lex.Integer);
+
+                var text = Token.Text;
+
+                Value = text.StartsWith("0x") ? long.Parse(text[2..], NumberStyles.HexNumber) : long.Parse(text, NumberStyles.Integer);
+            }
+
+            public long Value { get; }
+        }
+
+        public sealed class Float : Literal
+        {
+            public Float(Token token)
+                : base(token)
+            {
+                Assert(token.Lex == Lex.Float);
+
+                var text = token.Text;
+
+                Value = double.Parse(text);
+            }
+
+            public double Value { get; }
+        }
+
+        public sealed class Char : Literal
+        {
+            public Char(Token token)
+                : base(token) => Assert(token.Lex == Lex.Char);
+        }
+
+        public sealed class String : Literal
+        {
+            public String(Token token)
+                : base(token)
+            {
+                Assert(token.Lex == Lex.String);
+
+                var text = token.Text;
+
+                Assert(text.StartsWith('\"') && !text.StartsWith("\"\"\""));
+                Assert(text.EndsWith('\"') && !text.EndsWith("\"\"\""));
+
+                Value = text[1..^1];
+            }
+
+            public string Value { get; }
+        }
+
+        public sealed class LongString : Literal
+        {
+            public LongString(Token token)
+                : base(token)
+            {
+                Assert(token.Lex == Lex.LongString);
+
+                var text = token.Text;
+
+                Assert(text.StartsWith("\"\"\""));
+                Assert(text.EndsWith("\"\"\""));
+
+                Value = text[3..^3];
+            }
+
+            public string Value { get; }
+        }
+    }
+
+    public abstract class Ref : Expr.ExprImpl
+    {
+        public Ref(Decl decl) => Declaration = decl;
+
+        public Decl Declaration { get; }
+
+        public override void PP(Writer writer) => writer.Write($"{Declaration}");
+
+        public abstract class RefImpl<T> : Ref
+            where T : Decl
+        {
+            public RefImpl(T declaration)
+                : base(declaration)
+            {
+            }
+
+            public T Decl => (T)Declaration;
+        }
+
+        public sealed class Parameter : RefImpl<Decl.Parameter>
+        {
+            public Parameter(Decl.Parameter decl) : base(decl) { }
+        }
+
+        public sealed class Var : RefImpl<Decl.Var>
+        {
+            public Var(Decl.Var decl) : base(decl) { }
+        }
+
+        public sealed class Ctor : RefImpl<Decl.Ctor>
+        {
+            public Ctor(Decl.Ctor decl) : base(decl) { }
+        }
+
+        public sealed class Infix : RefImpl<Decl.Infix>
+        {
+            public Infix(Decl.Infix decl) : base(decl) { }
+        }
+
+        public sealed class Type : RefImpl<Decl.Custom>
+        {
+            public Type(Decl.Custom decl) : base(decl) { }
+        }
+
+        public new sealed class Alias : RefImpl<Decl.Alias>
+        {
+            public Alias(Decl.Alias decl) : base(decl) { }
+        }
+
+        public sealed class Native : RefImpl<Decl.Native>
+        {
+            public Native(Decl.Native decl) : base(decl) { }
+        }
     }
 }

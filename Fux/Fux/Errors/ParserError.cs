@@ -1,12 +1,9 @@
-﻿using Fux.Input;
+﻿namespace Fux.Errors;
 
-namespace Fux.Errors
+public class ParserError : LocatedMessageError
 {
-    public class ParserError : LocatedMessageError
+    public ParserError(ILocation location, string message)
+        : base(location, message)
     {
-        public ParserError(ILocation location, string message)
-            : base(location, message)
-        {
-        }
     }
 }

@@ -1,13 +1,12 @@
-﻿namespace Fux.Input
+﻿namespace Fux.Input;
+
+public interface ISource
 {
-    public interface ISource
-    {
-        public string Display { get; }
+    public string Display { get; }
 
-        public string Path { get; }
+    public string Path { get; }
 
-        (int line, int column) GetLineColumn(int offset);
+    (int line, int column) GetLineColumn(int offset);
 
-        string GetText(ILocation location);
-    }
+    string GetText(ILocation location);
 }

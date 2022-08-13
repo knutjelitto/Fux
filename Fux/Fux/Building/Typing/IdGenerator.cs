@@ -1,31 +1,24 @@
-﻿namespace Fux.Building.Typing
+﻿namespace Fux.Building.Typing;
+
+public class IdGenerator
 {
-    public class IdGenerator
+    private readonly Dictionary<string, int> counters = new();
+
+    public IdGenerator(Module module) => Module = module;
+
+    public Module Module { get; }
+
+    public void Clear() => counters.Clear();
+
+    public A.Identifier For(string prefix)
     {
-        private readonly Dictionary<string, int> counters = new();
-
-        public IdGenerator(Module module)
+        if (!counters.TryGetValue(prefix, out var count))
         {
-            Module = module;
+            count = 0;
+            counters.Add(prefix, count);
         }
-
-        public Module Module { get; }
-
-        public void Clear()
-        {
-            counters.Clear();
-        }
-
-        public A.Identifier For(string prefix)
-        {
-            if (!counters.TryGetValue(prefix, out int count))
-            {
-                count = 0;
-                counters.Add(prefix, count);
-            }
-            count++;
-            counters[prefix] = count;
-            return A.Identifier.Artificial(Module, $"{prefix}_{count}");
-        }
+        count++;
+        counters[prefix] = count;
+        return A.Identifier.Artificial(Module, $"{prefix}_{count}");
     }
 }

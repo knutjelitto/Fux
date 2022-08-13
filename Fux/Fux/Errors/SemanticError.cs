@@ -1,10 +1,9 @@
-﻿namespace Fux.Errors
+﻿namespace Fux.Errors;
+
+public class SemanticError : LocatedMessageError
 {
-    public class SemanticError : LocatedMessageError
+    public SemanticError(ILocation location, string message)
+        : base(location, message)
     {
-        public SemanticError(ILocation location, string message)
-            : base(location, message)
-        {
-        }
     }
 }

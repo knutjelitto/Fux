@@ -1,55 +1,34 @@
-﻿namespace Fux.Input.Ast
+﻿namespace Fux.Input.Ast;
+
+public abstract class Exposed
 {
-    public abstract class Exposed
+    protected Exposed(Identifier name) => Name = name;
+
+    public Identifier Name { get; }
+
+    public sealed class Type : Exposed
     {
-        protected Exposed(Identifier name)
+        public Type(Identifier name, bool inclusive)
+            : base(name)
         {
-            Name = name;
+            Assert(name.IsSingleUpper);
+            Inclusive = inclusive;
         }
 
-        public Identifier Name { get; }
+        public bool Inclusive { get; }
 
+        public void Add(Decl.Ctor ctor) => ((List<Decl.Ctor>)Ctors).Add(ctor);
 
-        public sealed class Type : Exposed
-        {
-            public Type(Identifier name, bool inclusive)
-                : base(name)
-            {
-                Assert(name.IsSingleUpper);
-                Inclusive = inclusive;
-            }
+        public IReadOnlyList<Decl.Ctor> Ctors { get; } = new List<Decl.Ctor>();
 
-            public bool Inclusive { get; }
+        public override string ToString() => Inclusive ? $"{Name}{Lex.Weak.ExposeAll}" : $"{Name}";
+    }
 
-            public void Add(Decl.Ctor ctor)
-            {
-                ((List<Decl.Ctor>)Ctors).Add(ctor);
-            }
+    public sealed class Var : Exposed
+    {
+        public Var(Identifier name)
+            : base(name) => Assert(name.IsSingleLower || name.IsSingleOp);
 
-            public IReadOnlyList<Decl.Ctor> Ctors { get; } = new List<Decl.Ctor>();
-
-            public override string ToString()
-            {
-                if (Inclusive)
-                {
-                    return $"{Name}{Lex.Weak.ExposeAll}";
-                }
-                return $"{Name}";
-            }
-        }
-
-        public sealed class Var : Exposed
-        {
-            public Var(Identifier name)
-                : base(name)
-            {
-                Assert(name.IsSingleLower || name.IsSingleOp);
-            }
-
-            public override string ToString()
-            {
-                return $"{Name}";
-            }
-        }
+        public override string ToString() => $"{Name}";
     }
 }

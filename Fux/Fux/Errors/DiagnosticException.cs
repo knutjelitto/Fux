@@ -1,12 +1,8 @@
-﻿namespace Fux.Errors
-{
-    public class DiagnosticException : Exception
-    {
-        public DiagnosticException(params Diagnostic[] diagnostics)
-        {
-            Diagnostics = diagnostics;
-        }
+﻿namespace Fux.Errors;
 
-        public Diagnostic[] Diagnostics { get; }
-    }
+public class DiagnosticException : Exception
+{
+    public DiagnosticException(params Diagnostic[] diagnostics) => Diagnostics = diagnostics;
+
+    public Diagnostic[] Diagnostics { get; }
 }

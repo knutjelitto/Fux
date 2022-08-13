@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FuxX\FuxX.csproj" />
     <ProjectReference Include="..\Fux\Fux.csproj" />
   </ItemGroup>
 

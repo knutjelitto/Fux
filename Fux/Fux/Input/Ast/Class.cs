@@ -1,5 +1,1 @@
-﻿using Fux.Building;
-
-namespace Fux.Input.Ast
-{
-}
+﻿namespace Fux.Input.Ast;

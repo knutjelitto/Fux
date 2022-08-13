@@ -2,132 +2,100 @@
 using Fux.Files;
 using Fux.Input;
 
-using Microsoft.Extensions.FileSystemGlobbing;
-using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
+namespace App;
 
-namespace App
+internal class Program
 {
-    internal class Program
+    private static void Main(string[] args) => BringUp();
+
+    private static void BringUp()
     {
-        static void Main(string[] args)
+        var top = new Root();
+        Console.WriteLine($"top: {top}");
+        var tmp = top.Sub("Tmp").EnshureFolder();
+        Console.WriteLine($"tmp: {tmp}");
+        var src = top.Sub("Src").EnshureFolder();
+        Console.WriteLine($"src: {src}");
+
+        var repo = new Repository(src);
+
+        Console.WriteLine("===");
+        foreach (var sourceUnit in repo.Sources)
         {
-            BringUp();
-
-            return;
-
-            var top = new Root();
-            Console.WriteLine($"top: {top}");
-
-            var src = top.Sub("Src").EnshureFolder();
-            Console.WriteLine($"src: {src}");
-
-            var tmp = top.Sub("Tmp").EnshureFolder();
-            Console.WriteLine($"tmp: {tmp}");
-
-            var coreFolder = src.Sub("Core").EnshureFolder();
-            Console.WriteLine($"Core: {coreFolder}");
-
-            var repo = new PackageRepo(src);
-            repo.Glob();
-
-            var core = new PackageFile(repo, "Fux/Core");
-
-            var matcher = new Matcher();
-            foreach (var pattern in core.Json.Sources)
+            var writerPath = tmp.Sub("All") / sourceUnit.Package.Path / sourceUnit.Path;
+            using (var writer = writerPath.Writer())
             {
-                matcher.AddInclude(pattern);
+                Console.WriteLine($"{sourceUnit.Package} - {sourceUnit}");
+
+                Lexx(writer, sourceUnit.Source);
             }
-
-            var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(coreFolder)));
-
-            foreach (var sourceMatch in matches.Files.Select(sm => new SourceFile(core, sm.Path)))
-            {
-                Console.WriteLine($"file: {sourceMatch}");
-            }
-
-            WaitKey();
         }
 
-        static void BringUp()
+        WaitKey();
+    }
+
+    private static void Lexx(Writer writer, Source source)
+    {
+        const string ind = "  ";
+        const string sep = $"{ind}-";
+
+        Console.Write($"{ind}{source.Count,5} characters");
+
+        var errors = new ErrorBag();
+        var lexer = new Lexer(errors, source.Clone());
+        var count = 0;
+
+        while (true)
         {
-            var top = new Root();
-            Console.WriteLine($"top: {top}");
+            var token = lexer.GetNext();
+            count++;
 
-            var src = top.Sub("Src").EnshureFolder();
-            Console.WriteLine($"src: {src}");
+            if (token.Lex == Lex.EOF)
+            {
+                break;
+            }
+        }
+        Console.Write($"{sep}{count,5} raw tokens");
 
-            var tmp = top.Sub("Tmp").EnshureFolder();
-            Console.WriteLine($"tmp: {tmp}");
+        lexer = new Lexer(errors, source.Clone());
+        var liner = new Liner(errors, lexer);
 
-            var coreFolder = src.Sub("Core").EnshureFolder();
-            Console.WriteLine($"Core: {coreFolder}");
+        Console.Write($"{sep}{liner.TokenCount,5} tokens");
 
-            var repo = new PackageRepo(src);
-            repo.Glob();
+        var elements = new List<Tokens>();
+        while (true)
+        {
+            var element = liner.GetElement();
+            elements.Add(element);
 
-            WaitKey();
+            if (element.Eof)
+            {
+                break;
+            }
         }
 
-        static void Lexx(Writer writer, Source source)
+        Console.WriteLine($"{sep}{elements.Count - 1,5} elements");
+
+        foreach (var element in elements)
         {
-            Console.WriteLine($"  .. {source.Count} characters");
-
-            var errors = new ErrorBag();
-            var lexer = new Lexer(errors, source.Clone());
-            var count = 0;
-
-            while (true)
+            foreach (var token in element)
             {
-                var token = lexer.GetNext();
-                count++;
-
-                if (token.Lex == Lex.EOF)
+                foreach (var white in token.Whites)
                 {
-                    break;
+                    _ = white.Text;
+                    writer.Write($"{white.Text}");
                 }
+                writer.Write($"{token.Text}");
             }
-            Console.WriteLine($"  .. {count} raw tokens");
-
-            lexer = new Lexer(errors, source.Clone());
-            var liner = new Liner(errors, lexer);
-
-            Console.WriteLine($"  .. {liner.TokenCount} tokens");
-
-            var elements = new List<Tokens>();
-            while (true)
-            {
-                var element = liner.GetElement();
-                elements.Add(element);
-
-                if (element.Eof)
-                {
-                    break;
-                }
-            }
-
-            Console.WriteLine($"  .. {elements.Count - 1} elements");
-
-            foreach (var element in elements)
-            {
-                foreach (var token in element)
-                {
-                    foreach (var white in token.Whites)
-                    {
-                        writer.Write($"{white.Text}");
-                    }
-                    writer.Write($"{token.Text}");
-                }
-            }
-
         }
+    }
 
-        static void WaitKey()
+    private static void WaitKey()
+    {
+        if (System.Diagnostics.Debugger.IsAttached)
         {
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                Console.WriteLine("(almost) any key ...");
-                Console.ReadKey();
-            }
+            Console.WriteLine("(almost) any key ...");
+            _ = Console.ReadKey();
         }
     }
 }

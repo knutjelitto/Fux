@@ -1,10 +1,12 @@
-﻿namespace Fux.Input
+﻿namespace Fux.Input;
+
+public sealed class Whites : List<Token>
 {
-    public sealed class Whites : List<Token>
+    public Whites()
     {
-        public override string ToString()
-        {
-            return string.Join("", this);
-        }
     }
+
+    public Whites(IEnumerable<Token> whites) => AddRange(whites);
+
+    public override string ToString() => string.Join("", this);
 }

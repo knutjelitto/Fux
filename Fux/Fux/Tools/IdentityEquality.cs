@@ -1,18 +1,9 @@
-﻿using System.Runtime.CompilerServices;
+﻿namespace Fux.Tools;
 
-namespace Fux.Tools
+public class IdentityEquality<TKey> : IEqualityComparer<TKey>
+    where TKey : class
 {
-    public class IdentityEquality<TKey> : IEqualityComparer<TKey>
-        where TKey : class
-    {
-        public bool Equals(TKey? x, TKey? y)
-        {
-            return ReferenceEquals(x, y);
-        }
+    public bool Equals(TKey? x, TKey? y) => ReferenceEquals(x, y);
 
-        public int GetHashCode(TKey obj)
-        {
-            return RuntimeHelpers.GetHashCode(obj);
-        }
-    }
+    public int GetHashCode(TKey obj) => RuntimeHelpers.GetHashCode(obj);
 }

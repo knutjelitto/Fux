@@ -1,9 +1,8 @@
-﻿namespace Fux.Errors
+﻿namespace Fux.Errors;
+
+public enum Level
 {
-    public enum Level
-    {
-        Info,
-        Warning,
-        Error,
-    }
+    Info,
+    Warning,
+    Error,
 }

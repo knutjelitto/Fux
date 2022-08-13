@@ -1,38 +1,34 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Fux.Building
+namespace Fux.Building;
+
+public sealed class VarScope : Scope
 {
-    public sealed class VarScope : Scope
+    private readonly Dictionary<A.Identifier, A.Decl.Parameter> parameters = new();
+
+    public void Add(A.Decl.Parameter parameter)
     {
-        private readonly Dictionary<A.Identifier, A.Decl.Parameter> parameters = new();
+        Assert(parameter.Pattern is A.Pattern.LowerId);
+        var name = ((A.Pattern.LowerId)parameter.Pattern).Identifier.SingleLower();
 
-        public void Add(A.Decl.Parameter parameter)
+        Assert(!parameters.ContainsKey(name));
+
+        parameters.Add(name, parameter);
+    }
+
+    public bool LookupParameter(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl.Parameter var) => parameters.TryGetValue(identifier.SingleLowerOrOp(), out var);
+
+    public override bool Resolve(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl expr)
+    {
+        if (identifier.IsSingleLower)
         {
-            Assert(parameter.Pattern is A.Pattern.LowerId);
-            var name = ((A.Pattern.LowerId)parameter.Pattern).Identifier.SingleLower();
-
-            Assert(!parameters.ContainsKey(name));
-
-            parameters.Add(name, parameter);
-        }
-
-        public bool LookupParameter(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl.Parameter var)
-        {
-            return parameters.TryGetValue(identifier.SingleLowerOrOp(), out var);
-        }
-
-        public override bool Resolve(A.Identifier identifier, [MaybeNullWhen(false)] out A.Decl expr)
-        {
-            if (identifier.IsSingleLower)
+            if (LookupParameter(identifier, out var item))
             {
-                if (LookupParameter(identifier, out var item))
-                {
-                    expr = item;
-                    return true;
-                }
+                expr = item;
+                return true;
             }
-
-            return base.Resolve(identifier, out expr);
         }
+
+        return base.Resolve(identifier, out expr);
     }
 }

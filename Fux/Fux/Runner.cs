@@ -1,12 +1,11 @@
-﻿namespace Fux
+﻿namespace Fux;
+
+public class Runner
 {
-    public class Runner
+    protected static void WaitForKey()
     {
-        protected static void WaitForKey()
-        {
-            Console.Write("any key ...");
-            Console.ReadKey(true);
-            Console.WriteLine();
-        }
+        Console.Write("any key ...");
+        _ = Console.ReadKey(true);
+        Console.WriteLine();
     }
 }
