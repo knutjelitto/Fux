@@ -1,5 +1,3 @@
-package Core module List
-
 {-| Core of the List type.
 
 # Type
@@ -13,14 +11,16 @@ package Core module List
 
 -}
 
+namespace Core
+
 enum List<a>
     Cons(a, List<a>)
     Nil
 
-fn Equals(x: List, y: List) : Bool
-fn NotEquals(x: List, y: List) : Bool
+fn Equal(x: List<a>, y: List<a>) : bool
+fn NotEqual(x: List<a>, y: List<a>) : bool
 
-fn Map<a>(map: fn(a):b, list: List<a>): List<b>
+fn Map<a, b>(map: fn(a):b, list: List<a>): List<b>
     case list of
         Nil => Nil
         Cons(x, xs) => Cons(map(x), Map(xs))

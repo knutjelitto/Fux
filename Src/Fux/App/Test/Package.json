@@ -2,7 +2,7 @@
     "name": "Fux.App.Test",
     "summary": "Fux testint application",
     "sources": [
-        "src/**/*.elm"
+        "src/**/*.fux"
     ],
     "dependencies": [
         "Fux.Core"

@@ -2,7 +2,7 @@
 
 public sealed class Source
 {
-    public Source(string display, string path, string content)
+    public Source(string display, Path path, string content)
     {
         Display = display;
         Path = path;
@@ -11,7 +11,7 @@ public sealed class Source
     }
 
     public string Display { get; }
-    public string Path { get; }
+    public Path Path { get; }
     public string Content { get; }
     public List<int> Lines { get; }
     public bool EOS { get; }

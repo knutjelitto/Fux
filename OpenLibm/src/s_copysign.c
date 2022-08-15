@@ -23,8 +23,7 @@
 
 #include "math_private.h"
 
-OLM_DLLEXPORT double
-copysign(double x, double y)
+OLM_DLLEXPORT double copysign(double x, double y)
 {
 	u_int32_t hx,hy;
 	GET_HIGH_WORD(hx,x);

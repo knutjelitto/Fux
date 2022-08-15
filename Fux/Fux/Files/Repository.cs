@@ -25,7 +25,7 @@ public class Repository
     private void Glob()
     {
         var matcher = new Matcher();
-        _ = matcher.AddInclude($"**/{Package.PackageFileName}");
+        _ = matcher.AddInclude($"/**/{Package.PackageFileName}");
 
         var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(Root)));
 

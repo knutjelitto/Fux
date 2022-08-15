@@ -57,7 +57,7 @@ INCLUDES = -Isrc/include
 
 # Global compiler flags
 CXXFLAGS := $(DBGCFLAGS) -Ofast -std=c++11 -fno-rtti -Wno-writable-strings -Wno-unknown-pragmas $(INCLUDES)
-CCFLAGS  := $(DBGCFLAGS) -Ofast -std=c2x $(INCLUDES)
+CCFLAGS  := $(DBGCFLAGS) -Ofast -std=c2x $(INCLUDES) -Werror=implicit-function-declaration
 
 # Global compiler flags for Wasm targeting
 CLANGFLAGS := -target wasm32 -nostdinc
@@ -90,8 +90,9 @@ CC  := "$(CLANG)"
 CXX := "$(CLANG)" -x c++
 LD  := "$(WASMLD)"
 
-all: $(OUTDIR)/output.wasm $(OUTDIR)/output.wat $(OUTDIR)/output.c 
 .PHONY: clean cleanall run analyze
+
+all: $(OUTDIR)/output.wasm $(OUTDIR)/output.wat $(OUTDIR)/output.c 
 
 clean:
 	$(info Removing all build files ...)
@@ -118,9 +119,9 @@ $(foreach F,$(filter %.cpp,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CXX),$
 $(foreach F,$(filter %.c  ,$(ALL_SOURCES)),$(eval $(call MAKE_OBJ,$(F),$$(CC),$$(CCFLAGS))))
 
 
-$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS)
+$(OUTDIR)/output.wasm : Makefile $(OTHER_OBJS) ../OpenLibm/libopenlibm.a
 	$(info Link $@ ...)
-	@$(LD) $(LDFLAGS) -o $@ $(OTHER_OBJS)
+	@$(LD) $(LDFLAGS) -L../OpenLibm -lopenlibm -o $@ $(OTHER_OBJS)
 	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
 
 $(OUTDIR)/output.wat: $(OUTDIR)/output.wasm

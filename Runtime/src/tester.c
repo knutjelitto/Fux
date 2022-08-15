@@ -7,8 +7,8 @@ void mathlinker()
     double x = 1.0;
     double y = 1.0;
 
-    cos(x);
-    sin(x);
-    tan(x);
-    sqrt(x);
+    core_math_cos(x);
+    core_math_sin(x);
+    core_math_tan(x);
+    core_math_sqrt(x);
 }

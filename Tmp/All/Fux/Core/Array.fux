@@ -1,9 +1,9 @@
-namespace Core.Array
+namespace Core
 
-{-| Core of the Array type.
+{-| The Array type.
 
 # Type
-@docs Create
+@docs Array<a>, Create
 
 # Equality
 @docs eq, ne
@@ -15,11 +15,9 @@ namespace Core.Array
 
 builtin type Array<a>
 
-let DefaultSize : int = 16
+buitin fn Create<a>(size: int, default: a) : Array<a>
 
-buitin fn Create<a>(int size) : Array<a>
-
-fn Equal<a>(x: Array<a>, y: Array<a>) : bool
+fn Equal(x: Array<a>, y: Array<a>) : bool
 
 fn Count<a>(x: Array<a>) : int
 

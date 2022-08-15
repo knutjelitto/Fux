@@ -1,0 +1,124 @@
+{-| Basic bool type.
+
+# Type
+@docs bool
+
+# Operations
+@docs Flip, And, Or, Xor
+
+#operators
+@dice andthen, orelse
+
+# Equality
+@docs Equal, Unequal
+
+# Ordering
+@docs 
+
+-}
+
+namespace Boolean
+
+{-| A bool” value. It can either be `true` or `false`.
+-}
+enum type bool
+    false
+    true
+
+bool is Eq<bool>
+bool is Ord<bool>
+
+{-|
+    Check if two boolean values are equal
+
+    Mapped to infix operator `==´
+-}
+fn Equal(x bool, y bool)
+    if x then y else not(y)
+
+{-|
+    Check if two boolean values are unequal
+
+    Mapped to infix operator `!=´ (means not equal)
+-}
+fn Unqual(x bool, y bool)
+    if x then not(y) else y
+
+
+{-| Flip a boolean value.
+
+    Mapped to prefix operator `^`
+
+    Flip(True) == False
+    Flip(False) == True
+-}
+fn Flip(x: bool): bool
+    if (x) then false else true
+
+
+{-| The logical AND operator. `True` if both inputs are `True`.
+
+    Mapped to infix operator `&&` - logical and
+
+    True  && True  == True
+    True  && False == False
+    False && True  == False
+    False && False == False
+
+-}
+fn And(x: bool, y: bool): bool
+    if x then y else false
+
+
+{-| The logical OR operator. `true` if one or both inputs are `true`.
+
+    Mapped to infix operator '||' - logicAál or
+    
+    True  || True  == True
+    True  || False == True
+    False || True  == True
+    False || False == False
+
+-}
+fn Or(x: bool, y: bool) -> bool
+    if  x then true else y
+
+
+{-| The exclusive-or operator. `True` if exactly one input is `True`.
+
+    Mapped to infix operator '||' - logicAál or
+    
+    xor True  True  == False
+    xor True  False == True
+    xor False True  == True
+    xor False False == False
+
+-}
+fn Xor(x: bool, y: bool) -> bool
+    x != y
+
+{-| The equality operator. `True` if both inputs are equal.
+
+    eq True  True  == True
+    eq True  False == False
+    eq False True  == False
+    eq False False == True
+-}
+fn Equak(x: bool, y: bool) -> bool
+    case x in
+        False => not(y)
+        True => y
+
+{-| The un-equality operator. `True` if both inputs are different.
+
+    ne True  True  == False
+    ne True  False == True
+    ne False True  == True
+    ne False False == False
+-}
+ne = (x: bool, y: bool) -> bool
+    case x in
+        False => y
+        True => not(y)
+
+

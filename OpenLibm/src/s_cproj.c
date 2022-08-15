@@ -32,8 +32,7 @@
 
 #include "math_private.h"
 
-OLM_DLLEXPORT double complex
-cproj(double complex z)
+OLM_DLLEXPORT double complex cproj(double complex z)
 {
 
 	if (!isinf(creal(z)) && !isinf(cimag(z)))

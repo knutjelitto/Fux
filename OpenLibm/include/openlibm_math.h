@@ -19,7 +19,7 @@
 #include <openlibm_defs.h>
 
 #ifndef __pure2
-#define __pure2
+#define __pure2 __attribute__((const))
 #endif
 
 /*
@@ -131,28 +131,29 @@ int isopenlibm(void);
  */
 OLM_DLLEXPORT int	__fpclassifyd(double) __pure2;
 OLM_DLLEXPORT int	__fpclassifyf(float) __pure2;
-OLM_DLLEXPORT int	__fpclassifyl(long double) __pure2;
-OLM_DLLEXPORT int	__isfinitef(float) __pure2;
+
 OLM_DLLEXPORT int	__isfinite(double) __pure2;
-OLM_DLLEXPORT int	__isfinitel(long double) __pure2;
+OLM_DLLEXPORT int	__isfinitef(float) __pure2;
+
 OLM_DLLEXPORT int	__isinff(float) __pure2;
-OLM_DLLEXPORT int	__isinfl(long double) __pure2;
 OLM_DLLEXPORT int	__isnanf(float) __pure2;
-OLM_DLLEXPORT int	__isnanl(long double) __pure2;
-OLM_DLLEXPORT int	__isnormalf(float) __pure2;
+
 OLM_DLLEXPORT int	__isnormal(double) __pure2;
-OLM_DLLEXPORT int	__isnormall(long double) __pure2;
+OLM_DLLEXPORT int	__isnormalf(float) __pure2;
+
 OLM_DLLEXPORT int	__signbit(double) __pure2;
 OLM_DLLEXPORT int	__signbitf(float) __pure2;
-OLM_DLLEXPORT int	__signbitl(long double) __pure2;
+
+#define EXPORT(name, result, signature) OLM_DLLEXPORT result core_math_ ## name signature
+
+EXPORT(cos, double, (double));
+EXPORT(sin, double, (double));
+EXPORT(tan, double, (double));
 
 OLM_DLLEXPORT double	acos(double);
 OLM_DLLEXPORT double	asin(double);
 OLM_DLLEXPORT double	atan(double);
 OLM_DLLEXPORT double	atan2(double, double);
-OLM_DLLEXPORT double	cos(double);
-OLM_DLLEXPORT double	sin(double);
-OLM_DLLEXPORT double	tan(double);
 
 OLM_DLLEXPORT double	cosh(double);
 OLM_DLLEXPORT double	sinh(double);
@@ -166,7 +167,7 @@ OLM_DLLEXPORT double	log10(double);
 OLM_DLLEXPORT double	modf(double, double *);	/* fundamentally !__pure2 */
 
 OLM_DLLEXPORT double	pow(double, double);
-OLM_DLLEXPORT double	sqrt(double);
+EXPORT(sqrt, double, (double));
 
 OLM_DLLEXPORT double	ceil(double);
 OLM_DLLEXPORT double	fabs(double) __pure2;
@@ -183,9 +184,9 @@ OLM_DLLEXPORT double	exp2(double);
 OLM_DLLEXPORT double	expm1(double);
 OLM_DLLEXPORT double	fma(double, double, double);
 OLM_DLLEXPORT double	hypot(double, double);
-OLM_DLLEXPORT int	ilogb(double) __pure2;
-OLM_DLLEXPORT int	(isinf)(double) __pure2;
-OLM_DLLEXPORT int	(isnan)(double) __pure2;
+OLM_DLLEXPORT int	    ilogb(double) __pure2;
+OLM_DLLEXPORT int	    (isinf)(double) __pure2;
+OLM_DLLEXPORT int	    (isnan)(double) __pure2;
 OLM_DLLEXPORT double	lgamma(double);
 OLM_DLLEXPORT long long llrint(double);
 OLM_DLLEXPORT long long llround(double);

@@ -11,17 +11,20 @@
 
 bool         isnan(double);
 
+#define DECLARE(name, result, signature) result core_math_ ## name signature
+
+DECLARE(cos, double, (double));
+DECLARE(sin, double, (double));
+DECLARE(tan, double, (double));
+
 double      acos(double);
-double      acosh(double);
 double      asin(double);
-double      asinh(double);
 double      atan(double);
 double      atan2(double, double);
-double      atanh(double);
-double      cbrt(double);
 
-double      copysign(double, double);
-double      cos(double);
+double      acosh(double);
+double      asinh(double);
+double      atanh(double);
 double      cosh(double);
 double      erf(double);
 double      erfc(double);
@@ -61,10 +64,11 @@ double      rint(double);
 double      round(double);
 double      scalbln(double, long);
 double      scalbn(double, int);
-double      sin(double);
 double      sinh(double);
-double      sqrt(double);
-double      tan(double);
+DECLARE(sqrt, double, (double));
 double      tanh(double);
 double      tgamma(double);
 double      trunc(double);
+
+double      cbrt(double);
+double      copysign(double, double);

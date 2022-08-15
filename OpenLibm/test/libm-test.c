@@ -2711,8 +2711,7 @@ fmod_test (void)
   print_max_error ("fmod", DELTAfmod, 0);
 }
 
-static void
-fpclassify_test (void)
+static void fpclassify_test (void)
 {
   init_max_error ();
 
@@ -2727,8 +2726,7 @@ fpclassify_test (void)
 }
 
 
-static void
-frexp_test (void)
+static void frexp_test (void)
 {
   int x;
 
@@ -2753,8 +2751,7 @@ frexp_test (void)
 
 #define gamma lgamma /* XXX scp XXX */
 #define gammaf lgammaf /* XXX scp XXX */
-static void
-gamma_test (void)
+static void gamma_test ()
 {
   errno = 0;
   FUNC(gamma) (1);
