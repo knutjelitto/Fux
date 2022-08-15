@@ -1,4 +1,6 @@
-﻿namespace Fux.Files;
+﻿using Fux.Parsing;
+
+namespace Fux.Files;
 
 public sealed class SourceUnit
 {
@@ -7,6 +9,7 @@ public sealed class SourceUnit
         Package = package;
         Path = path;
         Name = Path.ToString().Replace("/", ".");
+        Source = new(Name, FullPath, FullPath.ReadText());
     }
 
     public Package Package { get; }
@@ -14,7 +17,7 @@ public sealed class SourceUnit
     public Path Path { get; }
     public Path FullPath => Package.FullSourceFileName(this);
 
-    public Source Source => new(Name, FullPath, FullPath.ReadText());
+    public Source Source { get; }
 
     public bool Exists => FullPath.FileExists;
 

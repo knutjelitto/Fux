@@ -1,14 +1,16 @@
-﻿namespace Fux.Errors;
+﻿using Fux.Parsing;
+
+namespace Fux.Errors;
 
 public abstract class LocatedMessageError : ErrorDiagnostic
 {
-    public LocatedMessageError(ILocation location, string message)
+    public LocatedMessageError(Location location, string message)
     {
         Location = location;
         Message = message;
     }
 
-    public ILocation Location { get; }
+    public Location Location { get; }
     public string Message { get; }
 
     public override IEnumerable<string> Report()

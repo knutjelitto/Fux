@@ -1,6 +1,7 @@
 ﻿using Fux;
 using Fux.Files;
 using Fux.Input;
+using Fux.Parsing;
 using Fux.Tools;
 
 namespace App;
@@ -63,7 +64,7 @@ internal class Program
 
         Console.Write($"{sep}{liner.TokenCount,5} tokens");
 
-        var elements = new List<Tokens>();
+        var elements = new List<TokenSpan>();
         while (true)
         {
             var element = liner.GetElement();

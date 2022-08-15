@@ -1,10 +1,14 @@
 ﻿using Fux.Tree;
 
 namespace Fux.Parsing;
+
 public class Parser
 {
-    public Unit Parse(Liner line)
+    public Element Parse(SourceUnit unit, ErrorBag errors, Liner liner)
     {
-        var cursor = new Cursor()
+        var element = liner.GetElement();
+        var cursor = new Cursor(unit, errors, element);
+
+        throw new NotImplementedException();
     }
 }

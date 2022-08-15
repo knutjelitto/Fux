@@ -1,6 +1,4 @@
-﻿using Fux.Building;
-
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
@@ -11,10 +9,10 @@ public class Package
     public const string PackageFileName = "Package.json";
 
     private readonly List<Package> dependencies = new();
-    private readonly List<Module> exposed = new();
-    private readonly Dictionary<string, Module> exposedIndex = new();
-    private readonly List<Module> intern = new();
-    private readonly Dictionary<string, Module> internIndex = new();
+    private readonly List<SourceUnit> exposed = new();
+    private readonly Dictionary<string, SourceUnit> exposedIndex = new();
+    private readonly List<SourceUnit> intern = new();
+    private readonly Dictionary<string, SourceUnit> internIndex = new();
 
     public Package(Repository repo, Path path)
     {
@@ -35,9 +33,9 @@ public class Package
     public Path FullPackageFileName => FullPath / PackageFileName;
     public Path FullSourceFileName(SourceUnit sourceFile) => FullPath / sourceFile.Path;
 
-    public IReadOnlyList<Module> Exposed => exposed;
-    public IReadOnlyList<Module> Intern => intern;
-    public IEnumerable<Module> Modules => exposed.Concat(intern);
+    public IReadOnlyList<SourceUnit> Exposed => exposed;
+    public IReadOnlyList<SourceUnit> Intern => intern;
+    public IEnumerable<SourceUnit> Modules => exposed.Concat(intern);
 
     private void Glob()
     {
@@ -66,21 +64,21 @@ public class Package
 
     public void AddDependency(Package dependency) => dependencies.Add(dependency);
 
-    public void AddExposed(Module module)
+    public void AddExposed(SourceUnit module)
     {
         exposed.Add(module);
         exposedIndex.Add(module.Name, module);
     }
 
-    public void AddIntern(Module module)
+    public void AddIntern(SourceUnit module)
     {
         intern.Add(module);
         internIndex.Add(module.Name, module);
     }
 
-    public Module? TryGetExposed(string name) => exposedIndex.TryGetValue(name, out var module) ? module : null;
+    public SourceUnit? TryGetExposed(string name) => exposedIndex.TryGetValue(name, out var module) ? module : null;
 
-    public Module? FindImport(string importPath)
+    public SourceUnit? FindImport(string importPath)
     {
         var module = FindIntern(importPath);
 
@@ -113,9 +111,9 @@ public class Package
         return module;
     }
 
-    private Module? FindIntern(string name) => exposedIndex.TryGetValue(name, out var module) ? module : internIndex.TryGetValue(name, out module) ? module : module;
+    private SourceUnit? FindIntern(string name) => exposedIndex.TryGetValue(name, out var module) ? module : internIndex.TryGetValue(name, out module) ? module : module;
 
-    private Module? FindExtern(string importPath) => exposedIndex.TryGetValue(importPath, out var module) ? module : null;
+    private SourceUnit? FindExtern(string importPath) => exposedIndex.TryGetValue(importPath, out var module) ? module : null;
 
     public override string ToString() => Name;
 
