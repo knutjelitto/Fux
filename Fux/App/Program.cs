@@ -29,22 +29,22 @@ internal class Program
             {
                 Console.WriteLine($"{sourceUnit.Package} - {sourceUnit}");
 
-                Lexx(writer, sourceUnit.Source);
+                Lexx(writer, sourceUnit.Text);
             }
         }
 
         WaitKey();
     }
 
-    private static void Lexx(Writer writer, Source source)
+    private static void Lexx(Writer writer, Text text)
     {
         const string ind = "  ";
         const string sep = $"{ind}-";
 
-        Console.Write($"{ind}{source.Count,5} characters");
+        Console.Write($"{ind}{text.Count,5} characters");
 
         var errors = new ErrorBag();
-        var lexer = new Lexer(errors, source.Clone());
+        var lexer = new Lexer(errors, text.Clone());
         var count = 0;
 
         while (true)
@@ -59,7 +59,7 @@ internal class Program
         }
         Console.Write($"{sep}{count,5} raw tokens");
 
-        lexer = new Lexer(errors, source.Clone());
+        lexer = new Lexer(errors, text.Clone());
         var liner = new Liner(errors, lexer);
 
         Console.Write($"{sep}{liner.TokenCount,5} tokens");

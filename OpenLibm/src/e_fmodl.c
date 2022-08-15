@@ -17,8 +17,6 @@
 #include <openlibm_math.h>
 #include <stdint.h>
 
-#include "fpmath.h"
-
 #include "math_private.h"
 
 #define	BIAS (LDBL_MAX_EXP - 1)

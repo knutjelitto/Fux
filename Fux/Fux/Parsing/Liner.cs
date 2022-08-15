@@ -16,7 +16,7 @@ public sealed class Liner
 
     public ErrorBag Errors { get; }
     public Lexer Lexer { get; }
-    public Source Source => Lexer.Source;
+    public Text Source => Lexer.Source;
     public int TokenCount => tokens.Count;
     public int Count => elements.Count;
 

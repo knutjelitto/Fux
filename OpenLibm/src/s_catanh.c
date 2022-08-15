@@ -56,7 +56,3 @@ catanh(double complex z)
 	w = -1.0 * I * catan (z * I);
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(catanh, catanhl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

@@ -1,8 +1,8 @@
 ﻿namespace Fux.Parsing;
 
-public sealed class Source
+public sealed class Text
 {
-    public Source(string display, Path path, string content)
+    public Text(string display, Path path, string content)
     {
         Display = display;
         Path = path;
@@ -18,7 +18,7 @@ public sealed class Source
 
     public int Count => Content.Length;
 
-    public Source Clone() => new(Display, Path, Content);
+    public Text Clone() => new(Display, Path, Content);
 
     public int Ensure(int offset) => offset < Content.Length ? Content[offset] : -1;
 

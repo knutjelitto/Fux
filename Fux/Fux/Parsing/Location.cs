@@ -4,14 +4,14 @@ public sealed class Location
 {
     private (int line, int column)? lineColumn = null;
 
-    public Location(Source source, int offset, int length)
+    public Location(Text source, int offset, int length)
     {
         Source = source;
         Offset = offset;
         Length = length;
     }
 
-    public Source Source { get; }
+    public Text Source { get; }
     public int Offset { get; }
     public int Length { get; }
     public int Next => Offset + Length;

@@ -31,9 +31,6 @@
 #include <openlibm_fenv.h>
 #include <openlibm_math.h>
 
-#include "fpmath.h"
-
-//VBS
 #include "math_private.h"
 
 

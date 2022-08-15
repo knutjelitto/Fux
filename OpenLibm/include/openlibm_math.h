@@ -25,40 +25,29 @@
 /*
  * ANSI/POSIX
  */
-extern const union __infinity_un
-{
-	unsigned char	__uc[8];
-	double		__ud;
-} __infinity;
 
-extern const union __nan_un
-{
-	unsigned char	__uc[sizeof(float)];
-	float		__uf;
-} __nan;
+#define	HUGE_VAL	    __builtin_huge_val()
 
-#define	HUGE_VAL	__builtin_huge_val()
+#define	FP_ILOGB0	    (-INT_MAX)
+#define	FP_ILOGBNAN	    INT_MAX
 
-#define	FP_ILOGB0	(-INT_MAX)
-#define	FP_ILOGBNAN	INT_MAX
+#define	HUGE_VALF	    __builtin_huge_valf()
+#define	HUGE_VALL	    __builtin_huge_vall()
+#define	INFINITY	    __builtin_inff()
+#define	NAN		        __builtin_nanf("")
 
-#define	HUGE_VALF	__builtin_huge_valf()
-#define	HUGE_VALL	__builtin_huge_vall()
-#define	INFINITY	__builtin_inff()
-#define	NAN		    __builtin_nanf("")
-
-#define	MATH_ERRNO	1
-#define	MATH_ERREXCEPT	2
+#define	MATH_ERRNO          1
+#define	MATH_ERREXCEPT	    2
 #define	math_errhandling	MATH_ERREXCEPT
 
-#define	FP_FAST_FMAF	1
+#define	FP_FAST_FMAF	    1
 
 /* Symbolic constants to classify floating point numbers. */
-#define	FP_INFINITE	    0x01
-#define	FP_NAN		    0x02
-#define	FP_NORMAL	    0x04
-#define	FP_SUBNORMAL    0x08
-#define	FP_ZERO		    0x10
+#define	FP_INFINITE	        0x01
+#define	FP_NAN		        0x02
+#define	FP_NORMAL	        0x04
+#define	FP_SUBNORMAL        0x08
+#define	FP_ZERO		        0x10
 
 #define	fpclassify(x)                                       \
     ((sizeof (x) == sizeof (float)) ? __fpclassifyf(x)      \

@@ -29,7 +29,6 @@
 
 #include <openlibm_math.h>
 
-#include "fpmath.h"
 #include "math_private.h"
 
 OLM_DLLEXPORT double fmax(double x, double y)

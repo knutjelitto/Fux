@@ -1,4 +1,4 @@
-{-| Core of the float type.
+{-| Float type.
 
 # Arithmethics
 @docs Negate, Add, Sub, Mul, Div
@@ -10,8 +10,6 @@
 @docs LessThan, LessEqual, GreaterThan, GreaterEqual
 
 -}
-
-namespace Core.Float
 
 struct f64
 struct f32

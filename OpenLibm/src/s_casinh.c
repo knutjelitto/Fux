@@ -56,7 +56,3 @@ casinh(double complex z)
 	w = -1.0 * I * casin (z * I);
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(casinh, casinhl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

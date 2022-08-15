@@ -28,8 +28,9 @@
  */
 
 /* @(#)exp.c	8.1 (Berkeley) 6/4/93 */
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/bsdsrc/b_exp.c,v 1.9 2011/10/16 05:37:20 das Exp $");
+
+#include "cdefs-compat.h"
 
 #include <openlibm_math.h>
 
@@ -86,41 +87,44 @@ static const double invln2 = 0x1.71547652b82fep0;
 
 double __exp__D(double x, double c)
 {
-	double  z,hi,lo;
-	int k;
+    double  z,hi,lo;
+    int k;
 
-	if (x != x)	/* x is NaN */
-		return(x);
-	if ( x <= lnhuge ) {
-		if ( x >= lntiny ) {
+    if (x != x)	/* x is NaN */
+    {
+        return(x);
+    }
+    if ( x <= lnhuge )
+    {
+        if ( x >= lntiny )
+        {
+            /* argument reduction : x --> x - k*ln2 */
+            z = invln2*x;
+            k = z + copysign(.5, x);
 
-		    /* argument reduction : x --> x - k*ln2 */
-			z = invln2*x;
-			k = z + copysign(.5, x);
+            /* express (x+c)-k*ln2 as hi-lo and let x=hi-lo rounded */
 
-		    /* express (x+c)-k*ln2 as hi-lo and let x=hi-lo rounded */
+            hi=(x-k*ln2hi);			/* Exact. */
+            x= hi - (lo = k*ln2lo-c);
+            /* return 2^k*[1+x+x*c/(2+c)]  */
+            z=x*x;
+            c= x - z*(p1+z*(p2+z*(p3+z*(p4+z*p5))));
+            c = (x*c)/(2.0-c);
 
-			hi=(x-k*ln2hi);			/* Exact. */
-			x= hi - (lo = k*ln2lo-c);
-		    /* return 2^k*[1+x+x*c/(2+c)]  */
-			z=x*x;
-			c= x - z*(p1+z*(p2+z*(p3+z*(p4+z*p5))));
-			c = (x*c)/(2.0-c);
+            return  scalbn(1.+(hi-(lo - c)), k);
+        }
+        /* end of x > lntiny */
 
-			return  scalbn(1.+(hi-(lo - c)), k);
-		}
-		/* end of x > lntiny */
+        else
+             /* exp(-big#) underflows to zero */
+             if(isfinite(x))  return(scalbn(1.0,-5000));
 
-		else
-		     /* exp(-big#) underflows to zero */
-		     if(isfinite(x))  return(scalbn(1.0,-5000));
+             /* exp(-INF) is zero */
+             else return(0.0);
+    }
+    /* end of x < lnhuge */
 
-		     /* exp(-INF) is zero */
-		     else return(0.0);
-	}
-	/* end of x < lnhuge */
-
-	else
-	/* exp(INF) is INF, exp(+big#) overflows to INF */
-	    return( isfinite(x) ?  scalbn(1.0,5000)  : x);
+    else
+    /* exp(INF) is INF, exp(+big#) overflows to INF */
+        return( isfinite(x) ?  scalbn(1.0,5000)  : x);
 }

@@ -1,4 +1,5 @@
 {
+    "editor.renderWhitespace": "all",
     "makefile.extensionOutputFolder": "./.vscode",
     "terminal.integrated.cursorBlinking": true,
     "terminal.integrated.defaultProfile.windows": "Git Bash",

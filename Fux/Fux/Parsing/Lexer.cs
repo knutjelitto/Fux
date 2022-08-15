@@ -21,7 +21,7 @@ public sealed class Lexer
         }
     }
 
-    public Lexer(ErrorBag errors, Source source)
+    public Lexer(ErrorBag errors, Text source)
     {
         Errors = errors;
         Source = source;
@@ -29,7 +29,7 @@ public sealed class Lexer
     }
 
     public ErrorBag Errors { get; }
-    public Source Source { get; }
+    public Text Source { get; }
 
     public int Offset { get; private set; }
     public int Start { get; private set; }
@@ -141,6 +141,11 @@ public sealed class Lexer
 
             case '_' when !Next.IsLetterOrDigit():
                 return Wildcard();
+
+            case '#':
+                {
+                    return Build(Lex.Hash, 1);
+                }
 
             default:
                 if (Current.IsLower())

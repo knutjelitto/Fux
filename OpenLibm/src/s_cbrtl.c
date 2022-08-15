@@ -22,7 +22,6 @@
 // VBS
 //#include <ieeefp.h>
 
-#include "fpmath.h"
 #include "math_private.h"
 #if defined(__i386__)
 #include "i387/bsd_ieeefp.h"

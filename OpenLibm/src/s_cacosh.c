@@ -56,7 +56,3 @@ cacosh(double complex z)
 	w = I * cacos (z);
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(cacosh, cacoshl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

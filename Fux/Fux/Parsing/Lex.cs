@@ -69,6 +69,7 @@ public sealed class Lex
     public static readonly Lex Arrow = Add(new("->", terminatesSomething: true));
     public static readonly Lex Bar = Add(new("|", terminatesSomething: true));
     public static readonly Lex Lambda = Add(new("\\", startsAtomic: true));
+    public static readonly Lex Hash = Add(new("#", startsAtomic: true));
 
     public static readonly Lex Equal = Add(new("==", terminatesSomething: true));
     public static readonly Lex Unequal = Add(new("!=", terminatesSomething: true));

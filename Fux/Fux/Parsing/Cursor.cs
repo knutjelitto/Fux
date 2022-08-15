@@ -4,7 +4,7 @@ namespace Fux.Parsing;
 
 public sealed class Cursor
 {
-    public Cursor(SourceUnit unit, ErrorBag errors, TokenSpan tokens)
+    public Cursor(Source unit, ErrorBag errors, TokenSpan tokens)
     {
         Assert(tokens.Count > 0);
         Offset = 0;
@@ -14,7 +14,7 @@ public sealed class Cursor
     }
 
     public int Offset { get; private set; }
-    public SourceUnit Unit { get; }
+    public Source Unit { get; }
     public ErrorBag Errors { get; }
     public TokenSpan Tokens { get; }
 

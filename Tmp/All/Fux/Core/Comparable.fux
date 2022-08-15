@@ -1,0 +1,20 @@
+{-| Trait Ordered.
+
+# Trait
+@docs Comparable
+
+# Type
+@docs Order
+
+# Comparison
+@docs Less, le, gt, ge
+
+-}
+
+trait Comparable<a> : Eq<a>
+    fun LessThan(x: a, y: a): bool
+    fun LessEqual(x: a, y: a): bool
+    fun GreaterThan(x: a, y: a): bool
+    fun GreaterEqual(x: a, y: a): bool
+
+

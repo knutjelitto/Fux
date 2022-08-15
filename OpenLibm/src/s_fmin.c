@@ -29,11 +29,9 @@
 
 #include <openlibm_math.h>
 
-#include "fpmath.h"
 #include "math_private.h"
 
-OLM_DLLEXPORT double
-fmin(double x, double y)
+OLM_DLLEXPORT double fmin(double x, double y)
 {
 	union IEEEd2bits u[2];
 

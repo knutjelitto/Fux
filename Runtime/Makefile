@@ -34,7 +34,7 @@ WASM2WAT	= wasm-dis
 WASM2C		= wasm2c
 
 EXPORTS = 
-OTHER_SOURCES = $(wildcard *.c) src/tester.c src/kernel/core/core.c
+OTHER_SOURCES = $(wildcard *.c) src/Obi.cpp src/tester.c src/kernel/core/core.c
 ALL_SOURCES = $(OTHER_SOURCES)
 SOURCES = $(ALL_SOURCES)
 BUILD   = DEBUG
@@ -56,7 +56,7 @@ endif
 INCLUDES = -Isrc/include
 
 # Global compiler flags
-CXXFLAGS := $(DBGCFLAGS) -Ofast -std=c++11 -fno-rtti -Wno-writable-strings -Wno-unknown-pragmas $(INCLUDES)
+CXXFLAGS := $(DBGCFLAGS) -Ofast -std=c++17 -fno-rtti -Wno-writable-strings -Wno-unknown-pragmas $(INCLUDES)
 CCFLAGS  := $(DBGCFLAGS) -Ofast -std=c2x $(INCLUDES) -Werror=implicit-function-declaration
 
 # Global compiler flags for Wasm targeting
@@ -71,6 +71,7 @@ LDFLAGS += -initial-memory=1048576
 LDFLAGS += -max-memory=1048576
 LDFLAGS += -no-gc-sections
 LDFLAGS += -export-all
+LDFLAGS += -demangle
 LDFLAGS += $(addprefix -export=,$(patsubst _%,%,$(strip $(EXPORTS))))
 
 # Project Build flags, add defines from the make command line (e.g. D=MACRO=VALUE)

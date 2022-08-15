@@ -14,7 +14,6 @@
 #include <limits.h>
 #include <openlibm_math.h>
 
-#include "fpmath.h"
 #include "math_private.h"
 
 OLM_DLLEXPORT long double

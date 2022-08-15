@@ -13,7 +13,7 @@ typedef long long          int64_t;
 typedef unsigned int       uintptr_t;
 typedef int                intptr_t;
 
-_Static_assert(sizeof (uint8_t)  == 1, "invalid size");
+_Static_assert(sizeof(uint8_t)  == 1, "invalid size");
 _Static_assert(sizeof (uint16_t) == 2, "invalid size");
 _Static_assert(sizeof (uint32_t) == 4, "invalid size");
 _Static_assert(sizeof (uint64_t) == 8, "invalid size");

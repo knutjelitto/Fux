@@ -13,7 +13,10 @@
 			"stdint.h": "c",
 			"openlibm_math.h": "c",
 			"openlibm_defs.h": "c",
-			"fpmath.h": "c"
+			"fpmath.h": "c",
+			"limits.h": "c",
+			"cdefs-compat.h": "c",
+			"float.h": "c"
 		}
 	}
 }

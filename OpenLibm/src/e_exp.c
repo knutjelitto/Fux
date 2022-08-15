@@ -9,9 +9,9 @@
  * is preserved.
  * ====================================================
  */
+//__FBSDID("$FreeBSD: src/lib/msun/src/e_exp.c,v 1.14 2011/10/21 06:26:38 das Exp $");
 
 #include "cdefs-compat.h"
-//__FBSDID("$FreeBSD: src/lib/msun/src/e_exp.c,v 1.14 2011/10/21 06:26:38 das Exp $");
 
 /* __ieee754_exp(x)
  * Returns the exponential of x.
@@ -82,30 +82,29 @@
 #include "math_private.h"
 
 static const double
-one	= 1.0,
-halF[2]	= {0.5,-0.5,},
-huge	= 1.0e+300,
-o_threshold=  7.09782712893383973096e+02,  /* 0x40862E42, 0xFEFA39EF */
-u_threshold= -7.45133219101941108420e+02,  /* 0xc0874910, 0xD52D3051 */
-ln2HI[2]   ={ 6.93147180369123816490e-01,  /* 0x3fe62e42, 0xfee00000 */
-	     -6.93147180369123816490e-01,},/* 0xbfe62e42, 0xfee00000 */
-ln2LO[2]   ={ 1.90821492927058770002e-10,  /* 0x3dea39ef, 0x35793c76 */
-	     -1.90821492927058770002e-10,},/* 0xbdea39ef, 0x35793c76 */
-invln2 =  1.44269504088896338700e+00, /* 0x3ff71547, 0x652b82fe */
-P1   =  1.66666666666666019037e-01, /* 0x3FC55555, 0x5555553E */
-P2   = -2.77777777770155933842e-03, /* 0xBF66C16C, 0x16BEBD93 */
-P3   =  6.61375632143793436117e-05, /* 0x3F11566A, 0xAF25DE2C */
-P4   = -1.65339022054652515390e-06, /* 0xBEBBBD41, 0xC5D26BF1 */
-P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
+one         = 1.0,
+halF[2]	    = {0.5,-0.5,},
+huge	    = 1.0e+300,
+o_threshold =  7.09782712893383973096e+02,  /* 0x40862E42, 0xFEFA39EF */
+u_threshold = -7.45133219101941108420e+02,  /* 0xc0874910, 0xD52D3051 */
+ln2HI[2]    = { 6.93147180369123816490e-01,  /* 0x3fe62e42, 0xfee00000 */
+	            -6.93147180369123816490e-01,},/* 0xbfe62e42, 0xfee00000 */
+ln2LO[2]    = { 1.90821492927058770002e-10,  /* 0x3dea39ef, 0x35793c76 */
+	            -1.90821492927058770002e-10,},/* 0xbdea39ef, 0x35793c76 */
+invln2      =  1.44269504088896338700e+00, /* 0x3ff71547, 0x652b82fe */
+P1          =  1.66666666666666019037e-01, /* 0x3FC55555, 0x5555553E */
+P2          = -2.77777777770155933842e-03, /* 0xBF66C16C, 0x16BEBD93 */
+P3          =  6.61375632143793436117e-05, /* 0x3F11566A, 0xAF25DE2C */
+P4          = -1.65339022054652515390e-06, /* 0xBEBBBD41, 0xC5D26BF1 */
+P5          =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 
 static volatile double
-twom1000= 9.33263618503218878990e-302;     /* 2**-1000=0x01700000,0*/
+twom1000    = 9.33263618503218878990e-302;      /* 2**-1000=0x01700000,0*/
 
-OLM_DLLEXPORT double
-__ieee754_exp(double x)	/* default IEEE double exp */
+OLM_DLLEXPORT double __ieee754_exp(double x)    /* default IEEE double exp */
 {
-	double y,hi=0.0,lo=0.0,c,t,twopk;
-	int32_t k=0,xsb;
+    double y,hi=0.0,lo=0.0,c,t,twopk;
+    int32_t k=0,xsb;
 	u_int32_t hx;
 
 	GET_HIGH_WORD(hx,x);
@@ -116,7 +115,7 @@ __ieee754_exp(double x)	/* default IEEE double exp */
 	if(hx >= 0x40862E42) {			/* if |x|>=709.78... */
             if(hx>=0x7ff00000) {
 	        u_int32_t lx;
-		GET_LOW_WORD(lx,x);
+		GET_LOW_WORD(lx, x);
 		if(((hx&0xfffff)|lx)!=0)
 		     return x+x; 		/* NaN */
 		else return (xsb==0)? x:0.0;	/* exp(+-inf)={inf,0} */

@@ -1,7 +1,7 @@
-{-| Core of the Integer (big integer) type.
+{-| Integer trait.
 
-# Arithmethics
-@docs Negate, Add, Sub, Mul, Div, Mod, Rem
+# Trait
+@docs Integer
 
 # Equality
 @docs Equal, NotEqual
@@ -14,9 +14,7 @@
 
 -}
 
-namespace Core.Integer
-
-struct Integer
+trait Integer<a> : E
 
 fn Negate(Integer x) : int
 

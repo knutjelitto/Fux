@@ -72,7 +72,3 @@ cpow(double complex a, double complex z)
 	w = r * cos (theta) + (r * sin (theta)) * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(cpow, cpowl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

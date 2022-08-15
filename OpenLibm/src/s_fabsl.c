@@ -1,5 +1,5 @@
 /*-
- * Copyright (c) 2003 Dag-Erling Coïdan Smørgrav
+ * Copyright (c) 2003 Dag-Erling Coï¿½dan Smï¿½rgrav
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,6 @@
 
 #include <openlibm_math.h>
 #include "math_private.h"
-#include "fpmath.h"
 
 OLM_DLLEXPORT long double
 fabsl(long double x)

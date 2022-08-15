@@ -18,7 +18,7 @@ public class Repository
     public Root Root { get; }
 
     public List<Package> Packages { get; private set; } = new();
-    public IEnumerable<SourceUnit> Sources => Packages.SelectMany(p => p.Sources);
+    public IEnumerable<Source> Sources => Packages.SelectMany(p => p.Sources);
 
     public bool FindPackage(string packageName, [MaybeNullWhen(false)] out Package package) => Index.TryGetValue(packageName, out package);
 

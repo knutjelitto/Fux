@@ -18,7 +18,6 @@
 #include <float.h>
 #include <openlibm_math.h>
 
-#include "fpmath.h"
 #include "math_private.h"
 
 #define	GET_LDBL_MAN(h, l, v) do {	\

@@ -2,24 +2,40 @@
 
 Core of the int type.
 
+# Equality
+@docs Equal (==), NoEqual (!=)
+
+# Comparison
+@docs LessThan (<), LessEqual (<=), GreaterThan, GreaterEqual
+
 # Arithmethics
 @docs Negate, Add, Sub, Mul, Div, Mod, Rem
 
-# Equality
-@docs Equal, NoEqual
-
-# Comparison
-@docs LessThan, LessEqual, GreaterThan, GreaterEqual
-
 -}
 
-type int
+type int : i32
 
-impl int
-    fun Equal(int x, int y)
+impl Equateable<int>
+    fun Equal(x, y): bool
+        #wasm
+            (i32.eq $x $y)
+    fun Unequal(x, y): bool
+        #wasm
+            (i32.ne $x $y)
 
-impl Eq<int> where
-    fn Equal(x, y)
+impl Comparable<int>
+    fun LessThan(x, y): bool
+        #wasm
+            (i32.lt_s $x $y)
+    fun LessEqqual(x, y): bool
+        #wasm
+            (i32.le_s $x $y)
+    fun GreateThan(x, y): bool
+        #wasm
+            (i32.gt_s $x $y)
+    fun GreateEqual(x, y): bool
+        #wasm
+            (i32.ge_s $x $y)
 
 fn Negate(int x) : int
 
