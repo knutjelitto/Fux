@@ -13,7 +13,7 @@ impl boolean
                 (i32.ne (get_local $rhs) (i32.const 0))
             )
 
-    fun ==(lhs: boolean, rhs: boolean): boolean = %wasm {
+    fun (==) (lhs: boolean, rhs: boolean): boolean = %wasm {
         (i32.eq
             (i32.eqz (get_local $lhs))
             (i32.eqz (get_local $rhs))
