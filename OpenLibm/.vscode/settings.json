@@ -11,6 +11,8 @@
         "*.sax": "ceylon",
         "*.fux": "elm",
         "mathimpl.h": "c",
-        "cdefs-compat.h": "c"
+        "cdefs-compat.h": "c",
+        "math_private.h": "c",
+        "openlibm_intern.h": "c"
     }
 }

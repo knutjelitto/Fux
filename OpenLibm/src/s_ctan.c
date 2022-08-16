@@ -56,11 +56,7 @@
  * Also tested by ctan * ccot = 1 and catan(ctan(z))  =  z.
  */
 
-#include <float.h>
-#include <openlibm_complex.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #define MACHEP 1.1e-16
 #define MAXNUM 1.0e308
@@ -153,7 +149,3 @@ ctan(double complex z)
 	w = sin (2.0 * creal(z)) / d + (sinh (2.0 * cimag(z)) / d) * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(ctan, ctanl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

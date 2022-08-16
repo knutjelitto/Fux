@@ -26,41 +26,21 @@
  * $FreeBSD: src/lib/msun/src/s_isnan.c,v 1.9 2010/06/12 17:32:05 das Exp $
  */
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /* Provided by libc */
-#if 1
-OLM_DLLEXPORT int
-(isnan) (double d)
+OLM_DLLEXPORT int __isnan(double d)
 {
 	union IEEEd2bits u;
 
 	u.d = d;
 	return (u.bits.exp == 2047 && (u.bits.manl != 0 || u.bits.manh != 0));
 }
-#endif
 
-OLM_DLLEXPORT int
-__isnanf(float f)
+OLM_DLLEXPORT int __isnanf(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
 	return (u.bits.exp == 255 && u.bits.man != 0);
 }
-
-#ifdef OLM_LONG_DOUBLE
-OLM_DLLEXPORT int
-__isnanl(long double e)
-{
-	union IEEEl2bits u;
-
-	u.e = e;
-	mask_nbit_l(u);
-	return (u.bits.exp == 32767 && (u.bits.manl != 0 || u.bits.manh != 0));
-}
-#endif
-
-openlibm_weak_reference(__isnanf, isnanf);

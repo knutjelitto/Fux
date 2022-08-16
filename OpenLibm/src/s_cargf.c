@@ -24,13 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_cargf.c,v 1.1 2007/12/12 23:43:51 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT float
 cargf(float complex z)

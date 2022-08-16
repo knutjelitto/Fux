@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_sin.c,v 1.13 2011/02/10 07:37:50 das Exp $");
 
 /* sin(x)
@@ -44,15 +43,9 @@
  *	TRIG(x) returns trig(x) nearly rounded
  */
 
-#include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-//#define INLINE_REM_PIO2
-#include "math_private.h"
-//#include "e_rem_pio2.c"
-
-OLM_DLLEXPORT double
-sin(double x)
+OLM_DLLEXPORT double sin(double x)
 {
 	double y[2],z=0.0;
 	int32_t n, ix;
@@ -62,9 +55,12 @@ sin(double x)
 
     /* |x| ~< pi/4 */
 	ix &= 0x7fffffff;
-	if(ix <= 0x3fe921fb) {
+	if(ix <= 0x3fe921fb)
+	{
 	    if(ix<0x3e500000)			/* |x| < 2**-26 */
-	       {if((int)x==0) return x;}	/* generate inexact */
+	    {
+			if((int)x==0) return x;	/* generate inexact */
+		}
 	    return __kernel_sin(x,z,0);
 	}
 
@@ -83,7 +79,3 @@ sin(double x)
 	    }
 	}
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(sin, sinl);
-#endif

@@ -26,9 +26,9 @@
  * $FreeBSD: src/lib/msun/src/s_signbit.c,v 1.1 2004/07/19 08:16:10 das Exp $
  */
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT int
 __signbit(double d)

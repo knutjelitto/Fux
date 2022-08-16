@@ -10,8 +10,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_acos.c,v 1.13 2008/07/31 22:41:26 das Exp $");
 
 /* __ieee754_acos(x)
@@ -38,10 +36,7 @@
  * Function needed: sqrt
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 one=  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
@@ -68,7 +63,7 @@ OLM_DLLEXPORT double __ieee754_acos(double x)
 	GET_HIGH_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>=0x3ff00000) {	/* |x| >= 1 */
-	    u_int32_t lx;
+	    uint32_t lx;
 	    GET_LOW_WORD(lx,x);
 	    if(((ix-0x3ff00000)|lx)==0) {	/* |x|==1 */
 		if(hx>0) return 0.0;		/* acos(1) = 0  */
@@ -104,7 +99,3 @@ OLM_DLLEXPORT double __ieee754_acos(double x)
 	    return 2.0*(df+w);
 	}
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(acos, acosl);
-#endif

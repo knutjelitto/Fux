@@ -28,7 +28,6 @@
  */
 
 /* @(#)gamma.c	8.1 (Berkeley) 6/4/93 */
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/bsdsrc/b_tgamma.c,v 1.10 2008/02/22 02:26:51 das Exp $");
 
 /*
@@ -38,10 +37,7 @@
  * acknowledged.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "mathimpl.h"
+#include "openlibm_intern.h"
 
 /* METHOD:
  * x < 0: Use reflection formula, G(x) = pi/(sin(pi*x)*x*G(x))
@@ -123,8 +119,7 @@ static struct Double ratfun_gam(double, double);
 
 static const double zero = 0., one = 1.0, tiny = 1e-300;
 
-OLM_DLLEXPORT double tgamma(x)
-	double x;
+OLM_DLLEXPORT double tgamma(x) double x;
 {
 	struct Double u;
 
@@ -149,8 +144,7 @@ OLM_DLLEXPORT double tgamma(x)
 /*
  * Accurate to max(ulp(1/128) absolute, 2^-66 relative) error.
  */
-static struct Double
-large_gam(x)
+static struct Double large_gam(x)
 	double x;
 {
 	double z, p;
@@ -312,7 +306,3 @@ neg_gam(x)
 	if (sgn < 0) y = -y;
 	return (M_PI / (y*z));
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(tgamma, tgammal);
-#endif

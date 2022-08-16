@@ -13,12 +13,7 @@
  * ====================================================
  */
 
-
-#include "cdefs-compat.h"
-
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 two25   =  3.355443200e+07,	/* 0x4c000000 */
@@ -53,5 +48,3 @@ scalbnf (float x, int n)
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
         return x*twom25;
 }
-
-openlibm_strong_reference(scalbnf, ldexpf);

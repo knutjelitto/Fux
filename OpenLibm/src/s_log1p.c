@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_log1p.c,v 1.10 2008/03/29 16:37:59 das Exp $");
 
 /* double log1p(double x)
@@ -78,10 +77,7 @@
  *	 See HP-15C Advanced Functions Handbook, p.193.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 ln2_hi  =  6.93147180369123816490e-01,	/* 3fe62e42 fee00000 */
@@ -173,7 +169,3 @@ log1p(double x)
 	if(k==0) return f-(hfsq-s*(hfsq+R)); else
 		 return k*ln2_hi-((hfsq-(s*(hfsq+R)+(k*ln2_lo+c)))-f);
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(log1p, log1pl);
-#endif

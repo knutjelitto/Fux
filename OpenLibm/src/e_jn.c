@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_jn.c,v 1.11 2010/11/13 10:54:10 uqs Exp $");
 
 /*
@@ -40,9 +39,9 @@
  *	
  */
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 invsqrtpi=  5.64189583547756279280e-01, /* 0x3FE20DD7, 0x50429B6D */
@@ -64,7 +63,7 @@ __ieee754_jn(int n, double x)
 	EXTRACT_WORDS(hx,lx,x);
 	ix = 0x7fffffff&hx;
     /* if J(n,NaN) is NaN */
-	if((ix|((u_int32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
+	if((ix|((uint32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
 	if(n<0){		
 		n = -n;
 		x = -x;
@@ -222,7 +221,7 @@ __ieee754_yn(int n, double x)
 	EXTRACT_WORDS(hx,lx,x);
 	ix = 0x7fffffff&hx;
     /* if Y(n,NaN) is NaN */
-	if((ix|((u_int32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
+	if((ix|((uint32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
 	if((ix|lx)==0) return -one/zero;
 	if(hx<0) return zero/zero;
 	sign = 1;
@@ -255,7 +254,7 @@ __ieee754_yn(int n, double x)
 		}
 		b = invsqrtpi*temp/sqrt(x);
 	} else {
-	    u_int32_t high;
+	    uint32_t high;
 	    a = __ieee754_y0(x);
 	    b = __ieee754_y1(x);
 	/* quit if b is -inf */

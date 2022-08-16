@@ -28,12 +28,9 @@
  */
 
 /* @(#)log.c	8.2 (Berkeley) 11/30/93 */
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/bsdsrc/b_log.c,v 1.9 2008/02/22 02:26:51 das Exp $");
 
-#include <openlibm_math.h>
-
-#include "mathimpl.h"
+#include "openlibm_intern.h"
 
 /* Table-driven natural logarithm.
  *

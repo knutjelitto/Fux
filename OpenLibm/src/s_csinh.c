@@ -34,13 +34,12 @@
  * These values and the return value were taken from n1124.pdf.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_csinh.c,v 1.2 2011/10/21 06:29:32 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double huge = 0x1p1023;
 

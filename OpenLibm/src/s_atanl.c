@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_atanl.c,v 1.1 2008/07/31 22:41:26 das Exp $");
 
 /*
@@ -20,10 +19,10 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 #include "invtrig.h"
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const long double
 one   = 1.0,

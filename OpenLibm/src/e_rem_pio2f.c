@@ -14,7 +14,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_rem_pio2f.c,v 1.32 2009/06/03 08:16:34 ed Exp $");
 
 /* __ieee754_rem_pio2f(x,y)
@@ -24,10 +23,7 @@
  * use __kernel_rem_pio2() for large x
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /*
  * invpio2:  53 bits of 2/pi
@@ -40,8 +36,7 @@ invpio2 =  6.36619772367581382433e-01, /* 0x3FE45F30, 0x6DC9C883 */
 pio2_1  =  1.57079631090164184570e+00, /* 0x3FF921FB, 0x50000000 */
 pio2_1t =  1.58932547735281966916e-08; /* 0x3E5110b4, 0x611A6263 */
 
-__inline int
-__ieee754_rem_pio2f(float x, double *y)
+inline int __ieee754_rem_pio2f(float x, double *y)
 {
 	double w,r,fn;
 	double tx[1],ty[1];

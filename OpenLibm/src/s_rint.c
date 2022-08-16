@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_rint.c,v 1.16 2008/02/22 02:30:35 das Exp $");
 
 /*
@@ -23,10 +22,7 @@
  *	Inexact flag raised if x not equal to rint(x).
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 TWO52[2]={
@@ -38,7 +34,7 @@ OLM_DLLEXPORT double
 rint(double x)
 {
 	int32_t i0,j0,sx;
-	u_int32_t i,i1;
+	uint32_t i,i1;
 	double w,t;
 	EXTRACT_WORDS(i0,i1,x);
 	sx = (i0>>31)&1;
@@ -77,7 +73,7 @@ rint(double x)
 	    if(j0==0x400) return x+x;	/* inf or NaN */
 	    else return x;		/* x is integral */
 	} else {
-	    i = ((u_int32_t)(0xffffffff))>>(j0-20);
+	    i = ((uint32_t)(0xffffffff))>>(j0-20);
 	    if((i1&i)==0) return x;	/* x is integral */
 	    i>>=1;
 	    if((i1&i)!=0) i1 = (i1&(~i))|((0x40000000)>>(j0-20));
@@ -86,7 +82,3 @@ rint(double x)
 	STRICT_ASSIGN(double,w,TWO52[sx]+x);
 	return w-TWO52[sx];
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(rint, rintl);
-#endif

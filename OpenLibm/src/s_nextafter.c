@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_nextafter.c,v 1.12 2008/02/22 02:30:35 das Exp $");
 
 /* IEEE functions
@@ -20,17 +19,14 @@
  *   Special cases:
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double
 nextafter(double x, double y)
 {
 	volatile double t;
 	int32_t hx,hy,ix,iy;
-	u_int32_t lx,ly;
+	uint32_t lx,ly;
 
 	EXTRACT_WORDS(hx,lx,x);
 	EXTRACT_WORDS(hy,ly,y);
@@ -75,9 +71,3 @@ nextafter(double x, double y)
 	INSERT_WORDS(x,hx,lx);
 	return x;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(nextafter, nexttoward);
-openlibm_weak_reference(nextafter, nexttowardl);
-openlibm_weak_reference(nextafter, nextafterl);
-#endif

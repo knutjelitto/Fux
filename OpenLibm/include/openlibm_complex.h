@@ -50,7 +50,6 @@
 
 #define CMPLXF(x, y) ((float complex){x, y})
 #define CMPLX(x, y) ((double complex){x, y})
-#define CMPLXL(x, y) ((long double complex){x, y})
 
 /*
  * Double precision version of C99 functions

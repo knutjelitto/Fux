@@ -17,11 +17,11 @@
 #ifndef _OPENLIBM_INTERN_H_
 #define	_OPENLIBM_INTERN_H_
 
+#include <float.h>
+#include <stdint.h>
+#include "openlibm_math.h"
 #include "openlibm_complex.h"
 #include "openlibm_defs.h"
-#include "cdefs-compat.h"
-#include "types-compat.h"
-#include <stdint.h>
 
 union IEEEf2bits
 {
@@ -51,13 +51,17 @@ union IEEEd2bits
  */
 void __scan_nan(uint32_t *__words, int __num_words, const char *__s);
 
+struct Double
+{
+	double	a;
+	double	b;
+};
+
 /*
  * Functions internal to the math package, yet not static.
  */
 double __exp__D(double, double);
 struct Double __log__D(double);
-long double __p1evll(long double, void *, int);
-long double __polevll(long double, void *, int);
 
 /*
  * The original fdlibm code used statements like:
@@ -83,12 +87,12 @@ typedef union
     double value;
     struct
     {
-        u_int32_t lsw;
-        u_int32_t msw;
+        uint32_t lsw;
+        uint32_t msw;
     } parts;
     struct
     {
-        u_int64_t w;
+        uint64_t w;
     } xparts;
 } ieee_double_shape_type;
 
@@ -202,25 +206,7 @@ do {								\
 /*
  * Common routine to process the arguments to nan(), nanf(), and nanl().
  */
-void __scan_nan(u_int32_t *__words, int __num_words, const char *__s);
-
-/*
- * Mix 1 or 2 NaNs.  First add 0 to each arg.  This normally just turns
- * signaling NaNs into quiet NaNs by setting a quiet bit.  We do this
- * because we want to never return a signaling NaN, and also because we
- * don't want the quiet bit to affect the result.  Then mix the converted
- * args using addition.  The result is typically the arg whose mantissa
- * bits (considered as in integer) are largest.
- *
- * Technical complications: the result in bits might depend on the precision
- * and/or on compiler optimizations, especially when different register sets
- * are used for different precisions.  Try to make the result not depend on
- * at least the precision by always doing the main mixing step in long double
- * precision.  Try to reduce dependencies on optimizations by adding the
- * the 0's in different precisions (unless everything is in long double
- * precision).
- */
-#define	nan_mix(x, y)	(((x) + 0.0L) + ((y) + 0))
+void __scan_nan(uint32_t *__words, int __num_words, const char *__s);
 
 /*
  * ieee style elementary functions

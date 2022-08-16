@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_log2.c,v 1.4 2011/10/15 05:23:28 das Exp $");
 
 /*
@@ -24,10 +23,7 @@
  * in not-quite-routine extra precision.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 #include "k_log.h"
 
 static const double
@@ -42,7 +38,7 @@ __ieee754_log2(double x)
 {
 	double f,hfsq,hi,lo,r,val_hi,val_lo,w,y;
 	int32_t i,k,hx;
-	u_int32_t lx;
+	uint32_t lx;
 
 	EXTRACT_WORDS(hx,lx,x);
 
@@ -110,7 +106,3 @@ __ieee754_log2(double x)
 
 	return val_lo + val_hi;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(log2, log2l);
-#endif

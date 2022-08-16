@@ -24,12 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_fmin.c,v 1.1 2004/06/30 07:04:01 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double fmin(double x, double y)
 {

@@ -11,7 +11,6 @@
  * From: @(#)s_floor.c 5.1 93/09/24
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_truncl.c,v 1.9 2008/02/14 15:10:34 bde Exp $");
 
 /*
@@ -24,10 +23,10 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 #include <stdint.h>
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #ifdef LDBL_IMPLICIT_NBIT
 #define	MANH_SIZE	(LDBL_MANH_SIZE + 1)

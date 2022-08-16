@@ -12,8 +12,6 @@
  *
  * Optimized by Bruce D. Evans.
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_rem_pio2.c,v 1.22 2011/06/19 17:07:58 kargl Exp $");
 
 /* __ieee754_rem_pio2(x,y)
@@ -22,10 +20,7 @@
  * use __kernel_rem_pio2()
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /*
  * invpio2:  53 bits of 2/pi
@@ -48,13 +43,12 @@ pio2_2t =  2.02226624879595063154e-21, /* 0x3BA3198A, 0x2E037073 */
 pio2_3  =  2.02226624871116645580e-21, /* 0x3BA3198A, 0x2E000000 */
 pio2_3t =  8.47842766036889956997e-32; /* 0x397B839A, 0x252049C1 */
 
-__inline int
-__ieee754_rem_pio2(double x, double *y)
+inline int __ieee754_rem_pio2(double x, double *y)
 {
 	double z,w,t,r,fn;
 	double tx[3],ty[2];
 	int32_t e0,i,j,nx,n,ix,hx;
-	u_int32_t low;
+	uint32_t low;
 
 	GET_HIGH_WORD(hx,x);		/* high word of x */
 	ix = hx&0x7fffffff;
@@ -135,7 +129,7 @@ medium:
 	    r  = x-fn*pio2_1;
 	    w  = fn*pio2_1t;	/* 1st round good to 85 bit */
 	    {
-	        u_int32_t high;
+	        uint32_t high;
 	        j  = ix>>20;
 	        y[0] = r-w; 
 		GET_HIGH_WORD(high,y[0]);

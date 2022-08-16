@@ -8,8 +8,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_logf.h,v 1.3 2011/10/15 05:23:28 das Exp $");
 
 /*
@@ -23,8 +21,7 @@ Lg2 =      0xccce13.0p-25,	/* 0.40000972152 */
 Lg3 =      0x91e9ee.0p-25,	/* 0.28498786688 */
 Lg4 =      0xf89e26.0p-26;	/* 0.24279078841 */
 
-static inline float
-k_log1pf(float f)
+static inline float k_log1pf(float f)
 {
 	float hfsq,s,z,R,w,t1,t2;
 

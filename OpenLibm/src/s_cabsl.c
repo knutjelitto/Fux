@@ -17,7 +17,7 @@
  */
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 long double
 cabsl(long double complex z)

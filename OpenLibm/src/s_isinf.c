@@ -25,24 +25,20 @@
  *
  */
 
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-OLM_DLLEXPORT int (isinf) (double d)
+OLM_DLLEXPORT int __isinf(double d)
 {
-	union IEEEd2bits u;
+    union IEEEd2bits u;
 
-	u.d = d;
-	return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
+    u.d = d;
+    return (u.bits.exp == 2047 && u.bits.manl == 0 && u.bits.manh == 0);
 }
 
 OLM_DLLEXPORT int __isinff(float f)
 {
-	union IEEEf2bits u;
+    union IEEEf2bits u;
 
-	u.f = f;
-	return (u.bits.exp == 255 && u.bits.man == 0);
+    u.f = f;
+    return (u.bits.exp == 255 && u.bits.man == 0);
 }
-
-openlibm_weak_reference(__isinff, isinff);

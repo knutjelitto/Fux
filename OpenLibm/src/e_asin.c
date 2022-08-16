@@ -10,8 +10,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_asin.c,v 1.15 2011/02/10 07:37:50 das Exp $");
 
 /* __ieee754_asin(x)
@@ -44,10 +42,7 @@
  *
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 one =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
@@ -75,7 +70,7 @@ __ieee754_asin(double x)
 	GET_HIGH_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>= 0x3ff00000) {		/* |x|>= 1 */
-	    u_int32_t lx;
+	    uint32_t lx;
 	    GET_LOW_WORD(lx,x);
 	    if(((ix-0x3ff00000)|lx)==0)
 		    /* asin(1)=+-pi/2 with inexact */
@@ -111,7 +106,3 @@ __ieee754_asin(double x)
 	}    
 	if(hx>0) return t; else return -t;    
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(asin, asinl);
-#endif

@@ -50,7 +50,7 @@
  */
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 /* calculate cosh and sinh */
 

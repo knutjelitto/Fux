@@ -10,8 +10,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_log.c,v 1.15 2008/03/29 16:37:59 das Exp $");
 
 /* __ieee754_log(x)
@@ -65,10 +63,7 @@
  * to produce the hexadecimal values shown.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 ln2_hi  =  6.93147180369123816490e-01,	/* 3fe62e42 fee00000 */
@@ -89,7 +84,7 @@ __ieee754_log(double x)
 {
 	double hfsq,f,s,z,R,w,t1,t2,dk;
 	int32_t k,hx,i,j;
-	u_int32_t lx;
+	uint32_t lx;
 
 	EXTRACT_WORDS(hx,lx,x);
 
@@ -140,7 +135,3 @@ __ieee754_log(double x)
 		     return dk*ln2_hi-((s*(f-R)-dk*ln2_lo)-f);
 	}
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(log, logl);
-#endif

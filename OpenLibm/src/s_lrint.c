@@ -24,12 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 
 #include <openlibm_fenv.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #ifndef type
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_lrint.c,v 1.1 2005/01/11 23:12:55 das Exp $");

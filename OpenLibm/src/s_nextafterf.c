@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_nextafterf.c,v 1.11 2008/02/22 02:30:35 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT float
 nextafterf(float x, float y)

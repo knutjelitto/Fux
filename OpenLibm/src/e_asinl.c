@@ -12,7 +12,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_asinl.c,v 1.2 2008/08/03 17:49:05 das Exp $");
 
 /*
@@ -21,10 +20,10 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 #include "invtrig.h"
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const long double
 one =  1.00000000000000000000e+00,

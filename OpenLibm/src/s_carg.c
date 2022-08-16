@@ -24,16 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_carg.c,v 1.1 2007/12/12 23:43:51 das Exp $");
 
-#include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-OLM_DLLEXPORT double
-carg(double complex z)
+OLM_DLLEXPORT double carg(double complex z)
 {
 
 	return (atan2(cimag(z), creal(z)));

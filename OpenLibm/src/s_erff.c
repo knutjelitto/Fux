@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_erff.c,v 1.8 2008/02/22 02:30:35 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 tiny	    = 1e-30,
@@ -88,7 +87,7 @@ erff(float x)
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) {		/* erf(nan)=nan */
-	    i = ((u_int32_t)hx>>31)<<1;
+	    i = ((uint32_t)hx>>31)<<1;
 	    return (float)(1-i)+one/x;	/* erf(+-inf)=+-1 */
 	}
 
@@ -136,7 +135,7 @@ erfcf(float x)
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) {			/* erfc(nan)=nan */
 						/* erfc(+-inf)=0,2 */
-	    return (float)(((u_int32_t)hx>>31)<<1)+one/x;
+	    return (float)(((uint32_t)hx>>31)<<1)+one/x;
 	}
 
 	if(ix < 0x3f580000) {		/* |x|<0.84375 */

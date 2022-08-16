@@ -46,9 +46,9 @@
  */
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT long double complex
 cpowl(long double complex a, long double complex z)

@@ -14,15 +14,14 @@
  * fabs(x) returns the absolute value of x.
  */
 
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-OLM_DLLEXPORT double
-fabs(double x)
+OLM_DLLEXPORT double fabs(double x)
 {
-	u_int32_t high;
-	GET_HIGH_WORD(high,x);
-	SET_HIGH_WORD(x,high&0x7fffffff);
-        return x;
+    uint32_t high;
+
+    GET_HIGH_WORD(high,x);
+    SET_HIGH_WORD(x, high & 0x7fffffff);
+    
+    return x;
 }

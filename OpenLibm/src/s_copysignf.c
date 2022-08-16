@@ -13,7 +13,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_copysignf.c,v 1.10 2008/02/22 02:30:35 das Exp $");
 
 /*
@@ -22,14 +21,14 @@
  * with the sign bit of y.
  */
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT float
 copysignf(float x, float y)
 {
-	u_int32_t ix,iy;
+	uint32_t ix,iy;
 	GET_FLOAT_WORD(ix,x);
 	GET_FLOAT_WORD(iy,y);
 	SET_FLOAT_WORD(x,(ix&0x7fffffff)|(iy&0x80000000));

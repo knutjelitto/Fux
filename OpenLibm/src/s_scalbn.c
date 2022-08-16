@@ -17,12 +17,8 @@
  * exponentiation or a multiplication.
  */
 
-#include "cdefs-compat.h"
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 two54   =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
@@ -57,10 +53,3 @@ scalbn (double x, int n)
 	SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20));
         return x*twom54;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(scalbn, ldexpl);
-openlibm_weak_reference(scalbn, scalbnl);
-#endif
-
-openlibm_strong_reference(scalbn, ldexp);

@@ -26,21 +26,18 @@
  * ANSI/POSIX
  */
 
-#define	HUGE_VAL	    __builtin_huge_val()
+#define	HUGE_VAL        __builtin_huge_val()
+#define	HUGE_VALF       __builtin_huge_valf()
 
-#define	FP_ILOGB0	    (-INT_MAX)
-#define	FP_ILOGBNAN	    INT_MAX
+#define	FP_ILOGB0       (-INT_MAX)
+#define	FP_ILOGBNAN     INT_MAX
 
-#define	HUGE_VALF	    __builtin_huge_valf()
-#define	HUGE_VALL	    __builtin_huge_vall()
-#define	INFINITY	    __builtin_inff()
-#define	NAN		        __builtin_nanf("")
+#define	INFINITY        __builtin_inff()
+#define	NAN             __builtin_nanf("")
 
 #define	MATH_ERRNO          1
-#define	MATH_ERREXCEPT	    2
-#define	math_errhandling	MATH_ERREXCEPT
-
-#define	FP_FAST_FMAF	    1
+#define	MATH_ERREXCEPT      2
+#define	math_errhandling    MATH_ERREXCEPT
 
 /* Symbolic constants to classify floating point numbers. */
 #define	FP_INFINITE	        0x01
@@ -61,12 +58,12 @@
 
 #define	isinf(x)					                \
     ((sizeof (x) == sizeof (float)) ? __isinff(x)	\
-    : (sizeof (x) == sizeof (double)) ? isinf(x)	\
+    : (sizeof (x) == sizeof (double)) ? __isinf(x)	\
     : __isinfl(x))
 
 #define	isnan(x)					                \
     ((sizeof (x) == sizeof (float)) ? __isnanf(x)	\
-    : (sizeof (x) == sizeof (double)) ? isnan(x)	\
+    : (sizeof (x) == sizeof (double)) ? __isnan(x)	\
     : __isnanl(x))
 
 #define	isnormal(x)					                    \
@@ -124,7 +121,10 @@ OLM_DLLEXPORT int	__fpclassifyf(float) __pure2;
 OLM_DLLEXPORT int	__isfinite(double) __pure2;
 OLM_DLLEXPORT int	__isfinitef(float) __pure2;
 
+OLM_DLLEXPORT int	__isinf(double) __pure2;
 OLM_DLLEXPORT int	__isinff(float) __pure2;
+
+OLM_DLLEXPORT int	__isnan(double) __pure2;
 OLM_DLLEXPORT int	__isnanf(float) __pure2;
 
 OLM_DLLEXPORT int	__isnormal(double) __pure2;
@@ -135,18 +135,22 @@ OLM_DLLEXPORT int	__signbitf(float) __pure2;
 
 #define EXPORT(name, result, signature) OLM_DLLEXPORT result core_math_ ## name signature
 
-EXPORT(cos, double, (double));
-EXPORT(sin, double, (double));
-EXPORT(tan, double, (double));
+OLM_DLLEXPORT double    cos(double);
+OLM_DLLEXPORT double    sin(double);
+OLM_DLLEXPORT double    tan(double);
 
-OLM_DLLEXPORT double	acos(double);
-OLM_DLLEXPORT double	asin(double);
-OLM_DLLEXPORT double	atan(double);
-OLM_DLLEXPORT double	atan2(double, double);
+OLM_DLLEXPORT double    acos(double);
+OLM_DLLEXPORT double    asin(double);
+OLM_DLLEXPORT double    atan(double);
+OLM_DLLEXPORT double    atan2(double, double);
 
 OLM_DLLEXPORT double	cosh(double);
 OLM_DLLEXPORT double	sinh(double);
 OLM_DLLEXPORT double	tanh(double);
+
+OLM_DLLEXPORT double	acosh(double);
+OLM_DLLEXPORT double	asinh(double);
+OLM_DLLEXPORT double	atanh(double);
 
 OLM_DLLEXPORT double	exp(double);
 OLM_DLLEXPORT double	frexp(double, int *);	/* fundamentally !__pure2 */
@@ -156,16 +160,13 @@ OLM_DLLEXPORT double	log10(double);
 OLM_DLLEXPORT double	modf(double, double *);	/* fundamentally !__pure2 */
 
 OLM_DLLEXPORT double	pow(double, double);
-EXPORT(sqrt, double, (double));
+OLM_DLLEXPORT double    sqrt(double);
 
 OLM_DLLEXPORT double	ceil(double);
 OLM_DLLEXPORT double	fabs(double) __pure2;
 OLM_DLLEXPORT double	floor(double);
 OLM_DLLEXPORT double	fmod(double, double);
 
-OLM_DLLEXPORT double	acosh(double);
-OLM_DLLEXPORT double	asinh(double);
-OLM_DLLEXPORT double	atanh(double);
 OLM_DLLEXPORT double	cbrt(double);
 OLM_DLLEXPORT double	erf(double);
 OLM_DLLEXPORT double	erfc(double);
@@ -226,17 +227,22 @@ OLM_DLLEXPORT double	lgamma_r(double, int *);
 OLM_DLLEXPORT void	sincos(double, double *, double *);
 
 /* float versions of ANSI/POSIX functions */
-OLM_DLLEXPORT float	acosf(float);
-OLM_DLLEXPORT float	asinf(float);
-OLM_DLLEXPORT float	atanf(float);
-OLM_DLLEXPORT float	atan2f(float, float);
 OLM_DLLEXPORT float	cosf(float);
 OLM_DLLEXPORT float	sinf(float);
 OLM_DLLEXPORT float	tanf(float);
 
+OLM_DLLEXPORT float	acosf(float);
+OLM_DLLEXPORT float	asinf(float);
+OLM_DLLEXPORT float	atanf(float);
+OLM_DLLEXPORT float	atan2f(float, float);
+
 OLM_DLLEXPORT float	coshf(float);
 OLM_DLLEXPORT float	sinhf(float);
 OLM_DLLEXPORT float	tanhf(float);
+
+OLM_DLLEXPORT float	acoshf(float);
+OLM_DLLEXPORT float	asinhf(float);
+OLM_DLLEXPORT float	atanhf(float);
 
 OLM_DLLEXPORT float	exp2f(float);
 OLM_DLLEXPORT float	expf(float);
@@ -265,9 +271,6 @@ OLM_DLLEXPORT float	hypotf(float, float);
 OLM_DLLEXPORT float	lgammaf(float);
 OLM_DLLEXPORT float	tgammaf(float);
 
-OLM_DLLEXPORT float	acoshf(float);
-OLM_DLLEXPORT float	asinhf(float);
-OLM_DLLEXPORT float	atanhf(float);
 OLM_DLLEXPORT float	cbrtf(float);
 OLM_DLLEXPORT float	logbf(float);
 OLM_DLLEXPORT float	copysignf(float, float) __pure2;

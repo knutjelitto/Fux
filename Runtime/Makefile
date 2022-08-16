@@ -66,12 +66,11 @@ CLANGFLAGS += -fvisibility=hidden -fno-builtin -fno-exceptions -fno-threadsafe-s
 # Flags for wasm-ld
 LDFLAGS += -no-entry
 LDFLAGS += -allow-undefined
-#LDFLAGS += -import-memory
-LDFLAGS += -initial-memory=1048576
-LDFLAGS += -max-memory=1048576
+LDFLAGS += -import-memory
+#LDFLAGS += -initial-memory=1048576
+#LDFLAGS += -max-memory=1048576
 LDFLAGS += -no-gc-sections
 LDFLAGS += -export-all
-LDFLAGS += -demangle
 LDFLAGS += $(addprefix -export=,$(patsubst _%,%,$(strip $(EXPORTS))))
 
 # Project Build flags, add defines from the make command line (e.g. D=MACRO=VALUE)

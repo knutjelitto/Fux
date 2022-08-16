@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_acoshf.c,v 1.8 2008/02/22 02:30:34 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 one	= 1.0,

@@ -13,15 +13,9 @@
  * is preserved.
  * ====================================================
  */
-
-#ifndef INLINE_KERNEL_SINDF
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_sinf.c,v 1.16 2009/06/03 08:16:34 ed Exp $");
-#endif
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /* |sin(x)/x - s(x)| < 2**-37.5 (~[-4.89e-12, 4.824e-12]). */
 static const double
@@ -30,10 +24,6 @@ S2 =  0x111110896efbb2.0p-59,	/*  0.0083333293858894631756 */
 S3 = -0x1a00f9e2cae774.0p-65,	/* -0.000198393348360966317347 */
 S4 =  0x16cd878c3b46a7.0p-71;	/*  0.0000027183114939898219064 */
 
-#ifndef INLINE_KERNEL_SINDF
-extern
-#endif
-//__inline float
 OLM_DLLEXPORT float 
 __kernel_sindf(double x)
 {

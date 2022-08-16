@@ -1,5 +1,12 @@
 OPENLIBM_HOME=$(abspath .)
 
+AR			= llvm-ar
+CC			= clang
+WASMLD		= wasm-ld
+WASMOPT     = wasm-opt
+WASM2WAT	= wasm-dis
+WASM2C		= wasm2c
+
 # Default build rule for any Makefile in this project: all
 default: all
 
@@ -26,8 +33,16 @@ else
   WOPTFLAGS := -g -O0
 endif
 
-AR = llvm-ar
-CC = clang
+
+# Flags for wasm-ld
+LDFLAGS += -no-entry
+LDFLAGS += -allow-undefined
+LDFLAGS += -import-memory
+#LDFLAGS += -initial-memory=1048576
+#LDFLAGS += -max-memory=1048576
+LDFLAGS += -no-gc-sections
+LDFLAGS += -export-all
+LDFLAGS += $(addprefix -export=,$(patsubst _%,%,$(strip $(EXPORTS))))
 
 CFLAGS_add =
 CFLAGS_add += $(WOPTFLAGS)
@@ -62,12 +77,22 @@ DEPS := $(patsubst %.c.o,%.c.d,$(OBJS))
 
 OLM_LIB := libopenlibm.a
 
-all : $(OLM_LIB)
+all : $(OLM_LIB) openlibm.wasm openlibm.wat
 
 
 $(OLM_LIB): Makefile $(OBJS)
 	$(info Archive objects)
 	$(AR) -rcs libopenlibm.a $(OBJS)
+
+openlibm.wasm : Makefile $(OBJS)
+	$(info Link $@ ...)
+	@$(WASMLD) $(LDFLAGS) -o $@ $(OBJS)
+	@"$(WASMOPT)" --legalize-js-interface $(WOPTFLAGS) $@ -o $@
+
+openlibm.wat: openlibm.wasm
+	$(info Wasm->Wat $@ ...)
+	@"$(WASM2WAT)" openlibm.wasm -o $@
+
 
 $(OBJS): Makefile
 

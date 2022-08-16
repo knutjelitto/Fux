@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_ilogb.c,v 1.10 2008/02/22 02:30:35 das Exp $");
 
 /* ilogb(double x)
@@ -21,9 +20,9 @@
  */
 
 #include <limits.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT int ilogb(double x)
 {

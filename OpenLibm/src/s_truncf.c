@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_truncf.c,v 1.1 2004/06/20 09:25:43 das Exp $");
 
 /*
@@ -22,9 +21,9 @@
  *	Inexact flag raised if x not equal to truncf(x).
  */
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float huge = 1.0e30F;
 
@@ -32,7 +31,7 @@ OLM_DLLEXPORT float
 truncf(float x)
 {
 	int32_t i0,j0;
-	u_int32_t i;
+	uint32_t i;
 	GET_FLOAT_WORD(i0,x);
 	j0 = ((i0>>23)&0xff)-0x7f;
 	if(j0<23) {

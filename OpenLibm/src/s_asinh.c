@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_asinh.c,v 1.9 2008/02/22 02:30:35 das Exp $");
 
 /* asinh(x)
@@ -25,9 +24,9 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 one =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */

@@ -9,7 +9,6 @@
  * is preserved.
  * ====================================================
  */
- #include "cdefs-compat.h"
 
 /* sincos(x, s, c)
  * Several applications need sine and cosine of the same
@@ -34,12 +33,7 @@
  *      sincos(NaN, s, c)    is that NaN;
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-//#define INLINE_REM_PIO2
-#include "math_private.h"
-//#include "e_rem_pio2.c"
+#include "openlibm_intern.h"
 
 /* Constants used in polynomial approximation of sin/cos */
 static const double
@@ -58,8 +52,7 @@ C4  = -2.75573143513906633035e-07, /* 0xBE927E4F, 0x809C52AD */
 C5  =  2.08757232129817482790e-09, /* 0x3E21EE9E, 0xBDB4B1C4 */
 C6  = -1.13596475577881948265e-11; /* 0xBDA8FAE9, 0xBE8838D4 */
 
-static void
-__kernel_sincos( double x, double y, int iy, double * k_s, double * k_c )
+static void __kernel_sincos( double x, double y, int iy, double * k_s, double * k_c )
 {
     /* Inline calculation of sin/cos, as we can save
     some work, and we will always need to calculate
@@ -68,16 +61,14 @@ __kernel_sincos( double x, double y, int iy, double * k_s, double * k_c )
     z   = x*x;
     w   = z*z;
 
-    /* cos-specific computation; equivalent to calling
-     __kernel_cos(x,y) and storing in k_c*/
+    /* cos-specific computation; equivalent to calling __kernel_cos(x,y) and storing in k_c */
     r   = z*(C1+z*(C2+z*C3)) + w*w*(C4+z*(C5+z*C6));
     hz  = 0.5*z;
     v   = one-hz;
 
     *k_c = v + (((one-v)-hz) + (z*r-x*y));
 
-    /* sin-specific computation; equivalent to calling
-    __kernel_sin(x,y,1) and storing in k_s*/
+    /* sin-specific computation; equivalent to calling __kernel_sin(x,y,1) and storing in k_s */
     r   = S2+z*(S3+z*S4) + z*w*(S5+z*S6);
     v   = z*x;
     if(iy == 0)
@@ -86,8 +77,7 @@ __kernel_sincos( double x, double y, int iy, double * k_s, double * k_c )
         *k_s = x-((z*(half*y-v*r)-y)-v*S1);
 }
 
-OLM_DLLEXPORT void
-sincos(double x, double * s, double * c)
+OLM_DLLEXPORT void sincos(double x, double * s, double * c)
 {
     double y[2];
     int32_t ix;
@@ -144,7 +134,3 @@ sincos(double x, double * s, double * c)
         }
     }
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(sincos, sincosl);
-#endif

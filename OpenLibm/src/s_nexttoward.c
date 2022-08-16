@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_nexttoward.c,v 1.3 2011/02/10 07:38:13 das Exp $");
 
 /*
@@ -20,9 +19,9 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #if LDBL_MAX_EXP != 0x4000
 #error "Unsupported long double format"
@@ -34,7 +33,7 @@ nexttoward(double x, long double y)
 	union IEEEl2bits uy;
 	volatile double t;
 	int32_t hx,ix;
-	u_int32_t lx;
+	uint32_t lx;
 
 	EXTRACT_WORDS(hx,lx,x);
 	ix = hx&0x7fffffff;		/* |x| */

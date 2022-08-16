@@ -14,13 +14,12 @@
  */
 
 #ifndef INLINE_KERNEL_TANDF
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_tanf.c,v 1.23 2009/06/03 08:16:34 ed Exp $");
 #endif
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /* |tan(x)/x - t(x)| < 2**-25.5 (~[-2e-08, 2e-08]). */
 static const double

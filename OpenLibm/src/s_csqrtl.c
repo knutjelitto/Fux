@@ -24,13 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 
 #include <float.h>
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /*
  * gcc doesn't implement complex multiplication or division correctly,

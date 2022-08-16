@@ -3,7 +3,7 @@
         {
             "name": "Wasm32",
             "includePath": [
-                "${workspaceFolder}",
+                "${workspaceFolder}/src",
                 "${workspaceFolder}/include",
                 "${workspaceFolder}/wasm32"
             ],

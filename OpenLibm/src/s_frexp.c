@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_frexp.c,v 1.11 2008/02/22 02:30:35 das Exp $");
 
 /*
@@ -23,10 +22,7 @@
  * with *exp=0.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 two54 =  1.80143985094819840000e+16; /* 0x43500000, 0x00000000 */
@@ -50,7 +46,3 @@ frexp(double x, int *eptr)
 	SET_HIGH_WORD(x,hx);
 	return x;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(frexp, frexpl);
-#endif

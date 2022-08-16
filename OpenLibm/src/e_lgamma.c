@@ -11,8 +11,6 @@
  * ====================================================
  *
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_lgamma.c,v 1.9 2008/02/22 02:30:35 das Exp $");
 
 /* __ieee754_lgamma(x)
@@ -21,9 +19,7 @@
  * Method: call __ieee754_lgamma_r
  */
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double
 __ieee754_lgamma(double x)

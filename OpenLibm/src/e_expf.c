@@ -12,14 +12,9 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_expf.c,v 1.16 2011/10/21 06:26:38 das Exp $");
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 one	= 1.0,
@@ -46,7 +41,7 @@ __ieee754_expf(float x)
 {
 	float y,hi=0.0,lo=0.0,c,t,twopk;
 	int32_t k=0,xsb;
-	u_int32_t hx;
+	uint32_t hx;
 
 	GET_FLOAT_WORD(hx,x);
 	xsb = (hx>>31)&1;		/* sign bit of x */

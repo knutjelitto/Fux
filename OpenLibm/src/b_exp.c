@@ -30,9 +30,7 @@
 /* @(#)exp.c	8.1 (Berkeley) 6/4/93 */
 //__FBSDID("$FreeBSD: src/lib/msun/bsdsrc/b_exp.c,v 1.9 2011/10/16 05:37:20 das Exp $");
 
-#include "cdefs-compat.h"
-
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
 /* EXP(X)
  * RETURN THE EXPONENTIAL OF X
@@ -70,7 +68,7 @@
  *	error was 0.869 ulps (units in the last place).
  */
 
-#include "mathimpl.h"
+#include "openlibm_intern.h"
 
 static const double p1 = 0x1.555555555553ep-3;
 static const double p2 = -0x1.6c16c16bebd93p-9;

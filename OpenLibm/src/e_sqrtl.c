@@ -24,14 +24,13 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_sqrtl.c,v 1.1 2008/03/02 01:47:58 das Exp $");
 
 #include <float.h>
 #include <openlibm_fenv.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /* Return (x + ulp) for normal positive x. Assumes no overflow. */
 static inline long double

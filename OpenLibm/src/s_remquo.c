@@ -10,13 +10,9 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_remquo.c,v 1.2 2008/03/30 20:47:26 das Exp $");
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double Zero[] = {0.0, -0.0,};
 
@@ -32,7 +28,7 @@ OLM_DLLEXPORT double
 remquo(double x, double y, int *quo)
 {
 	int32_t n,hx,hy,hz,ix,iy,sx,i;
-	u_int32_t lx,ly,lz,q,sxy;
+	uint32_t lx,ly,lz,q,sxy;
 
 	EXTRACT_WORDS(hx,lx,x);
 	EXTRACT_WORDS(hy,ly,y);
@@ -52,7 +48,7 @@ remquo(double x, double y, int *quo)
 	    }
 	    if(lx==ly) {
 		*quo = 1;
-		return Zero[(u_int32_t)sx>>31];	/* |x|=|y| return x*0*/
+		return Zero[(uint32_t)sx>>31];	/* |x|=|y| return x*0*/
 	    }
 	}
 
@@ -115,7 +111,7 @@ remquo(double x, double y, int *quo)
     /* convert back to floating value and restore the sign */
 	if((hx|lx)==0) {			/* return sign(x)*0 */
 	    *quo = (sxy ? -q : q);
-	    return Zero[(u_int32_t)sx>>31];
+	    return Zero[(uint32_t)sx>>31];
 	}
 	while(hx<0x00100000) {		/* normalize x */
 	    hx = hx+hx+(lx>>31); lx = lx+lx;
@@ -126,7 +122,7 @@ remquo(double x, double y, int *quo)
 	} else {		/* subnormal output */
 	    n = -1022 - iy;
 	    if(n<=20) {
-		lx = (lx>>n)|((u_int32_t)hx<<(32-n));
+		lx = (lx>>n)|((uint32_t)hx<<(32-n));
 		hx >>= n;
 	    } else if (n<=31) {
 		lx = (hx<<(32-n))|(lx>>n); hx = sx;
@@ -152,7 +148,3 @@ fixup:
 	*quo = (sxy ? -q : q);
 	return x;
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(remquo, remquol);
-#endif

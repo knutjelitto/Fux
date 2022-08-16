@@ -12,16 +12,11 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_hypotf.c,v 1.14 2011/10/15 07:00:28 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-OLM_DLLEXPORT float
-__ieee754_hypotf(float x, float y)
+OLM_DLLEXPORT float __ieee754_hypotf(float x, float y)
 {
 	float a,b,t1,t2,y1,y2,w;
 	int32_t j,k,ha,hb;

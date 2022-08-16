@@ -24,13 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_exp2f.c,v 1.9 2008/02/22 02:27:34 das Exp $");
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #define	TBLBITS	4
 #define	TBLSIZE	(1 << TBLBITS)
@@ -95,7 +94,7 @@ exp2f(float x)
 {
 	double tv, twopk, u, z;
 	float t;
-	u_int32_t hx, ix, i0;
+	uint32_t hx, ix, i0;
 	int32_t k;
 
 	/* Filter out exceptional cases. */

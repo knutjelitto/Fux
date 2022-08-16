@@ -46,14 +46,9 @@
  *    IEEE      -10,+10     30000      1.8e-14      2.2e-15
  */
 
-#include <float.h>
-#include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-double complex
-cacos(double complex z)
+double complex cacos(double complex z)
 {
 	double complex w;
 
@@ -61,7 +56,3 @@ cacos(double complex z)
 	w = (M_PI_2 - creal (w)) - cimag (w) * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(cacos, cacosl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

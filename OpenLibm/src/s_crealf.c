@@ -28,7 +28,7 @@
 
 #include <openlibm_complex.h>
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT float
 crealf(float complex z)

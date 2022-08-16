@@ -14,12 +14,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_cbrtf.c,v 1.18 2008/02/22 02:30:35 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /* cbrtf(x)
  * Return cube root of x
@@ -34,8 +33,8 @@ cbrtf(float x)
 	double r,T;
 	float t;
 	int32_t hx;
-	u_int32_t sign;
-	u_int32_t high;
+	uint32_t sign;
+	uint32_t high;
 
 	GET_FLOAT_WORD(hx,x);
 	sign=hx&0x80000000; 		/* sign= sign(x) */

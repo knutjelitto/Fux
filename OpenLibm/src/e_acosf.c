@@ -12,13 +12,9 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_acosf.c,v 1.11 2008/08/03 17:39:54 das Exp $");
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 one =  1.0000000000e+00, /* 0x3F800000 */

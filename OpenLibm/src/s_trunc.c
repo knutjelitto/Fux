@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_trunc.c,v 1.4 2008/02/22 02:27:34 das Exp $");
 
 /*
@@ -22,10 +21,7 @@
  *	Inexact flag raised if x not equal to trunc(x).
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double huge = 1.0e300;
 
@@ -33,7 +29,7 @@ OLM_DLLEXPORT double
 trunc(double x)
 {
 	int32_t i0,i1,j0;
-	u_int32_t i;
+	uint32_t i;
 	EXTRACT_WORDS(i0,i1,x);
 	j0 = ((i0>>20)&0x7ff)-0x3ff;
 	if(j0<20) {
@@ -53,7 +49,7 @@ trunc(double x)
 	    if(j0==0x400) return x+x;	/* inf or NaN */
 	    else return x;		/* x is integral */
 	} else {
-	    i = ((u_int32_t)(0xffffffff))>>(j0-20);
+	    i = ((uint32_t)(0xffffffff))>>(j0-20);
 	    if((i1&i)==0) return x;	/* x is integral */
 	    if(huge+x>0.0)		/* raise inexact flag */
 		i1 &= (~i);
@@ -61,7 +57,3 @@ trunc(double x)
 	INSERT_WORDS(x,i0,i1);
 	return x;
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(trunc, truncl);
-#endif

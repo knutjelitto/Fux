@@ -13,13 +13,12 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_expm1f.c,v 1.12 2011/10/21 06:26:38 das Exp $");
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 one		= 1.0,
@@ -42,7 +41,7 @@ expm1f(float x)
 {
 	float y,hi,lo,c,t,e,hxs,hfx,r1,twopk;
 	int32_t k,xsb;
-	u_int32_t hx;
+	uint32_t hx;
 
 	GET_FLOAT_WORD(hx,x);
 	xsb = hx&0x80000000;		/* sign bit of x */

@@ -28,7 +28,7 @@
 
 #include <openlibm_complex.h>
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double complex
 conj(double complex z)

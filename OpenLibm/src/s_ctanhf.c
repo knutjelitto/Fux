@@ -28,20 +28,19 @@
  * Hyperbolic tangent of a complex argument z.  See s_ctanh.c for details.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_ctanhf.c,v 1.2 2011/10/21 06:30:16 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT float complex
 ctanhf(float complex z)
 {
 	float x, y;
 	float t, beta, s, rho, denom;
-	u_int32_t hx, ix;
+	uint32_t hx, ix;
 
 	x = crealf(z);
 	y = cimagf(z);

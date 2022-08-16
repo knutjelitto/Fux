@@ -27,9 +27,9 @@
  */
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #if LDBL_MAX_EXP != 0x4000
 #error "Unsupported long double format"

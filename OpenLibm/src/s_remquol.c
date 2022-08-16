@@ -10,27 +10,26 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_remquol.c,v 1.2 2008/07/31 20:09:47 das Exp $");
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 #include <stdint.h>
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #define	BIAS (LDBL_MAX_EXP - 1)
 
 #if LDBL_MANL_SIZE > 32
-typedef	u_int64_t manl_t;
+typedef	uint64_t manl_t;
 #else
-typedef	u_int32_t manl_t;
+typedef	uint32_t manl_t;
 #endif
 
 #if LDBL_MANH_SIZE > 32
-typedef	u_int64_t manh_t;
+typedef	uint64_t manh_t;
 #else
-typedef	u_int32_t manh_t;
+typedef	uint32_t manh_t;
 #endif
 
 /*

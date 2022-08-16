@@ -13,13 +13,12 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_log1pf.c,v 1.12 2008/03/29 16:37:59 das Exp $");
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 ln2_hi =   6.9313812256e-01,	/* 0x3f317180 */

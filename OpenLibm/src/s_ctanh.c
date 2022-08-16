@@ -63,20 +63,19 @@
  *   precision.  I also handle large x differently.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_ctanh.c,v 1.2 2011/10/21 06:30:16 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double complex
 ctanh(double complex z)
 {
 	double x, y;
 	double t, beta, s, rho, denom;
-	u_int32_t hx, ix, lx;
+	uint32_t hx, ix, lx;
 
 	x = creal(z);
 	y = cimag(z);

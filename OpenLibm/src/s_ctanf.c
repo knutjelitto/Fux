@@ -54,7 +54,7 @@
  */
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 #define MACHEPF 3.0e-8
 #define MAXNUMF 1.0e38f

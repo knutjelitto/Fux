@@ -10,8 +10,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_sinh.c,v 1.11 2011/10/21 06:28:47 das Exp $");
 
 /* __ieee754_sinh(x)
@@ -32,10 +30,7 @@
  *	only sinh(0)=0 is exact for finite x.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double one = 1.0, shuge = 1.0e307;
 
@@ -73,7 +68,3 @@ __ieee754_sinh(double x)
     /* |x| > overflowthresold, sinh(x) overflow */
 	return x*shuge;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(sinh, sinhl);
-#endif

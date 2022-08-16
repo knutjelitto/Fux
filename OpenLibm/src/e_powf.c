@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_powf.c,v 1.16 2011/10/21 06:26:07 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float
 bp[] = {1.0, 1.5,},
@@ -126,7 +125,7 @@ __ieee754_powf(float x, float y)
 	    return z;
 	}
 
-	n = ((u_int32_t)hx>>31)-1;
+	n = ((uint32_t)hx>>31)-1;
 
     /* (x<0)**(non-int) is NaN */
 	if((n|yisint)==0) return (x-x)/(x-x);

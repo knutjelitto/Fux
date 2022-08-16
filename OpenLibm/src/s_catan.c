@@ -62,11 +62,7 @@
  * 2.9e-17.  See also clog().
  */
 
-#include <float.h>
-#include <openlibm_complex.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 #define MAXNUM 1.0e308
 
@@ -127,7 +123,3 @@ ovrf:
 	w = MAXNUM + MAXNUM * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(catan, catanl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

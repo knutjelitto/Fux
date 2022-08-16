@@ -24,12 +24,11 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_tgammaf.c,v 1.1 2008/02/18 17:27:10 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /*
  * We simply call tgamma() rather than bloating the math library with

@@ -25,8 +25,8 @@
  *
  */
 
-#include <openlibm_math.h>
-#include "math_private.h"
+#include "openlibm_math.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT int __fpclassifyd(double d)
 {

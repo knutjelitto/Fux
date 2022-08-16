@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_tan.c,v 1.13 2011/02/10 07:37:50 das Exp $");
 
 /* tan(x)
@@ -43,12 +42,7 @@
  *	TRIG(x) returns trig(x) nearly rounded
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-//#define INLINE_REM_PIO2
-#include "math_private.h"
-//#include "e_rem_pio2.c"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT double
 tan(double x)
@@ -77,7 +71,3 @@ tan(double x)
 							-1 -- n odd */
 	}
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(tan, tanl);
-#endif

@@ -1,5 +1,11 @@
-SOURCEFILES = common.c \
-	e_acos.c e_acosf.c e_acosh.c e_acoshf.c e_asin.c e_asinf.c \
+SOURCEFILES = \
+	common.c \
+	e_acos.c \
+	e_acosf.c \
+	e_acosh.c \
+	e_acoshf.c \
+	e_asin.c \
+	e_asinf.c \
 	e_atan2.c e_atan2f.c e_atanh.c e_atanhf.c e_cosh.c e_coshf.c e_exp.c \
 	e_expf.c e_fmod.c e_fmodf.c \
 	e_hypot.c e_hypotf.c e_j0.c e_j0f.c e_j1.c e_j1f.c \
@@ -12,7 +18,9 @@ SOURCEFILES = common.c \
 	k_cosf.c k_sinf.c k_tanf.c \
 	s_asinh.c s_asinhf.c s_atan.c s_atanf.c s_carg.c s_cargf.c \
 	s_cbrt.c s_cbrtf.c s_ceil.c s_ceilf.c \
-	s_copysign.c s_copysignf.c s_cos.c s_cosf.c \
+	s_copysign.c s_copysignf.c \
+	d/s_cos.c \
+	s_cosf.c \
 	s_csqrt.c s_csqrtf.c s_erf.c s_erff.c \
 	s_exp2.c s_exp2f.c s_expm1.c s_expm1f.c s_fabs.c s_fabsf.c s_fdim.c \
 	s_floor.c s_floorf.c \

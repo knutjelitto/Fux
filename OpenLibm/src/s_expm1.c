@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_expm1.c,v 1.12 2011/10/21 06:26:38 das Exp $");
 
 /* expm1(x)
@@ -108,10 +107,7 @@
  * to produce the hexadecimal values shown.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 one			= 1.0,
@@ -133,7 +129,7 @@ expm1(double x)
 {
 	double y,hi,lo,c,t,e,hxs,hfx,r1,twopk;
 	int32_t k,xsb;
-	u_int32_t hx;
+	uint32_t hx;
 
 	GET_HIGH_WORD(hx,x);
 	xsb = hx&0x80000000;		/* sign bit of x */
@@ -143,7 +139,7 @@ expm1(double x)
 	if(hx >= 0x4043687A) {			/* if |x|>=56*ln2 */
 	    if(hx >= 0x40862E42) {		/* if |x|>=709.78... */
                 if(hx>=0x7ff00000) {
-		    u_int32_t low;
+		    uint32_t low;
 		    GET_LOW_WORD(low,x);
 		    if(((hx&0xfffff)|low)!=0)
 		         return x+x; 	 /* NaN */
@@ -215,7 +211,3 @@ expm1(double x)
 	}
 	return y;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(expm1, expm1l);
-#endif

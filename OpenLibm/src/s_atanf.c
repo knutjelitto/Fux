@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_atanf.c,v 1.10 2008/08/01 01:24:25 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float atanhi[] = {
   4.6364760399e-01, /* atan(0.5)hi 0x3eed6338 */

@@ -11,8 +11,6 @@
  * ====================================================
  *
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_lgamma_r.c,v 1.11 2011/10/15 07:00:28 das Exp $");
 
 /* __ieee754_lgamma_r(x, signgamp)
@@ -83,9 +81,7 @@
  *	
  */
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 two52=  4.50359962737049600000e+15, /* 0x43300000, 0x00000000 */

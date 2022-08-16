@@ -11,8 +11,6 @@
  * ====================================================
  *
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_atan2.c,v 1.14 2008/08/02 19:17:00 das Exp $");
 
 /* __ieee754_atan2(y,x)
@@ -42,10 +40,7 @@
  * to produce the hexadecimal values shown.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static volatile double
 tiny  = 1.0e-300;
@@ -62,7 +57,7 @@ __ieee754_atan2(double y, double x)
 {
 	double z;
 	int32_t k,m,hx,hy,ix,iy;
-	u_int32_t lx,ly;
+	uint32_t lx,ly;
 
 	EXTRACT_WORDS(hx,lx,x);
 	ix = hx&0x7fffffff;
@@ -123,7 +118,3 @@ __ieee754_atan2(double y, double x)
 	    	    return  (z-pi_lo)-pi;/* atan(-,-) */
 	}
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(atan2, atan2l);
-#endif

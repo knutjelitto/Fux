@@ -9,15 +9,14 @@
  * ====================================================
 */
 
-#include "cdefs-compat.h"
 
 #include <float.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 //#define	INLINE_KERNEL_COSDF
 //#define	INLINE_KERNEL_SINDF
 //#define INLINE_REM_PIO2F
-#include "math_private.h"
+#include "openlibm_intern.h"
 //#include "e_rem_pio2f.c"
 //#include "k_cosf.c"
 //#include "k_sinf.c"

@@ -24,15 +24,12 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_exp.c,v 1.1 2011/10/21 06:27:56 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_intern.h"
 
-#include "math_private.h"
-
-static const u_int32_t k = 1799;		/* constant for reduction */
+static const uint32_t k = 1799;		/* constant for reduction */
 static const double kln2 =  1246.97177782734161156;	/* k * ln2 */
 
 /*
@@ -46,7 +43,7 @@ static double
 __frexp_exp(double x, int *expt)
 {
 	double exp_x;
-	u_int32_t hx;
+	uint32_t hx;
 
 	/*
 	 * We use exp(x) = exp(x - kln2) * 2**k, carefully chosen to

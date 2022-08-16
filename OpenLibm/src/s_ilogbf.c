@@ -15,11 +15,10 @@
 
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_ilogbf.c,v 1.8 2008/02/22 02:30:35 das Exp $");
 
-#include "cdefs-compat.h"
 #include <limits.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 OLM_DLLEXPORT int ilogbf(float x)
 {

@@ -54,11 +54,7 @@
  * absolute error 1.0e-16.
  */
 
-#include <float.h>
-#include <openlibm_complex.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 double complex
 clog(double complex z)
@@ -73,7 +69,3 @@ clog(double complex z)
 	w = p + rr * I;
 	return (w);
 }
-
-#if	LDBL_MANT_DIG == DBL_MANT_DIG
-openlibm_strong_reference(clog, clogl);
-#endif	/* LDBL_MANT_DIG == DBL_MANT_DIG */

@@ -12,13 +12,9 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_atan2f.c,v 1.12 2008/08/03 17:39:54 das Exp $");
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static volatile float
 tiny  = 1.0e-30;

@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_tanh.c,v 1.9 2008/02/22 02:30:36 das Exp $");
 
 /* Tanh(x)
@@ -37,10 +36,7 @@
  *	only tanh(0)=0 is exact for finite argument.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double one = 1.0, two = 2.0, tiny = 1.0e-300, huge = 1.0e300;
 
@@ -77,7 +73,3 @@ tanh(double x)
 	}
 	return (jx>=0)? z: -z;
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(tanh, tanhl);
-#endif

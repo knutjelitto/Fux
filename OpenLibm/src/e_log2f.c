@@ -8,20 +8,15 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/e_log2f.c,v 1.5 2011/10/15 05:23:28 das Exp $");
 
 /*
  * Float version of e_log2.c.  See the latter for most comments.
  */
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 #include "k_logf.h"
 
-// VBS
 #define float_t float
 
 static const float
@@ -31,8 +26,7 @@ ivln2lo    = -1.7605285393e-04; /* 0xb9389ad4 */
 
 static const float zero   =  0.0;
 
-OLM_DLLEXPORT float
-__ieee754_log2f(float x)
+OLM_DLLEXPORT float __ieee754_log2f(float x)
 {
 	float f,hfsq,hi,lo,r,y;
 	int32_t i,k,hx;

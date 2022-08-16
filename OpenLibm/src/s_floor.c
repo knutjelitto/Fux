@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_floor.c,v 1.11 2008/02/15 07:01:40 bde Exp $");
 
 /*
@@ -22,10 +21,7 @@
  *	Inexact flag raised if x not equal to floor(x).
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double huge = 1.0e300;
 
@@ -33,7 +29,7 @@ OLM_DLLEXPORT double
 floor(double x)
 {
 	int32_t i0,i1,j0;
-	u_int32_t i,j;
+	uint32_t i,j;
 	EXTRACT_WORDS(i0,i1,x);
 	j0 = ((i0>>20)&0x7ff)-0x3ff;
 	if(j0<20) {
@@ -58,7 +54,7 @@ floor(double x)
 	}
 	else
 	{
-	    i = ((u_int32_t)(0xffffffff))>>(j0-20);
+	    i = ((uint32_t)(0xffffffff))>>(j0-20);
 	    if((i1&i)==0) return x;	/* x is integral */
 	    if(huge+x>0.0) { 		/* raise inexact flag */
 		if(i0<0) {
@@ -75,7 +71,3 @@ floor(double x)
 	INSERT_WORDS(x,i0,i1);
 	return x;
 }
-
-#if LDBL_MANT_DIG == 53
-openlibm_weak_reference(floor, floorl);
-#endif

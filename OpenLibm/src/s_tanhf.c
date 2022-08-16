@@ -13,12 +13,11 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_tanhf.c,v 1.9 2008/02/22 02:30:36 das Exp $");
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float one=1.0, two=2.0, tiny = 1.0e-30, huge = 1.0e30;
 OLM_DLLEXPORT float

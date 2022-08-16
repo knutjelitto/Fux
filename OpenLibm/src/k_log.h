@@ -11,7 +11,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_log.h,v 1.2 2011/10/15 05:23:28 das Exp $");
 
 /*
@@ -84,8 +83,7 @@ Lg7 = 1.479819860511658591e-01;  /* 3FC2F112 DF3E5244 */
  * We always inline k_log1p(), since doing so produces a
  * substantial performance improvement (~40% on amd64).
  */
-static inline double
-k_log1p(double f)
+static inline double k_log1p(double f)
 {
 	double hfsq,s,z,R,w,t1,t2;
 

@@ -10,8 +10,6 @@
  * is preserved.
  * ====================================================
  */
-
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/k_cos.c,v 1.12 2008/02/19 12:54:14 bde Exp $");
 
 /*
@@ -53,9 +51,7 @@
  *	   any extra precision in w.
  */
 
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 one =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */

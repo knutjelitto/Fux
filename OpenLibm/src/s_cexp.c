@@ -24,15 +24,14 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_cexp.c,v 1.3 2011/10/21 06:27:56 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
-static const u_int32_t
+static const uint32_t
 exp_ovfl  = 0x40862e42,			/* high bits of MAX_EXP * ln2 ~= 710 */
 cexp_ovfl = 0x4096b8e4;			/* (MAX_EXP - MIN_DENORM_EXP) * ln2 */
 
@@ -40,7 +39,7 @@ OLM_DLLEXPORT double complex
 cexp(double complex z)
 {
 	double x, y, exp_x;
-	u_int32_t hx, hy, lx, ly;
+	uint32_t hx, hy, lx, ly;
 
 	x = creal(z);
 	y = cimag(z);

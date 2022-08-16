@@ -10,7 +10,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_logb.c,v 1.12 2008/02/08 01:22:13 bde Exp $");
 
 /*
@@ -19,10 +18,7 @@
  * Use ilogb instead.
  */
 
-#include <float.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const double
 two54 = 1.80143985094819840000e+16;	/* 43500000 00000000 */
@@ -43,7 +39,3 @@ logb(double x)
 	} else
 		return (double) ((ix>>20)-1023);
 }
-
-#if (LDBL_MANT_DIG == 53)
-openlibm_weak_reference(logb, logbl);
-#endif

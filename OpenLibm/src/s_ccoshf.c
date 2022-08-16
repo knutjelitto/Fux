@@ -28,13 +28,12 @@
  * Hyperbolic cosine of a complex argument.  See s_ccosh.c for details.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_ccoshf.c,v 1.2 2011/10/21 06:29:32 das Exp $");
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float huge = 0x1p127;
 

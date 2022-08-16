@@ -13,7 +13,6 @@
  * ====================================================
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_floorf.c,v 1.8 2008/02/22 02:30:35 das Exp $");
 
 /*
@@ -25,9 +24,9 @@
  *	Inexact flag raised if x not equal to floorf(x).
  */
 
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 static const float huge = 1.0e30;
 
@@ -35,7 +34,7 @@ OLM_DLLEXPORT float
 floorf(float x)
 {
 	int32_t i0,j0;
-	u_int32_t i;
+	uint32_t i;
 	GET_FLOAT_WORD(i0,x);
 	j0 = ((i0>>23)&0xff)-0x7f;
 	if(j0<23) {

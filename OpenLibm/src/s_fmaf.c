@@ -24,13 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#include "cdefs-compat.h"
 //__FBSDID("$FreeBSD: src/lib/msun/src/s_fmaf.c,v 1.3 2011/10/15 04:16:58 das Exp $");
 
-#include <openlibm_fenv.h>
-#include <openlibm_math.h>
-
-#include "math_private.h"
+#include "openlibm_intern.h"
 
 /*
  * Fused multiply-add: Compute x * y + z with a single rounding error.
@@ -43,7 +39,7 @@ OLM_DLLEXPORT float
 fmaf(float x, float y, float z)
 {
 	double xy, result;
-	u_int32_t hr, lr;
+	uint32_t hr, lr;
 
 	xy = (double)x * y;
 	result = xy + z;

@@ -44,7 +44,7 @@
  */
 
 #include <openlibm_complex.h>
-#include <openlibm_math.h>
+#include "openlibm_math.h"
 
 long double complex
 ccoshl(long double complex z)
