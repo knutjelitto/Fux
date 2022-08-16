@@ -47,16 +47,17 @@ public sealed class Lex
 
     public static readonly Lex Newline = Add(new("_nl_", isWhite: true));
     public static readonly Lex Space = Add(new("_sp_", isWhite: true));
-    public static readonly Lex LineComment = Add(new("_line-comment_", isWhite: true));
-    public static readonly Lex BlockComment = Add(new("_block-comment_", isWhite: true));
+    public static readonly Lex LineComment = Add(new("line-comment", isWhite: true));
+    public static readonly Lex BlockComment = Add(new("block-comment", isWhite: true));
 
     public static readonly Lex GroupOpen = Add(new("⟦", startsAtomic: true));
     public static readonly Lex GroupClose = Add(new("⟧"));
     public static readonly Lex LowerId = Add(new("LowerId", startsAtomic: true, isIdentifier: true));
     public static readonly Lex UpperId = Add(new("UpperId", startsAtomic: true, isIdentifier: true));
-    public static readonly Lex OperatorId = Add(new("OperatorId", startsAtomic: true, isIdentifier: true));
-    public static readonly Lex Wildcard = Add(new("_wildcard_", startsAtomic: true));
-    public static readonly Lex Operator = Add(new("_operator_"));
+    public static readonly Lex Identifier = Add(new("identifier", startsAtomic: true, isIdentifier: true));
+    public static readonly Lex OpIdentifier = Add(new("op-identifier", startsAtomic: true, isIdentifier: true));
+    public static readonly Lex Wildcard = Add(new("wildcard", startsAtomic: true));
+    public static readonly Lex Operator = Add(new("operator"));
     public static readonly Lex Integer = Add(new("Int", startsAtomic: true));
     public static readonly Lex Float = Add(new("Float", startsAtomic: true));
     public static readonly Lex String = Add(new("String", startsAtomic: true));
@@ -70,6 +71,7 @@ public sealed class Lex
     public static readonly Lex Bar = Add(new("|", terminatesSomething: true));
     public static readonly Lex Lambda = Add(new("\\", startsAtomic: true));
     public static readonly Lex Hash = Add(new("#", startsAtomic: true));
+    public static readonly Lex CoCo = Add(new("::"));
 
     public static readonly Lex Equal = Add(new("==", terminatesSomething: true));
     public static readonly Lex Unequal = Add(new("!=", terminatesSomething: true));
@@ -84,24 +86,29 @@ public sealed class Lex
     public static readonly Lex RightSquareBracket = Add(new("]", terminatesSomething: true, isBracket: true));
     public static readonly Lex LeftAngleBracket = Add(new("<", startsAtomic: true, isBracket: true));
     public static readonly Lex RightAngleBracket = Add(new(">", terminatesSomething: true, isBracket: true));
-    public static readonly Lex KwIf = Add(new("if", isKeyword: true, startsAtomic: true));
-    public static readonly Lex KwThen = Add(new("then", isKeyword: true));
-    public static readonly Lex KwElse = Add(new("else", isKeyword: true));
+
+    public static readonly Lex KxStack = Add(new("%stack", isKeyword: true));
+
+    public static readonly Lex KwAs = Add(new("as", isKeyword: true));
     public static readonly Lex KwCase = Add(new("case", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwClass = Add(new("class", isKeyword: true));
+    public static readonly Lex KwElse = Add(new("else", isKeyword: true));
+    public static readonly Lex KwFun = Add(new("fun", isKeyword: true));
+    public static readonly Lex KwIf = Add(new("if", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwImpl = Add(new("impl", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwThen = Add(new("then", isKeyword: true));
     public static readonly Lex KwOf = Add(new("of", isKeyword: true));
     public static readonly Lex KwLet = Add(new("let", isKeyword: true, startsAtomic: true));
     public static readonly Lex KwIn = Add(new("in", isKeyword: true));
     public static readonly Lex KwType = Add(new("type", isKeyword: true));
     public static readonly Lex KwModule = Add(new("module", isKeyword: true));
     public static readonly Lex KwImport = Add(new("import", isKeyword: true));
-    public static readonly Lex KwAs = Add(new("as", isKeyword: true));
     public static readonly Lex KwInfix = Add(new("infix", isKeyword: true));
     public static readonly Lex KwAlias = Add(new("alias", isKeyword: true));
     public static readonly Lex KwEffect = Add(new("effect", isKeyword: true));
     public static readonly Lex KwExposing = Add(new("exposing", isKeyword: true));
     public static readonly Lex KwPort = Add(new("port", isKeyword: true));
     public static readonly Lex KwWhere = Add(new("where", isKeyword: true));
-    public static readonly Lex KwClass = Add(new("class", isKeyword: true));
     public static readonly Lex KwInstance = Add(new("instance", isKeyword: true));
     public static readonly Lex KwNamespace = Add(new("namespace", isKeyword: true));
 

@@ -1,6 +1,6 @@
 ﻿using Fux.Parsing;
 
-namespace Fux.Errors;
+namespace Fux.ErrorHandling;
 
 public abstract class LocatedMessageError : ErrorDiagnostic
 {

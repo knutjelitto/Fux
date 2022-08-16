@@ -1,5 +1,8 @@
 ﻿namespace Fux.Tree;
 
-public class Decl : Node
+public class Decl : Element
 {
+    public Decl()
+    {
+    }
 }

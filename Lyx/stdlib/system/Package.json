@@ -1,0 +1,8 @@
+{
+    "name": "Fux.Core",
+    "summary": "Fux Core library",
+    "sources": [
+        "core/**/bool*.lys"
+    ],
+    "dependencies": {}
+}

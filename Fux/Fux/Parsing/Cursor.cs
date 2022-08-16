@@ -44,7 +44,6 @@ public sealed class Cursor
                 !StartsPrefix;
 
     public int State => Offset;
-
     public void Reset(int state) => Offset = state;
 
     public int Line => Current.Location.Line;
@@ -79,6 +78,9 @@ public sealed class Cursor
             return Tokens[Offset - 1];
         }
     }
+
+    public static implicit operator Token(Cursor cursor) => cursor.Current;
+
 
     public T Scope<T>(Func<Cursor, T> parser)
         where T : Node
@@ -133,13 +135,22 @@ public sealed class Cursor
 
     }
 
-    public bool More() => Offset < Tokens.Count;
+    public bool More()
+    {
+        return Offset < Tokens.Count;
+    }
 
     public bool TerminatesSomething => Offset < Tokens.Count && Tokens[Offset].Lex.TerminatesSomething;
 
-    public Token Swallow(Lex lexKind, [CallerMemberName] string? member = null) => this.Is(lexKind) ? Advance() : throw Errors.Parser.Unexpected(lexKind, this.At(), member);
+    public Token Swallow(Lex lexKind, [CallerMemberName] string? member = null)
+    {
+        return this.Is(lexKind) ? Advance() : throw Errors.Parser.Unexpected(lexKind, this.At(), member);
+    }
 
-    public Token SwallowOp(string op, [CallerMemberName] string? member = null) => this.Is(Lex.Operator) && this.IsWeak(op) ? Advance() : throw Errors.Parser.Unexpected(Lex.Operator, this.At(), member);
+    public Token SwallowOp(string op, [CallerMemberName] string? member = null)
+    {
+        return this.Is(Lex.Operator) && this.IsWeak(op) ? Advance() : throw Errors.Parser.Unexpected(Lex.Operator, this.At(), member);
+    }
 
     public bool SwallowIf(Lex lexKind)
     {
@@ -153,5 +164,8 @@ public sealed class Cursor
         return false;
     }
 
-    public override string ToString() => More() ? Current.Dbg() : "<EOF>";
+    public override string ToString()
+    {
+        return More() ? Current.Dbg() : "<EOF>";
+    }
 }

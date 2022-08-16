@@ -1,4 +1,4 @@
-﻿namespace Fux.Errors;
+﻿namespace Fux.ErrorHandling;
 
 public enum Level
 {

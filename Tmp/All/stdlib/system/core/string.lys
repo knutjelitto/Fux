@@ -15,8 +15,7 @@ import system::core::math
 
 type string = %stack { lowLevelType="i64" byteSize=8 }
 
-impl string
-{
+impl string {
   /**
    * Returns the string length in UCS chars.
    */

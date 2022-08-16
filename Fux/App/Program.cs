@@ -1,6 +1,6 @@
 ﻿using Fux;
+using Fux.ErrorHandling;
 using Fux.Files;
-using Fux.Input;
 using Fux.Parsing;
 using Fux.Tools;
 
@@ -16,30 +16,48 @@ internal class Program
         Console.WriteLine($"top: {top}");
         var tmp = top.Sub("Tmp").EnshureFolder();
         Console.WriteLine($"tmp: {tmp}");
-        var src = top.Sub("Src").EnshureFolder();
+        var src = top.Sub("Lyx").EnshureFolder();
         Console.WriteLine($"src: {src}");
 
         var repo = new Repository(src);
 
         Console.WriteLine("===");
-        foreach (var sourceUnit in repo.Sources)
+        foreach (var source in repo.Sources)
         {
-            var writerPath = tmp.Sub("All") / sourceUnit.Package.Path / sourceUnit.Path;
+            var writerPath = tmp.Sub("All") / source.Package.Path / source.Path;
             using (var writer = writerPath.Writer())
             {
-                Console.WriteLine($"{sourceUnit.Package} - {sourceUnit}");
+                Console.WriteLine($"{source.Package} - {source}");
 
-                Lexx(writer, sourceUnit.Text);
+                try
+                {
+                    Lexx(writer, source);
+                }
+                catch (DiagnosticException diagnostics)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("===");
+                    foreach (var diagnostic in diagnostics.Diagnostics)
+                    {
+                        foreach (var line in diagnostic.Report())
+                        {
+                            Console.WriteLine($"{line}");
+                        }
+                    }
+                    break;
+                }
             }
         }
 
         WaitKey();
     }
 
-    private static void Lexx(Writer writer, Text text)
+    private static void Lexx(Writer writer, Source source)
     {
         const string ind = "  ";
         const string sep = $"{ind}-";
+
+        var text = source.Text;
 
         Console.Write($"{ind}{text.Count,5} characters");
 
@@ -90,6 +108,10 @@ internal class Program
                 writer.Write($"{token.Text}");
             }
         }
+
+        var parser = new Parser(source, errors);
+
+        var document = parser.Parse();
     }
 
     private static void WaitKey()

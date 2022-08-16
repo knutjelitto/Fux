@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Fux.Parsing;
+﻿namespace Fux.Parsing;
 public static class CursorExtensions
 {
     public static bool Is(this Cursor cursor, params Lex[] lexes)
@@ -26,7 +20,7 @@ public static class CursorExtensions
     public static bool WhitesBefore(this Cursor cursor) => cursor.More() && cursor.Current.WhitesBefore;
 
     public static bool IsIdentifier(this Cursor cursor) => cursor.More() &&
-            (cursor.Current.Lex == Lex.LowerId || cursor.Current.Lex == Lex.UpperId || cursor.Current.Lex == Lex.OperatorId);
+            (cursor.Current.Lex == Lex.LowerId || cursor.Current.Lex == Lex.UpperId || cursor.Current.Lex == Lex.OpIdentifier);
 
     public static bool IsWeak(this Cursor cursor, string text) => cursor.More() && cursor.Current.Text == text;
 

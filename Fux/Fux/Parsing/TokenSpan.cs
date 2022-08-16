@@ -23,7 +23,7 @@ public class TokenSpan : IReadOnlyList<Token>
     public int Start { get; }
     public int Limit { get; private set; }
 
-    public bool Eof => Start == Tokens.Count - 1;
+    public bool Eof => Start == Tokens.Count - 1 && Tokens[Start].Lex == Lex.EOF;
 
     public IEnumerator<Token> GetEnumerator()
     {

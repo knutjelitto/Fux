@@ -2,6 +2,13 @@
 
 public sealed class Lexer
 {
+    public Lexer(ErrorBag errors, Text source)
+    {
+        Errors = errors;
+        Source = source;
+        Offset = 0;
+    }
+
     private static readonly HashSet<int> symbols = new()
     {
         '+',  '-',  '*',  '/',
@@ -19,13 +26,6 @@ public sealed class Lexer
         {
             AddKw(kw.Name, kw);
         }
-    }
-
-    public Lexer(ErrorBag errors, Text source)
-    {
-        Errors = errors;
-        Source = source;
-        Offset = 0;
     }
 
     public ErrorBag Errors { get; }
@@ -64,11 +64,17 @@ public sealed class Lexer
             case '\r':
                 return White(Lex.Newline, 1);
 
-            case '{' when Next == '-':
+            case '/' when Next == '*':
                 return BlockComment();
 
-            case '-' when Next == '-':
+            case '/' when Next == '/':
                 return LineComment();
+
+            case '{' when Next == '-':
+                return BlockComment2();
+
+            case '-' when Next == '-':
+                return LineComment2();
 
             case ' ':
                 {
@@ -125,8 +131,14 @@ public sealed class Lexer
             case '.' when !Next.IsSymbol():
                 return Build(Lex.Dot, 1);
 
+            case ':' when Is(1, ':'):
+                return Build(Lex.CoCo, 2);
+
             case ':' when !Next.IsSymbol():
                 return Build(Lex.Colon, 1);
+
+            case '%' when Is(1, IsLower):
+                return XIdentifier();
 
             case '=':
                 return Build(Lex.Assign, 1);
@@ -148,13 +160,9 @@ public sealed class Lexer
                 }
 
             default:
-                if (Current.IsLower())
+                if (Current.IsLetter())
                 {
-                    return LowerId();
-                }
-                else if (Current.IsUpper())
-                {
-                    return Build(UpperId());
+                    return Identifier();
                 }
                 else if (Current.IsDigit())
                 {
@@ -188,7 +196,7 @@ public sealed class Lexer
 
             if (At(offset) == ')')
             {
-                var token = Build(Lex.OperatorId, offset + 1);
+                var token = Build(Lex.OpIdentifier, offset + 1);
 
                 return token;
             }
@@ -206,6 +214,29 @@ public sealed class Lexer
 
     private Token BlockComment()
     {
+        Assert(Current == '/' && Next == '*');
+
+        Offset += 2;
+
+        while (true)
+        {
+            if (Current == '*' && Next == '/')
+            {
+                return White(Lex.BlockComment, 2);
+            }
+            else
+            {
+                if (Current == '\n')
+                {
+                    Source.NextLine(Offset + 1);
+                }
+                Offset += 1;
+            }
+        }
+    }
+
+    private Token BlockComment2()
+    {
         Assert(Current == '{' && Next == '-');
 
         Offset += 2;
@@ -214,7 +245,7 @@ public sealed class Lexer
         {
             if (Current == '{' && Next == '-')
             {
-                _ = BlockComment();
+                _ = BlockComment2();
             }
             else if (Current == '-' && Next == '}')
             {
@@ -232,6 +263,25 @@ public sealed class Lexer
     }
 
     private Token LineComment()
+    {
+        Assert(Current == '/' && Next == '/');
+
+        Offset += 2;
+
+        while (true)
+        {
+            if (Current is '\n' or '\r' or -1)
+            {
+                return White(Lex.LineComment);
+            }
+            else
+            {
+                Offset += 1;
+            }
+        }
+    }
+
+    private Token LineComment2()
     {
         Assert(Current == '-' && Next == '-');
 
@@ -394,13 +444,18 @@ public sealed class Lexer
                 }
                 else
                 {
-                    if (Current == '\0')
+                    if (Current == -1)
                     {
                         throw new NotImplementedException("unexpected end in string literal");
                     }
                     throw new NotImplementedException("illegal character in string literal");
                 }
                 break;
+        }
+
+        if (Current != '\'')
+        {
+            throw Errors.Lexer.UnterminatedCharacterLiteral(Location, Current);
         }
 
         Assert(Current == '\'');
@@ -474,13 +529,13 @@ public sealed class Lexer
 
     private int Match(int rune) => Match(current => current == rune);
 
-    private Token LowerId()
+    private Token Identifier()
     {
-        Assert(Current.IsLower());
+        Assert(Current.IsLetter());
 
         IdTail();
 
-        var token = Build(Lex.LowerId);
+        var token = Build(Lex.Identifier);
 
         if (keywords.TryGetValue(token.Text, out var tuple))
         {
@@ -490,19 +545,26 @@ public sealed class Lexer
         return token;
     }
 
-    private Lex UpperId()
+    private Token XIdentifier()
     {
-        Assert(Current.IsUpper());
+        Assert(Is('%'));
 
         IdTail();
 
-        return Lex.UpperId;
+        var token = Build(Lex.Identifier);
+
+        if (keywords.TryGetValue(token.Text, out var tuple))
+        {
+            token = new Token(tuple.kwLex, token);
+        }
+
+        return token;
     }
 
     private void IdTail()
     {
         Offset += 1;
-        while (Current.IsLower() || Current.IsUpper() || Current.IsDigit() || Current == '_' || Current == '-')
+        while (Current.IsLetterOrDigit() || Current == '_' || Current == '-')
         {
             if (Current == '-' && (!Is(-1, IsLetter) || !Is(1, IsLetter)))
             {
