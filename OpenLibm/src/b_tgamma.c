@@ -172,8 +172,7 @@ static struct Double large_gam(x)
  * Good to < 1 ulp.  (provably .90 ulp; .87 ulp on 1,000,000 runs.)
  * It also has correct monotonicity.
  */
-static double
-small_gam(x)
+static double small_gam(x)
 	double x;
 {
 	double y, ym1, t;

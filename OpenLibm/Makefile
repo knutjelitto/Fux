@@ -64,7 +64,7 @@ print-%:
 
 SUBDIRS = src
 
-include src/Make.files
+include Make.files
 
 SRCS := $(addprefix src/,$(SOURCEFILES))
 OBJS := $(patsubst %.c,%.c.o,$(SRCS))

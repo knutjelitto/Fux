@@ -1,4 +1,4 @@
-{-| Basic bool type.
+{-| The ``bool´´ type.
 
 # Type
 @docs bool
@@ -7,7 +7,7 @@
 @docs Flip, And, Or, Xor
 
 #operators
-@dice andthen, orelse
+@docs AndThen, OrElse
 
 # Equality
 @docs Equal, Unequal
@@ -17,13 +17,17 @@
 
 -}
 
-namespace Boolean
-
 {-| A bool” value. It can either be `true` or `false`.
 -}
 enum type bool
     false
     true
+
+impl Equateable<bool>
+    fun Equal(x, y)
+        if x then y else !y
+    fund Unequal(x, y)
+        if x then !y else y
 
 bool is Eq<bool>
 bool is Ord<bool>

@@ -1,0 +1,16 @@
+
+|-DocumentNode
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="nextInt"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-IntegerLiteral=0
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="nextFloat"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=f32
+          |-NameIdentifierNode="f32"
+      |-FloatLiteral=0

@@ -1,0 +1,64 @@
+
+|-DocumentNode
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="x" annotations=MutableDeclaration
+      |-FunctionCallNode
+        |-MemberNode
+          |-FunctionCallNode
+            |-MemberNode
+              |-FunctionCallNode
+                |-MemberNode
+                  |-ReferenceNode resolvedReference=<null>
+                    |-QNameNode=a
+                      |-NameIdentifierNode="a"
+                  |-NameIdentifierNode="map"
+                |-ReferenceNode resolvedReference=<null>
+                  |-QNameNode=b
+                    |-NameIdentifierNode="b"
+              |-NameIdentifierNode="map"
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=c
+                |-NameIdentifierNode="c"
+          |-NameIdentifierNode="map"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=d
+            |-NameIdentifierNode="d"
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="y" annotations=MutableDeclaration
+      |-BinaryExpressionNode
+        |-BinaryExpressionNode
+          |-IntegerLiteral=1
+          |-NameIdentifierNode="+"
+          |-BinaryExpressionNode
+            |-BinaryExpressionNode
+              |-IntegerLiteral=2
+              |-NameIdentifierNode="*"
+              |-IntegerLiteral=3
+            |-NameIdentifierNode="/"
+            |-IntegerLiteral=4
+        |-NameIdentifierNode="-"
+        |-BinaryExpressionNode
+          |-IntegerLiteral=5
+          |-NameIdentifierNode="%"
+          |-IntegerLiteral=6
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="z" annotations=MutableDeclaration
+      |-BinaryExpressionNode
+        |-BinaryExpressionNode
+          |-BinaryExpressionNode
+            |-BinaryExpressionNode
+              |-IntegerLiteral=1
+              |-NameIdentifierNode="+"
+              |-IntegerLiteral=2
+            |-NameIdentifierNode="*"
+            |-IntegerLiteral=3
+          |-NameIdentifierNode="/"
+          |-BinaryExpressionNode
+            |-IntegerLiteral=4
+            |-NameIdentifierNode="-"
+            |-IntegerLiteral=5
+        |-NameIdentifierNode="%"
+        |-IntegerLiteral=6

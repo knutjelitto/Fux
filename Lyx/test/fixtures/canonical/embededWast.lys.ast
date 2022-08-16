@@ -1,0 +1,173 @@
+
+|-DocumentNode
+  |-FunDirectiveNode
+    |-DecoratorNode
+      |-NameIdentifierNode="inline"
+    |-FunctionNode
+      |-NameIdentifierNode="test"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+      |-WasmExpressionNode
+  |-FunDirectiveNode
+    |-DecoratorNode
+      |-NameIdentifierNode="inline"
+    |-FunctionNode
+      |-NameIdentifierNode="test"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+      |-WasmExpressionNode
+  |-FunDirectiveNode
+    |-DecoratorNode
+      |-NameIdentifierNode="inline"
+    |-FunctionNode
+      |-NameIdentifierNode="test"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+      |-WasmExpressionNode
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="freeblock" annotations=MutableDeclaration
+      |-IntegerLiteral=0
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="malloc"
+      |-ParameterNode
+        |-NameIdentifierNode="size"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-WasmExpressionNode
+        |-WasmAtomNode
+          |-QNameNode=$address
+            |-NameIdentifierNode="$address"
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+        |-WasmAtomNode
+          |-QNameNode=$address
+            |-NameIdentifierNode="$address"
+          |-WasmAtomNode
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=freeblock
+                |-NameIdentifierNode="freeblock"
+        |-WasmAtomNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=freeblock
+              |-NameIdentifierNode="freeblock"
+          |-WasmAtomNode
+            |-WasmAtomNode
+              |-QNameNode=$address
+                |-NameIdentifierNode="$address"
+            |-WasmAtomNode
+              |-QNameNode=$size
+                |-NameIdentifierNode="$size"
+        |-WasmAtomNode
+          |-QNameNode=$address
+            |-NameIdentifierNode="$address"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="strAdd"
+      |-ParameterNode
+        |-NameIdentifierNode="a"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ParameterNode
+        |-NameIdentifierNode="b"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-WasmExpressionNode
+        |-WasmAtomNode
+          |-QNameNode=$sum
+            |-NameIdentifierNode="$sum"
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+        |-WasmAtomNode
+          |-QNameNode=$aSize
+            |-NameIdentifierNode="$aSize"
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+        |-WasmAtomNode
+          |-QNameNode=$newStr
+            |-NameIdentifierNode="$newStr"
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+        |-WasmAtomNode
+          |-WasmAtomNode
+            |-QNameNode=$aSize
+              |-NameIdentifierNode="$aSize"
+            |-WasmAtomNode
+              |-QNameNode=a
+                |-NameIdentifierNode="a"
+          |-WasmAtomNode
+            |-QNameNode=$sum
+              |-NameIdentifierNode="$sum"
+            |-WasmAtomNode
+              |-WasmAtomNode
+                |-WasmAtomNode
+                  |-QNameNode=$aSize
+                    |-NameIdentifierNode="$aSize"
+                |-WasmAtomNode
+                  |-QNameNode=b
+                    |-NameIdentifierNode="b"
+              |-WasmAtomNode
+                |-IntegerLiteral=1
+          |-WasmAtomNode
+            |-QNameNode=$newStr
+              |-NameIdentifierNode="$newStr"
+            |-WasmAtomNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=malloc
+                  |-NameIdentifierNode="malloc"
+              |-WasmAtomNode
+                |-WasmAtomNode
+                  |-QNameNode=$sum
+                    |-NameIdentifierNode="$sum"
+                |-WasmAtomNode
+                  |-IntegerLiteral=1
+          |-WasmAtomNode
+            |-WasmAtomNode
+              |-QNameNode=$newStr
+                |-NameIdentifierNode="$newStr"
+            |-WasmAtomNode
+              |-QNameNode=$sum
+                |-NameIdentifierNode="$sum"
+          |-WasmAtomNode
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=string_copy
+                |-NameIdentifierNode="string_copy"
+            |-WasmAtomNode
+              |-QNameNode=$a
+                |-NameIdentifierNode="$a"
+            |-WasmAtomNode
+              |-QNameNode=$newStr
+                |-NameIdentifierNode="$newStr"
+          |-WasmAtomNode
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=string_copy
+                |-NameIdentifierNode="string_copy"
+            |-WasmAtomNode
+              |-QNameNode=$b
+                |-NameIdentifierNode="$b"
+            |-WasmAtomNode
+              |-WasmAtomNode
+                |-WasmAtomNode
+                  |-QNameNode=$newStr
+                    |-NameIdentifierNode="$newStr"
+                |-WasmAtomNode
+                  |-QNameNode=$aSize
+                    |-NameIdentifierNode="$aSize"
+              |-WasmAtomNode
+                |-IntegerLiteral=1
+          |-WasmAtomNode
+            |-QNameNode=$newStr
+              |-NameIdentifierNode="$newStr"

@@ -1,0 +1,345 @@
+
+|-DocumentNode
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="bool"
+    |-StackTypeNode
+  |-EnumDirectiveNode
+    |-NameIdentifierNode="Color"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Red"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Green"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Blue"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn1"
+    |-UnionTypeNode
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=A
+          |-NameIdentifierNode="A"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=B
+          |-NameIdentifierNode="B"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=C
+          |-NameIdentifierNode="C"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn1"
+    |-FunctionTypeNode
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn2"
+    |-FunctionTypeNode
+      |-SignatureParameterNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn3"
+    |-FunctionTypeNode
+      |-SignatureParameterNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-SignatureParameterNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn4"
+    |-FunctionTypeNode
+      |-SignatureParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn5"
+    |-FunctionTypeNode
+      |-SignatureParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-SignatureParameterNode
+        |-NameIdentifierNode="b"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=void
+          |-NameIdentifierNode="void"
+  |-TypeDirectiveNode
+    |-NameIdentifierNode="theFn6"
+    |-FunctionTypeNode
+      |-SignatureParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=bool
+            |-NameIdentifierNode="bool"
+      |-SignatureParameterNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="compare"
+      |-ParameterNode
+        |-NameIdentifierNode="a"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=Color
+            |-NameIdentifierNode="Color"
+      |-ParameterNode
+        |-NameIdentifierNode="b"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=Color
+            |-NameIdentifierNode="Color"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=bool
+          |-NameIdentifierNode="bool"
+      |-BlockNode
+        |-BinaryExpressionNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=a
+              |-NameIdentifierNode="a"
+          |-NameIdentifierNode="=="
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="main"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-FunctionCallNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=compare
+            |-NameIdentifierNode="compare"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=Red
+            |-NameIdentifierNode="Red"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=Green
+            |-NameIdentifierNode="Green"
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-UnionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=void
+              |-NameIdentifierNode="void"
+          |-FunctionTypeNode
+            |-SignatureParameterNode
+              |-NameIdentifierNode="a"
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=i32
+                  |-NameIdentifierNode="i32"
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=i32
+                |-NameIdentifierNode="i32"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-UnionTypeNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=a
+            |-NameIdentifierNode="a"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=c
+              |-NameIdentifierNode="c"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=d
+              |-NameIdentifierNode="d"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-UnionTypeNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=_
+            |-NameIdentifierNode="_"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=_
+            |-NameIdentifierNode="_"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=void
+            |-NameIdentifierNode="void"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=void
+              |-NameIdentifierNode="void"
+          |-FunctionTypeNode
+            |-SignatureParameterNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=i32
+                  |-NameIdentifierNode="i32"
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=i32
+                |-NameIdentifierNode="i32"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-UnionTypeNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=a
+            |-NameIdentifierNode="a"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=c
+              |-NameIdentifierNode="c"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=d
+              |-NameIdentifierNode="d"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-UnionTypeNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=a
+            |-NameIdentifierNode="a"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=c
+              |-NameIdentifierNode="c"
+        |-IntersectionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=d
+              |-NameIdentifierNode="d"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=b
+              |-NameIdentifierNode="b"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-SignatureParameterNode
+          |-NameIdentifierNode="a"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=void
+            |-NameIdentifierNode="void"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-SignatureParameterNode
+          |-NameIdentifierNode="a"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+        |-SignatureParameterNode
+          |-NameIdentifierNode="b"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+        |-UnionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=void
+              |-NameIdentifierNode="void"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+      |-IntegerLiteral=1
+  |-VarDirectiveNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode="test" annotations=MutableDeclaration
+      |-FunctionTypeNode
+        |-SignatureParameterNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+        |-SignatureParameterNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+        |-UnionTypeNode
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=void
+              |-NameIdentifierNode="void"
+          |-ReferenceNode resolvedReference=<null>
+            |-QNameNode=i32
+              |-NameIdentifierNode="i32"
+      |-IntegerLiteral=1
+  |-EnumDirectiveNode
+    |-NameIdentifierNode="Number"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Infinity"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="NDet"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Real"
+      |-ParameterNode
+        |-NameIdentifierNode="number"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=f32
+            |-NameIdentifierNode="f32"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Natural"
+      |-ParameterNode
+        |-NameIdentifierNode="number"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+    |-StructDeclarationNode
+      |-NameIdentifierNode="Complex"
+      |-ParameterNode
+        |-NameIdentifierNode="real"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=f32
+            |-NameIdentifierNode="f32"
+      |-ParameterNode
+        |-NameIdentifierNode="imaginary"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=f32
+            |-NameIdentifierNode="f32"

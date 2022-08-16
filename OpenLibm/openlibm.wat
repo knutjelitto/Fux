@@ -92076,7 +92076,7 @@
        )
       )
       (local.set $151
-       (f64.const 5.960464477539063e-08)
+       (f64.const 5.9604644775390625e-08)
       )
       (local.set $152
        (f64.mul
@@ -94353,7 +94353,7 @@
       )
      )
      (local.set $558
-      (f64.const 5.960464477539063e-08)
+      (f64.const 5.9604644775390625e-08)
      )
      (local.set $559
       (f64.mul
@@ -94878,7 +94878,7 @@
      )
     )
     (local.set $655
-     (f64.const 5.960464477539063e-08)
+     (f64.const 5.9604644775390625e-08)
     )
     (local.set $656
      (f64.mul
@@ -155168,7 +155168,7 @@
     )
    )
    (local.set $116
-    (f32.const 2.9802322387695313e-08)
+    (f32.const 2.9802322387695312e-08)
    )
    (local.set $117
     (f32.mul
@@ -199757,8 +199757,8 @@
  ;; custom section ".debug_loc", size 689
  ;; custom section ".debug_ranges", size 952
  ;; custom section ".debug_abbrev", size 23967
- ;; custom section ".debug_line", size 213590
- ;; custom section ".debug_str", size 5683
+ ;; custom section ".debug_line", size 213588
+ ;; custom section ".debug_str", size 5692
  ;; custom section "producers", size 43
 )
 

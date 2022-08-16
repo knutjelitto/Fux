@@ -71,7 +71,7 @@ huge 	= 1e300,
 one	= 1.0,
 invsqrtpi=  5.64189583547756279280e-01, /* 0x3FE20DD7, 0x50429B6D */
 tpi      =  6.36619772367581382433e-01, /* 0x3FE45F30, 0x6DC9C883 */
- 		/* R0/S0 on [0, 2.00] */
+         /* R0/S0 on [0, 2.00] */
 R02  =  1.56249999999999947958e-02, /* 0x3F8FFFFF, 0xFFFFFFFD */
 R03  = -1.89979294238854721751e-04, /* 0xBF28E6A5, 0xB61AC6E9 */
 R04  =  1.82954049532700665670e-06, /* 0x3EBEB1D1, 0x0C503919 */
@@ -86,49 +86,49 @@ static const double zero = 0.0;
 OLM_DLLEXPORT double
 __ieee754_j0(double x)
 {
-	double z, s,c,ss,cc,r,u,v;
-	int32_t hx,ix;
+    double z, s,c,ss,cc,r,u,v;
+    int32_t hx,ix;
 
-	GET_HIGH_WORD(hx,x);
-	ix = hx&0x7fffffff;
-	if(ix>=0x7ff00000) return one/(x*x);
-	x = fabs(x);
-	if(ix >= 0x40000000) {	/* |x| >= 2.0 */
-		s = sin(x);
-		c = cos(x);
-		ss = s-c;
-		cc = s+c;
-		if(ix<0x7fe00000) {  /* make sure x+x not overflow */
-		    z = -cos(x+x);
-		    if ((s*c)<zero) cc = z/ss;
-		    else 	    ss = z/cc;
-		}
-	/*
-	 * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
-	 * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
-	 */
-		if(ix>0x48000000) z = (invsqrtpi*cc)/sqrt(x);
-		else {
-		    u = pzero(x); v = qzero(x);
-		    z = invsqrtpi*(u*cc-v*ss)/sqrt(x);
-		}
-		return z;
-	}
-	if(ix<0x3f200000) {	/* |x| < 2**-13 */
-	    if(huge+x>one) {	/* raise inexact if x != 0 */
-	        if(ix<0x3e400000) return one;	/* |x|<2**-27 */
-	        else 	      return one - 0.25*x*x;
-	    }
-	}
-	z = x*x;
-	r =  z*(R02+z*(R03+z*(R04+z*R05)));
-	s =  one+z*(S01+z*(S02+z*(S03+z*S04)));
-	if(ix < 0x3FF00000) {	/* |x| < 1.00 */
-	    return one + z*(-0.25+(r/s));
-	} else {
-	    u = 0.5*x;
-	    return((one+u)*(one-u)+z*(r/s));
-	}
+    GET_HIGH_WORD(hx,x);
+    ix = hx&0x7fffffff;
+    if(ix>=0x7ff00000) return one/(x*x);
+    x = fabs(x);
+    if(ix >= 0x40000000) {	/* |x| >= 2.0 */
+        s = sin(x);
+        c = cos(x);
+        ss = s-c;
+        cc = s+c;
+        if(ix<0x7fe00000) {  /* make sure x+x not overflow */
+            z = -cos(x+x);
+            if ((s*c)<zero) cc = z/ss;
+            else 	    ss = z/cc;
+        }
+    /*
+     * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
+     * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
+     */
+        if(ix>0x48000000) z = (invsqrtpi*cc)/sqrt(x);
+        else {
+            u = pzero(x); v = qzero(x);
+            z = invsqrtpi*(u*cc-v*ss)/sqrt(x);
+        }
+        return z;
+    }
+    if(ix<0x3f200000) {	/* |x| < 2**-13 */
+        if(huge+x>one) {	/* raise inexact if x != 0 */
+            if(ix<0x3e400000) return one;	/* |x|<2**-27 */
+            else 	      return one - 0.25*x*x;
+        }
+    }
+    z = x*x;
+    r =  z*(R02+z*(R03+z*(R04+z*R05)));
+    s =  one+z*(S01+z*(S02+z*(S03+z*S04)));
+    if(ix < 0x3FF00000) {	/* |x| < 1.00 */
+        return one + z*(-0.25+(r/s));
+    } else {
+        u = 0.5*x;
+        return((one+u)*(one-u)+z*(r/s));
+    }
 }
 
 static const double
@@ -147,13 +147,13 @@ v04  =  4.41110311332675467403e-10; /* 0x3DFE5018, 0x3BD6D9EF */
 OLM_DLLEXPORT double
 __ieee754_y0(double x)
 {
-	double z, s,c,ss,cc,u,v;
-	int32_t hx,ix,lx;
+    double z, s,c,ss,cc,u,v;
+    int32_t hx,ix,lx;
 
-	EXTRACT_WORDS(hx,lx,x);
+    EXTRACT_WORDS(hx,lx,x);
         ix = 0x7fffffff&hx;
     /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0  */
-	if(ix>=0x7ff00000) return  one/(x+x*x); 
+    if(ix>=0x7ff00000) return  one/(x+x*x); 
         if((ix|lx)==0) return -one/zero;
         if(hx<0) return zero/zero;
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
@@ -172,10 +172,10 @@ __ieee754_y0(double x)
                 c = cos(x);
                 ss = s-c;
                 cc = s+c;
-	/*
-	 * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
-	 * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
-	 */
+    /*
+     * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
+     * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
+     */
                 if(ix<0x7fe00000) {  /* make sure x+x not overflow */
                     z = -cos(x+x);
                     if ((s*c)<zero) cc = z/ss;
@@ -187,14 +187,14 @@ __ieee754_y0(double x)
                     z = invsqrtpi*(u*ss+v*cc)/sqrt(x);
                 }
                 return z;
-	}
-	if(ix<=0x3e400000) {	/* x < 2**-27 */
-	    return(u00 + tpi*__ieee754_log(x));
-	}
-	z = x*x;
-	u = u00+z*(u01+z*(u02+z*(u03+z*(u04+z*(u05+z*u06)))));
-	v = one+z*(v01+z*(v02+z*(v03+z*v04)));
-	return(u/v + tpi*(__ieee754_j0(x)*__ieee754_log(x)));
+    }
+    if(ix<=0x3e400000) {	/* x < 2**-27 */
+        return(u00 + tpi*__ieee754_log(x));
+    }
+    z = x*x;
+    u = u00+z*(u01+z*(u02+z*(u03+z*(u04+z*(u05+z*u06)))));
+    v = one+z*(v01+z*(v02+z*(v03+z*v04)));
+    return(u/v + tpi*(__ieee754_j0(x)*__ieee754_log(x)));
 }
 
 /* The asymptotic expansions of pzero is
@@ -206,31 +206,37 @@ __ieee754_y0(double x)
  * and
  *	| pzero(x)-1-R/S | <= 2  ** ( -60.26)
  */
-static const double pR8[6] = { /* for x in [inf, 8]=1/[0,0.125] */
-  0.00000000000000000000e+00, /* 0x00000000, 0x00000000 */
- -7.03124999999900357484e-02, /* 0xBFB1FFFF, 0xFFFFFD32 */
- -8.08167041275349795626e+00, /* 0xC02029D0, 0xB44FA779 */
- -2.57063105679704847262e+02, /* 0xC0701102, 0x7B19E863 */
- -2.48521641009428822144e+03, /* 0xC0A36A6E, 0xCD4DCAFC */
- -5.25304380490729545272e+03, /* 0xC0B4850B, 0x36CC643D */
-};
-static const double pS8[5] = {
-  1.16534364619668181717e+02, /* 0x405D2233, 0x07A96751 */
-  3.83374475364121826715e+03, /* 0x40ADF37D, 0x50596938 */
-  4.05978572648472545552e+04, /* 0x40E3D2BB, 0x6EB6B05F */
-  1.16752972564375915681e+05, /* 0x40FC810F, 0x8F9FA9BD */
-  4.76277284146730962675e+04, /* 0x40E74177, 0x4F2C49DC */
+static const double pR8[6] =    /* for x in [inf, 8]=1/[0,0.125] */
+{
+    0.00000000000000000000e+00, /* 0x00000000, 0x00000000 */
+   -7.03124999999900357484e-02, /* 0xBFB1FFFF, 0xFFFFFD32 */
+   -8.08167041275349795626e+00, /* 0xC02029D0, 0xB44FA779 */
+   -2.57063105679704847262e+02, /* 0xC0701102, 0x7B19E863 */
+   -2.48521641009428822144e+03, /* 0xC0A36A6E, 0xCD4DCAFC */
+   -5.25304380490729545272e+03, /* 0xC0B4850B, 0x36CC643D */
 };
 
-static const double pR5[6] = { /* for x in [8,4.5454]=1/[0.125,0.22001] */
- -1.14125464691894502584e-11, /* 0xBDA918B1, 0x47E495CC */
- -7.03124940873599280078e-02, /* 0xBFB1FFFF, 0xE69AFBC6 */
- -4.15961064470587782438e+00, /* 0xC010A370, 0xF90C6BBF */
- -6.76747652265167261021e+01, /* 0xC050EB2F, 0x5A7D1783 */
- -3.31231299649172967747e+02, /* 0xC074B3B3, 0x6742CC63 */
- -3.46433388365604912451e+02, /* 0xC075A6EF, 0x28A38BD7 */
+static const double pS8[5] =
+{
+    1.16534364619668181717e+02, /* 0x405D2233, 0x07A96751 */
+    3.83374475364121826715e+03, /* 0x40ADF37D, 0x50596938 */
+    4.05978572648472545552e+04, /* 0x40E3D2BB, 0x6EB6B05F */
+    1.16752972564375915681e+05, /* 0x40FC810F, 0x8F9FA9BD */
+    4.76277284146730962675e+04, /* 0x40E74177, 0x4F2C49DC */
 };
-static const double pS5[5] = {
+
+static const double pR5[6] =    /* for x in [8,4.5454]=1/[0.125,0.22001] */
+{
+   -1.14125464691894502584e-11, /* 0xBDA918B1, 0x47E495CC */
+   -7.03124940873599280078e-02, /* 0xBFB1FFFF, 0xE69AFBC6 */
+   -4.15961064470587782438e+00, /* 0xC010A370, 0xF90C6BBF */
+   -6.76747652265167261021e+01, /* 0xC050EB2F, 0x5A7D1783 */
+   -3.31231299649172967747e+02, /* 0xC074B3B3, 0x6742CC63 */
+   -3.46433388365604912451e+02, /* 0xC075A6EF, 0x28A38BD7 */
+};
+
+static const double pS5[5] =
+{
   6.07539382692300335975e+01, /* 0x404E6081, 0x0C98C5DE */
   1.05125230595704579173e+03, /* 0x40906D02, 0x5C7E2864 */
   5.97897094333855784498e+03, /* 0x40B75AF8, 0x8FBE1D60 */
@@ -238,7 +244,8 @@ static const double pS5[5] = {
   2.40605815922939109441e+03, /* 0x40A2CC1D, 0xC70BE864 */
 };
 
-static const double pR3[6] = {/* for x in [4.547,2.8571]=1/[0.2199,0.35001] */
+static const double pR3[6] = /* for x in [4.547,2.8571]=1/[0.2199,0.35001] */
+{
  -2.54704601771951915620e-09, /* 0xBE25E103, 0x6FE1AA86 */
  -7.03119616381481654654e-02, /* 0xBFB1FFF6, 0xF7C0E24B */
  -2.40903221549529611423e+00, /* 0xC00345B2, 0xAEA48074 */
@@ -246,49 +253,53 @@ static const double pR3[6] = {/* for x in [4.547,2.8571]=1/[0.2199,0.35001] */
  -5.80791704701737572236e+01, /* 0xC04D0A22, 0x420A1A45 */
  -3.14479470594888503854e+01, /* 0xC03F72AC, 0xA892D80F */
 };
-static const double pS3[5] = {
-  3.58560338055209726349e+01, /* 0x4041ED92, 0x84077DD3 */
-  3.61513983050303863820e+02, /* 0x40769839, 0x464A7C0E */
-  1.19360783792111533330e+03, /* 0x4092A66E, 0x6D1061D6 */
-  1.12799679856907414432e+03, /* 0x40919FFC, 0xB8C39B7E */
-  1.73580930813335754692e+02, /* 0x4065B296, 0xFC379081 */
+
+static const double pS3[5] =
+{
+    3.58560338055209726349e+01, /* 0x4041ED92, 0x84077DD3 */
+    3.61513983050303863820e+02, /* 0x40769839, 0x464A7C0E */
+    1.19360783792111533330e+03, /* 0x4092A66E, 0x6D1061D6 */
+    1.12799679856907414432e+03, /* 0x40919FFC, 0xB8C39B7E */
+    1.73580930813335754692e+02, /* 0x4065B296, 0xFC379081 */
 };
 
 static const double pR2[6] = {/* for x in [2.8570,2]=1/[0.3499,0.5] */
- -8.87534333032526411254e-08, /* 0xBE77D316, 0xE927026D */
- -7.03030995483624743247e-02, /* 0xBFB1FF62, 0x495E1E42 */
- -1.45073846780952986357e+00, /* 0xBFF73639, 0x8A24A843 */
- -7.63569613823527770791e+00, /* 0xC01E8AF3, 0xEDAFA7F3 */
- -1.11931668860356747786e+01, /* 0xC02662E6, 0xC5246303 */
- -3.23364579351335335033e+00, /* 0xC009DE81, 0xAF8FE70F */
-};
-static const double pS2[5] = {
-  2.22202997532088808441e+01, /* 0x40363865, 0x908B5959 */
-  1.36206794218215208048e+02, /* 0x4061069E, 0x0EE8878F */
-  2.70470278658083486789e+02, /* 0x4070E786, 0x42EA079B */
-  1.53875394208320329881e+02, /* 0x40633C03, 0x3AB6FAFF */
-  1.46576176948256193810e+01, /* 0x402D50B3, 0x44391809 */
+    -8.87534333032526411254e-08, /* 0xBE77D316, 0xE927026D */
+    -7.03030995483624743247e-02, /* 0xBFB1FF62, 0x495E1E42 */
+    -1.45073846780952986357e+00, /* 0xBFF73639, 0x8A24A843 */
+    -7.63569613823527770791e+00, /* 0xC01E8AF3, 0xEDAFA7F3 */
+    -1.11931668860356747786e+01, /* 0xC02662E6, 0xC5246303 */
+    -3.23364579351335335033e+00, /* 0xC009DE81, 0xAF8FE70F */
 };
 
-	/* Note: This function is only called for ix>=0x40000000 (see above) */
-	static double pzero(double x)
+static const double pS2[5] =
 {
-	const double *p,*q;
-	double z,r,s;
-	int32_t ix;
-	GET_HIGH_WORD(ix,x);
-	ix &= 0x7fffffff;
-        assert(ix>=0x40000000 && ix<=0x48000000);
-	if(ix>=0x40200000)     {p = pR8; q= pS8;}
-	else if(ix>=0x40122E8B){p = pR5; q= pS5;}
-	else if(ix>=0x4006DB6D){p = pR3; q= pS3;}
-	else                   {p = pR2; q= pS2;}
-	z = one/(x*x);
-	r = p[0]+z*(p[1]+z*(p[2]+z*(p[3]+z*(p[4]+z*p[5]))));
-	s = one+z*(q[0]+z*(q[1]+z*(q[2]+z*(q[3]+z*q[4]))));
-	return one+ r/s;
+    2.22202997532088808441e+01, /* 0x40363865, 0x908B5959 */
+    1.36206794218215208048e+02, /* 0x4061069E, 0x0EE8878F */
+    2.70470278658083486789e+02, /* 0x4070E786, 0x42EA079B */
+    1.53875394208320329881e+02, /* 0x40633C03, 0x3AB6FAFF */
+    1.46576176948256193810e+01, /* 0x402D50B3, 0x44391809 */
+};
+
+    /* Note: This function is only called for ix>=0x40000000 (see above) */
+static double pzero(double x)
+{
+    const double *p,*q;
+    double z,r,s;
+    int32_t ix;
+    GET_HIGH_WORD(ix,x);
+    ix &= 0x7fffffff;
+    assert(ix>=0x40000000 && ix<=0x48000000);
+    if (ix >= 0x40200000)     {p = pR8; q= pS8;}
+    else if(ix>=0x40122E8B){p = pR5; q= pS5;}
+    else if(ix>=0x4006DB6D){p = pR3; q= pS3;}
+    else                   {p = pR2; q= pS2;}
+    z = one / (x * x);
+    r = p[0] + z * (p[1] + z * (p[2] + z * (p[3] + z * (p[4] + z * p[5]))));
+    s = one + z * (q[0] + z * (q[1] + z * (q[2] + z * (q[3] + z *q[4]))));
+    return one + r / s;
 }
-		
+        
 
 /* For x >= 8, the asymptotic expansions of qzero is
  *	-1/8 s + 75/1024 s^3 - ..., where s = 1/x.
@@ -370,18 +381,18 @@ static const double qS2[6] = {
 /* Note: This function is only called for ix>=0x40000000 (see above) */
 static double qzero(double x)
 {
-	const double *p,*q;
-	double s,r,z;
-	int32_t ix;
-	GET_HIGH_WORD(ix,x);
-	ix &= 0x7fffffff;
+    const double *p,*q;
+    double s,r,z;
+    int32_t ix;
+    GET_HIGH_WORD(ix,x);
+    ix &= 0x7fffffff;
         assert(ix>=0x40000000 && ix<=0x48000000);
-	if(ix>=0x40200000)     {p = qR8; q= qS8;}
-	else if(ix>=0x40122E8B){p = qR5; q= qS5;}
-	else if(ix>=0x4006DB6D){p = qR3; q= qS3;}
-	else                   {p = qR2; q= qS2;}
-	z = one/(x*x);
-	r = p[0]+z*(p[1]+z*(p[2]+z*(p[3]+z*(p[4]+z*p[5]))));
-	s = one+z*(q[0]+z*(q[1]+z*(q[2]+z*(q[3]+z*(q[4]+z*q[5])))));
-	return (-.125 + r/s)/x;
+    if(ix>=0x40200000)     {p = qR8; q= qS8;}
+    else if(ix>=0x40122E8B){p = qR5; q= qS5;}
+    else if(ix>=0x4006DB6D){p = qR3; q= qS3;}
+    else                   {p = qR2; q= qS2;}
+    z = one/(x*x);
+    r = p[0]+z*(p[1]+z*(p[2]+z*(p[3]+z*(p[4]+z*p[5]))));
+    s = one+z*(q[0]+z*(q[1]+z*(q[2]+z*(q[3]+z*(q[4]+z*q[5])))));
+    return (-.125 + r/s)/x;
 }

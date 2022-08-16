@@ -1,0 +1,145 @@
+
+|-DocumentNode
+  |-EffectDirectiveNode
+    |-EffectDeclarationNode
+      |-NameIdentifierNode="exn"
+      |-EffectMemberDeclarationNode
+        |-NameIdentifierNode="raise"
+  |-EffectDirectiveNode
+    |-EffectDeclarationNode
+      |-NameIdentifierNode="exn"
+      |-EffectMemberDeclarationNode
+        |-NameIdentifierNode="raise"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="sqr"
+      |-ParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-BinaryExpressionNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+        |-NameIdentifierNode="*"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="sqr"
+      |-ParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-BinaryExpressionNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+        |-NameIdentifierNode="*"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="sqr"
+      |-ParameterNode
+        |-NameIdentifierNode="x"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-BinaryExpressionNode
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+        |-NameIdentifierNode="*"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=x
+            |-NameIdentifierNode="x"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="safeDiv"
+      |-ParameterNode
+        |-NameIdentifierNode="a"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=T
+            |-NameIdentifierNode="T"
+      |-ParameterNode
+        |-NameIdentifierNode="b"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=T
+            |-NameIdentifierNode="T"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=T
+          |-NameIdentifierNode="T"
+      |-BlockNode
+        |-IfNode
+          |-BinaryExpressionNode
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=b
+                |-NameIdentifierNode="b"
+            |-NameIdentifierNode="=="
+            |-IntegerLiteral=0
+          |-BlockNode
+            |-FunctionCallNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=raise
+                  |-NameIdentifierNode="raise"
+          |-BlockNode
+            |-BinaryExpressionNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=a
+                  |-NameIdentifierNode="a"
+              |-NameIdentifierNode="/"
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=b
+                  |-NameIdentifierNode="b"
+  |-FunDirectiveNode
+    |-FunctionNode
+      |-NameIdentifierNode="zeroDiv"
+      |-ParameterNode
+        |-NameIdentifierNode="a"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ParameterNode
+        |-NameIdentifierNode="b"
+        |-ReferenceNode resolvedReference=<null>
+          |-QNameNode=i32
+            |-NameIdentifierNode="i32"
+      |-ReferenceNode resolvedReference=<null>
+        |-QNameNode=i32
+          |-NameIdentifierNode="i32"
+      |-BlockNode
+        |-IfNode
+          |-BinaryExpressionNode
+            |-ReferenceNode resolvedReference=<null>
+              |-QNameNode=b
+                |-NameIdentifierNode="b"
+            |-NameIdentifierNode="=="
+            |-IntegerLiteral=0
+          |-BlockNode
+            |-FunctionCallNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=raise
+                  |-NameIdentifierNode="raise"
+          |-BlockNode
+            |-BinaryExpressionNode
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=a
+                  |-NameIdentifierNode="a"
+              |-NameIdentifierNode="/"
+              |-ReferenceNode resolvedReference=<null>
+                |-QNameNode=b
+                  |-NameIdentifierNode="b"
