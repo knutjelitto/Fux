@@ -2,10 +2,10 @@
 
 public class FunDirective : Directive
 {
-    public FunDirective(Name name)
+    public FunDirective(FunDeclaration declaration)
     {
-        Name = name;
+        Declaration = declaration;
     }
 
-    public Name Name { get; }
+    public FunDeclaration Declaration { get; }
 }

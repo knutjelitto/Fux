@@ -52,10 +52,9 @@ public sealed class Lex
 
     public static readonly Lex GroupOpen = Add(new("⟦", startsAtomic: true));
     public static readonly Lex GroupClose = Add(new("⟧"));
-    public static readonly Lex LowerId = Add(new("LowerId", startsAtomic: true, isIdentifier: true));
-    public static readonly Lex UpperId = Add(new("UpperId", startsAtomic: true, isIdentifier: true));
     public static readonly Lex Identifier = Add(new("identifier", startsAtomic: true, isIdentifier: true));
     public static readonly Lex OpIdentifier = Add(new("op-identifier", startsAtomic: true, isIdentifier: true));
+    public static readonly Lex WasmIdentifier = Add(new("wasm-identifier", startsAtomic: true, isIdentifier: true));
     public static readonly Lex Wildcard = Add(new("wildcard", startsAtomic: true));
     public static readonly Lex Operator = Add(new("operator"));
     public static readonly Lex Integer = Add(new("Int", startsAtomic: true));
@@ -88,6 +87,7 @@ public sealed class Lex
     public static readonly Lex RightAngleBracket = Add(new(">", terminatesSomething: true, isBracket: true));
 
     public static readonly Lex KxStack = Add(new("%stack", isKeyword: true));
+    public static readonly Lex KxWasm = Add(new("%wasm", isKeyword: true));
 
     public static readonly Lex KwAs = Add(new("as", isKeyword: true));
     public static readonly Lex KwCase = Add(new("case", isKeyword: true, startsAtomic: true));

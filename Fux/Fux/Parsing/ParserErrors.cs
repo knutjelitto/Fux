@@ -7,11 +7,11 @@ public sealed class ParserErrors : InputErrors
     {
     }
 
-    public DiagnosticException NotImplemented(Token current, [CallerMemberName] string? member = null)
+    public DiagnosticException NotImplementedAt(Token current, [CallerMemberName] string? member = null)
     {
-        var text = string.IsNullOrEmpty(current.Text) ? current.Lex.Name : current.Text;
+        member = member == null ? "" : $" (in {member})";
         return Add(
-            new ParserError(current.Location, $"{member} - not implemented at '{text}'")
+            new ParserError(current.Location, $"not implemented at {current.Lex.PP()}{member}")
         );
     }
 

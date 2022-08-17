@@ -20,10 +20,6 @@ public sealed class Cursor
 
     public bool StartsAtomic => More() && Current.Lex.StartsAtomic;
 
-    public bool StartsTypeAnnotation => Tokens[Offset].Lex == Lex.LowerId &&
-                Offset + 1 < Tokens.Count &&
-                Tokens[Offset + 1].Lex == Lex.Colon;
-
     public bool StartsPrefix
     {
         get
@@ -96,7 +92,10 @@ public sealed class Cursor
 
     public Cursor Subcursor()
     {
-        Assert(Current.First);
+        if (!Current.First)
+        {
+            throw Errors.Parser.NotImplementedAt(Current);
+        }
 
         var subs = new TokenSpan(Tokens.Tokens, Current.Index, Current.Index);
 

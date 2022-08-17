@@ -20,7 +20,7 @@ public static class CursorExtensions
     public static bool WhitesBefore(this Cursor cursor) => cursor.More() && cursor.Current.WhitesBefore;
 
     public static bool IsIdentifier(this Cursor cursor) => cursor.More() &&
-            (cursor.Current.Lex == Lex.LowerId || cursor.Current.Lex == Lex.UpperId || cursor.Current.Lex == Lex.OpIdentifier);
+            (cursor.Current.Lex == Lex.Identifier || cursor.Current.Lex == Lex.OpIdentifier || cursor.Current.Lex == Lex.WasmIdentifier);
 
     public static bool IsWeak(this Cursor cursor, string text) => cursor.More() && cursor.Current.Text == text;
 

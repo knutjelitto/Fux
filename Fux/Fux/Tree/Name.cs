@@ -8,7 +8,7 @@ public class Name : Node
     {
         Token = token;
 
-        Assert(token.Lex == Lex.Identifier || token.Lex == Lex.OpIdentifier);
+        Assert(token.Lex == Lex.Identifier || token.Lex == Lex.OpIdentifier || token.Lex == Lex.WasmIdentifier);
     }
 
     public Token Token { get; }

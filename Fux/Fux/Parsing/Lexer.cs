@@ -159,6 +159,11 @@ public sealed class Lexer
                     return Build(Lex.Hash, 1);
                 }
 
+            case '$' when Next.IsLetter():
+                {
+                    return WasmIdentifier();
+                }
+
             default:
                 if (Current.IsLetter())
                 {
@@ -543,6 +548,18 @@ public sealed class Lexer
         }
 
         return token;
+    }
+
+    private Token WasmIdentifier()
+    {
+        Assert(Current == '$');
+
+        Offset += 1;
+        Assert(Current.IsLetter());
+
+        IdTail();
+
+        return Build(Lex.WasmIdentifier);
     }
 
     private Token XIdentifier()
