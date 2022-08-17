@@ -1,12 +1,9 @@
-﻿using System.Xml.Linq;
-
-using Fux.Tree;
-
+﻿using Fux.Tree;
 using Type = Fux.Tree.Type;
 
 namespace Fux.Parsing;
 
-public class Parser
+public partial class Parser
 {
     public Parser(Source source, ErrorBag errors)
     {
@@ -231,137 +228,12 @@ public class Parser
         });
     }
 
-
     private Type ParseOfType(Cursor cursor)
     {
         return cursor.Scope(cursor =>
         {
             _ = cursor.Swallow(Lex.Colon);
             return ParseType(cursor);
-        });
-    }
-
-    private Expression ParseExpression(Cursor cursor)
-    {
-        return cursor.Scope(cursor =>
-        {
-            if (cursor.Is(Lex.KxWasm))
-            {
-                return ParseWasmExpression(cursor);
-            }
-            if (cursor.Is(Lex.KwIf))
-            {
-                return ParseIfExpression(cursor);
-            }
-
-            throw Errors.Parser.NotImplementedAt(cursor);
-        });
-    }
-
-    private Expression ParseIfExpression(Cursor cursor)
-    {
-        return cursor.Scope<Expression>(cursor =>
-        {
-            _ = cursor.Swallow(Lex.KwIf);
-
-            throw Errors.Parser.NotImplementedAt(cursor);
-        });
-    }
-
-    private Expression ParseWasmExpression(Cursor cursor)
-    {
-        return cursor.Scope(cursor =>
-        {
-            _ = cursor.Swallow(Lex.KxWasm);
-            var sexpression = ParseSExpression(cursor);
-
-            return new WasmExpression(sexpression);
-        });
-    }
-
-    private SExpression ParseSExpression(Cursor cursor)
-    {
-        return cursor.Scope<SExpression>(cursor =>
-        {
-            _ = cursor.Swallow(Lex.LeftRoundBracket);
-            var symbol = ParseSSymbol(cursor);
-            var atoms = new List<SAtom>();
-            while (!cursor.SwallowIf(Lex.RightRoundBracket))
-            {
-                var atom = ParseSAtom(cursor);
-                atoms.Add(atom);
-            }
-
-            return new SExpression(symbol, atoms);
-        });
-    }
-
-    private SAtom ParseSAtom(Cursor cursor)
-    {
-        return cursor.Scope<SAtom>(cursor =>
-        {
-            if (cursor.Is(Lex.LeftRoundBracket))
-            {
-                return ParseSExpression(cursor);
-            }
-            if (cursor.Is(Lex.WasmIdentifier))
-            {
-                return ParseSName(cursor);
-            }
-            if (cursor.Is(Lex.Integer))
-            {
-                return ParseSNumber(cursor);
-            }
-
-            throw Errors.Parser.NotImplementedAt(cursor);
-        });
-    }
-
-    private SSymbol ParseSSymbol(Cursor cursor)
-    {
-        return cursor.Scope(cursor =>
-        {
-            var names = new List<Name>();
-            do
-            {
-                var name = ParseName(cursor);
-                names.Add(name);
-            }
-            while (cursor.SwallowIf(Lex.Dot));
-
-            return new SSymbol(names);
-        });
-    }
-
-    private SName ParseSName(Cursor cursor)
-    {
-        return cursor.Scope(cursor =>
-        {
-            var names = new List<Name>();
-            var name = ParseWasmName(cursor);
-            names.Add(name);
-            while (cursor.SwallowIf(Lex.Dot))
-            {
-                name = ParseName(cursor);
-                names.Add(name);
-            }
-
-            var qname = new QName(names);
-
-            return new SName(qname);
-        });
-    }
-
-    private SNumber ParseSNumber(Cursor cursor)
-    {
-        return cursor.Scope(cursor =>
-        {
-            if (cursor.Is(Lex.Integer))
-            {
-                return new SNumber(cursor.Swallow(Lex.Integer));
-            }
-
-            throw Errors.Parser.NotImplementedAt(cursor);
         });
     }
 

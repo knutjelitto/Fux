@@ -66,11 +66,18 @@ public sealed class Lex
     public static readonly Lex Colon = Add(new(":", terminatesSomething: true));
     public static readonly Lex Assign = Add(new("=", terminatesSomething: true));
     public static readonly Lex Comma = Add(new(",", terminatesSomething: true));
-    public static readonly Lex Arrow = Add(new("->", terminatesSomething: true));
-    public static readonly Lex Bar = Add(new("|", terminatesSomething: true));
+    public static readonly Lex LightArrow = Add(new("->", terminatesSomething: true));
+    public static readonly Lex BoldArrow = Add(new("=>", terminatesSomething: true));
     public static readonly Lex Lambda = Add(new("\\", startsAtomic: true));
     public static readonly Lex Hash = Add(new("#", startsAtomic: true));
     public static readonly Lex CoCo = Add(new("::"));
+
+    public static readonly Lex OpOr = Add(new("|", terminatesSomething: true));
+    public static readonly Lex OpAnd = Add(new("&", terminatesSomething: true));
+    public static readonly Lex OpXor = Add(new("^", terminatesSomething: true));
+
+    public static readonly Lex OpOrElse = Add(new("||"));
+    public static readonly Lex OpAndThen = Add(new("&&"));
 
     public static readonly Lex Equal = Add(new("==", terminatesSomething: true));
     public static readonly Lex Unequal = Add(new("!=", terminatesSomething: true));
@@ -89,14 +96,21 @@ public sealed class Lex
     public static readonly Lex KxStack = Add(new("%stack", isKeyword: true));
     public static readonly Lex KxWasm = Add(new("%wasm", isKeyword: true));
 
+    public static readonly Lex KwIf = Add(new("if", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwThen = Add(new("then", isKeyword: true));
+    public static readonly Lex KwElse = Add(new("else", isKeyword: true));
+
+    public static readonly Lex KwMatch = Add(new("match", isKeyword: true));
+
+    public static readonly Lex KwLoop = Add(new("loop", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwBreak = Add(new("break", isKeyword: true, startsAtomic: true));
+    public static readonly Lex KwContinue = Add(new("continue", isKeyword: true, startsAtomic: true));
+
     public static readonly Lex KwAs = Add(new("as", isKeyword: true));
     public static readonly Lex KwCase = Add(new("case", isKeyword: true, startsAtomic: true));
     public static readonly Lex KwClass = Add(new("class", isKeyword: true));
-    public static readonly Lex KwElse = Add(new("else", isKeyword: true));
     public static readonly Lex KwFun = Add(new("fun", isKeyword: true));
-    public static readonly Lex KwIf = Add(new("if", isKeyword: true, startsAtomic: true));
     public static readonly Lex KwImpl = Add(new("impl", isKeyword: true, startsAtomic: true));
-    public static readonly Lex KwThen = Add(new("then", isKeyword: true));
     public static readonly Lex KwOf = Add(new("of", isKeyword: true));
     public static readonly Lex KwLet = Add(new("let", isKeyword: true, startsAtomic: true));
     public static readonly Lex KwIn = Add(new("in", isKeyword: true));

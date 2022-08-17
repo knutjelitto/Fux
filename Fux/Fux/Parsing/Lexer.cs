@@ -86,14 +86,29 @@ public sealed class Lexer
                     return White(Lex.Space);
                 }
 
-            case '|' when !Next.IsSymbol():
-                return Build(Lex.Bar, 1);
+            case '|' when Next != '|':
+                return Build(Lex.OpOr, 1);
+
+            case '|' when Next == '|':
+                return Build(Lex.OpOrElse, 2);
+
+            case '&' when Next != '&':
+                return Build(Lex.OpAnd, 1);
+
+            case '&' when Next == '&':
+                return Build(Lex.OpAndThen, 2);
+
+            case '^':
+                return Build(Lex.OpXor, 1);
 
             case '\\' when !Next.IsSymbol():
                 return Build(Lex.Lambda, 1);
 
             case '-' when Next == '>':
-                return Build(Lex.Arrow, 2);
+                return Build(Lex.LightArrow, 2);
+
+            case '=' when Next == '>':
+                return Build(Lex.BoldArrow, 2);
 
             case '"' when Next == '"' && Is(2, '"'):
                 return LongString();
