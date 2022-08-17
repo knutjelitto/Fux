@@ -156,7 +156,7 @@ public sealed class Lexer
                 return XIdentifier();
 
             case '=':
-                return Build(Lex.Assign, 1);
+                return Build(Lex.OpAssign, 1);
             case ',':
                 return Build(Lex.Comma, 1);
 

@@ -174,7 +174,7 @@ namespace Fux.Parsing
                         throw Errors.Parser.NotImplementedAt(cursor);
                     }
 
-                    return Assign(cursor);
+                    return OperatorExpression(cursor);
                 });
 
             }
@@ -195,111 +195,18 @@ namespace Fux.Parsing
                 });
             }
 
-            private Expression Assign(Cursor cursor)
+            private Expression OperatorExpression(Cursor cursor)
             {
                 return cursor.Scope<Expression>(cursor =>
                 {
+                    var lhs = Unary(cursor);
+
+                    if (cursor.IsOperator())
                     var exprs = new List<Expression>();
 
                     var expr = Or(cursor);
                     exprs.Add(expr);
 
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Or(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression And(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression BitOr(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression BitXor(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression BitAnd(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Eq(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Rel(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Shift(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Add(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Mul(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression Is(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Expression As(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
                     throw Errors.Parser.NotImplementedAt(cursor);
                 });
             }
