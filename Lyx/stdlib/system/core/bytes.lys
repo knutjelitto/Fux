@@ -19,7 +19,7 @@ impl bytes
         discriminant as u64 << 32
 
     // bytes
-    fun apply(size: u32): bytes = %wasm {
+    wasm fun apply(size: u32): bytes
         (local $allocation i32)
         (local $allocationSize i32)
         
@@ -40,17 +40,16 @@ impl bytes
 
         (i64.or
             (call $bytesDiscriminant)
-            (i64.extend_u/i32 (get_local $allocation)))
+            (i64.extend_i32_u (get_local $allocation)))
 
-  private fun toAddr(str: bytes): u32 = %wasm {
-    (call $addressFromRef (get_local $str))
-  }
+    private wasm fun toAddr(str: bytes): u32
+        (call $addressFromRef (get_local $str))
 
-  #[explicit]
-  fun as(lhs: bytes): ref = %wasm { (get_local $lhs) }
+    explicit wasm fun (as) (lhs: bytes): ref
+        (get_local $lhs)
 
-  #[getter]
-  fun length(self: bytes): u32 = u32.load(self as ref)
+    getter fun length(self: bytes): u32
+        u32.load(self as ref)
 
   #[getter]
   fun ptr(self: bytes): u32 = {

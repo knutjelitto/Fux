@@ -1,6 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Fux.Tree;
 
-using Fux.Tree;
 using Type = Fux.Tree.Type;
 
 #pragma warning disable IDE1006 // Naming Styles

@@ -95,7 +95,7 @@ namespace Fux.Parsing
             {
                 return cursor.Scope<Expression>(cursor =>
                 {
-                    var lhs = Unary(cursor);
+                    var lhs = Prefix(cursor);
 
                     if (cursor.IsInfix())
                     {
@@ -115,7 +115,7 @@ namespace Fux.Parsing
                     {
                         var op = lh;
 
-                        var rhs = Unary(cursor);
+                        var rhs = Prefix(cursor);
 
                         if (cursor.IsInfix())
                         {
@@ -153,13 +153,13 @@ namespace Fux.Parsing
                 }
             }
 
-            private Expression Unary(Cursor cursor)
+            private Expression Prefix(Cursor cursor)
             {
-                return cursor.Scope<Expression>(cursor =>
+                return cursor.Scope(cursor =>
                 {
                     if (cursor.More() && cursor.Current.Lex.IsOperator)
                     {
-                        if (!Prefix.Find(cursor.Current, out var prefix))
+                        if (!Parsing.Prefix.Find(cursor.Current, out var prefix))
                         {
                             throw Errors.Parser.CanNotResolvePrefix(cursor);
                         }
@@ -175,7 +175,85 @@ namespace Fux.Parsing
 
             private Expression Atomic(Cursor cursor)
             {
-                return cursor.Scope<Expression>(cursor =>
+                return cursor.Scope(cursor =>
+                {
+                    var expression = Value(cursor);
+
+                    do
+                    {
+                        if (cursor.Is(Lex.Dot))
+                        {
+                            expression = cursor.Scope(cursor =>
+                            {
+                                cursor.Swallow(Lex.Dot);
+                                var member = Parser.ParseName(cursor);
+                                return new MemberExpression(expression, member);
+                            });
+
+                            continue;
+                        }
+
+                        if (cursor.Is(Lex.DotUp))
+                        {
+                            expression = cursor.Scope(cursor =>
+                            {
+                                cursor.Swallow(Lex.DotUp);
+                                var member = Parser.ParseName(cursor);
+                                return new SpecialMemberExpression(expression, member);
+                            });
+
+                            continue;
+                        }
+
+                        if (cursor.Is(Lex.LeftSquareBracket))
+                        {
+                            expression = cursor.Scope(cursor =>
+                            {
+                                cursor.Swallow(Lex.LeftSquareBracket);
+                                var index = Parse(cursor);
+                                cursor.Swallow(Lex.RightSquareBracket);
+
+                                return new IndexExpression(expression, index);
+                            });
+
+                            continue;
+                        }
+
+                        if (cursor.Is(Lex.LeftRoundBracket))
+                        {
+                            expression = cursor.Scope(cursor =>
+                            {
+                                cursor.Swallow(Lex.LeftRoundBracket);
+
+                                var argumentItems = new List<Expression>();
+                                while (cursor.IsNot(Lex.RightRoundBracket))
+                                {
+                                    var argument = Parse(cursor);
+                                    argumentItems.Add(argument);
+
+                                    if (!cursor.SwallowIf(Lex.Comma))
+                                    {
+                                        break;
+                                    }
+                                }
+                                cursor.Swallow(Lex.RightRoundBracket);
+
+                                var arguments = new CallArguments(argumentItems);
+
+                                return new CallExpression(expression, arguments);
+                            });
+
+                            continue;
+                        }
+
+                        break;
+                    }
+                    while (true);
+
+                    return expression;
+                });
+
+                Expression Value(Cursor cursor)
                 {
                     if (cursor.Current.Lex.IsLiteral)
                     {
@@ -189,10 +267,11 @@ namespace Fux.Parsing
                     {
                         var expression = Parse(cursor);
                         _ = cursor.Swallow(Lex.RightRoundBracket);
+                        return expression;
                     }
 
                     throw Errors.Parser.NotImplementedAt(cursor);
-                });
+                }
             }
         }
     }

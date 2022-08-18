@@ -70,6 +70,54 @@ namespace Fux.Tree
         public Expression Rhs { get; }
     }
 
+    public class MemberExpression : Expression
+    {
+        public MemberExpression(Expression primary, Name member)
+        {
+            Primary = primary;
+            Member = member;
+        }
+
+        public Expression Primary { get; }
+        public Name Member { get; }
+    }
+
+    public class SpecialMemberExpression : Expression
+    {
+        public SpecialMemberExpression(Expression primary, Name member)
+        {
+            Primary = primary;
+            Member = member;
+        }
+
+        public Expression Primary { get; }
+        public Name Member { get; }
+    }
+
+    public class IndexExpression : Expression
+    {
+        public IndexExpression(Expression primary, Expression index)
+        {
+            Primary = primary;
+            Index = index;
+        }
+
+        public Expression Primary { get; }
+        public Expression Index { get; }
+    }
+
+    public class CallExpression : Expression
+    {
+        public CallExpression(Expression primary, CallArguments arguments)
+        {
+            Primary = primary;
+            Arguments = arguments;
+        }
+
+        public Expression Primary { get; }
+        public CallArguments Arguments { get; }
+    }
+
     public class LiteralExpression : Expression
     {
         public LiteralExpression(Token token)

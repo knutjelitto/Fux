@@ -57,7 +57,7 @@ namespace Fux.Parsing
                     {
                         return SExpression(cursor);
                     }
-                    if (cursor.Is(Lex.WasmIdentifier))
+                    if (cursor.Is(Lex.Identifier, Lex.WasmIdentifier))
                     {
                         return SName(cursor);
                     }
@@ -93,7 +93,7 @@ namespace Fux.Parsing
                     var names = new List<Name>();
                     var name = WasmName(cursor);
                     names.Add(name);
-                    while (cursor.SwallowIf(Lex.Dot))
+                    while (cursor.SwallowIf(Lex.CoCo))
                     {
                         name = Parser.ParseName(cursor);
                         names.Add(name);
@@ -122,9 +122,12 @@ namespace Fux.Parsing
             {
                 return cursor.Scope(cursor =>
                 {
-                    var id = cursor.Swallow(Lex.WasmIdentifier);
+                    if (cursor.Is(Lex.Identifier))
+                    {
+                        return new Name(cursor.Swallow(Lex.Identifier));
+                    }
 
-                    return new Name(id);
+                    return new Name(cursor.Swallow(Lex.WasmIdentifier));
                 });
             }
         }

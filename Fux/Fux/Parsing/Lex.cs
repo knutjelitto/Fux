@@ -66,6 +66,8 @@ public abstract class Lex
     public static readonly Lex Wildcard = Add(new Fix("wildcard"));
 
     public static readonly Lex Dot = Add(new Fix("."));
+    public static readonly Lex DotUp = Add(new Fix(".^"));
+
     public static readonly Lex Colon = Add(new Fix(":"));
     public static readonly Lex Comma = Add(new Fix(","));
     public static readonly Lex LightArrow = Add(new Fix("->"));
@@ -87,6 +89,8 @@ public abstract class Lex
     public static readonly Lex Unequal = Add(new Fix("!=", isOperator: true));
     public static readonly Lex LessEqual = Add(new Fix("<=", isOperator: true));
     public static readonly Lex GreaterEqual = Add(new Fix(">=", isOperator: true));
+
+    public static readonly Lex OpShl = Add(new Fix("<<", isOperator: true));
 
     public static readonly Lex OpAs = Add(new Fix("as", isOperator: true));
 

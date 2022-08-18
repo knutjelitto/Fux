@@ -141,13 +141,19 @@ public sealed class Lexer
                 return Build(Lex.Unequal, 2);
 
             case '<' when Next == '=':
-                return Build(Lex.LessEqual, 1);
+                return Build(Lex.LessEqual, 2);
+
+            case '<' when Next == '<':
+                return Build(Lex.OpShl, 2);
 
             case '>' when Next == '=':
-                return Build(Lex.LessEqual, 1);
+                return Build(Lex.GreaterEqual, 2);
 
-            case '.' when !Next.IsSymbol():
+            case '.' when !Is(1, '^'):
                 return Build(Lex.Dot, 1);
+
+            case '.' when Is(1, '^'):
+                return Build(Lex.DotUp, 2);
 
             case ':' when Is(1, ':'):
                 return Build(Lex.CoCo, 2);
