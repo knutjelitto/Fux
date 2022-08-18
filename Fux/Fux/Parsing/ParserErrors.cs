@@ -35,6 +35,22 @@ public sealed class ParserErrors : InputErrors
         );
     }
 
+    public DiagnosticException CanNotResolveInfix(Token maybeInfix, [CallerMemberName] string? member = null)
+    {
+        member = member == null ? "" : $" (in {member})";
+        return Add(
+            new ParserError(maybeInfix.Location, $"can't resolve {maybeInfix.Lex.PP()} as infix operator{member}")
+        );
+    }
+
+    public DiagnosticException CanNotResolvePrefix(Token maybePrefix, [CallerMemberName] string? member = null)
+    {
+        member = member == null ? "" : $" (in {member})";
+        return Add(
+            new ParserError(maybePrefix.Location, $"can't resolve {maybePrefix.Lex.PP()} as prefix operator{member}")
+        );
+    }
+
     public DiagnosticException IllegalFirstLexeme(Token first) => Add(
             new ParserError(first.Location, $"first lexeme on line can not preceeded by a comment")
         );

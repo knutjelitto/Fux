@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "Lyx"
+		},
+		{
+			"path": "LyxX"
 		}
 	],
 	"settings": {}

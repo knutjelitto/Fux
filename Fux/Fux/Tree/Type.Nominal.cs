@@ -8,4 +8,6 @@ public class NominalType : Type
     }
 
     public Name Name { get; }
+
+    public override string ToString() => $"{Name}";
 }

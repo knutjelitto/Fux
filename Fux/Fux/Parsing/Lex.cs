@@ -5,11 +5,12 @@ public abstract class Lex
     public static readonly List<Lex> allLex = new();
 
     private Lex(string name,
-        bool isKeyword = false,
-        bool isWhite = false,
-        bool isIdentifier = false,
-        bool isBracket = false,
-        bool isOperator = false)
+        bool isKeyword,
+        bool isWhite,
+        bool isIdentifier,
+        bool isBracket,
+        bool isOperator,
+        bool isLiteral)
     {
         Name = string.Intern(name);
         IsKeyword = isKeyword;
@@ -17,6 +18,7 @@ public abstract class Lex
         IsIdentifier = isIdentifier;
         IsBracket = isBracket;
         IsOperator = isOperator;
+        IsLiteral = isLiteral;
     }
 
     public string Name { get; }
@@ -25,6 +27,7 @@ public abstract class Lex
     public bool IsIdentifier { get; }
     public bool IsBracket { get; }
     public bool IsOperator { get; }
+    public bool IsLiteral { get; }
 
     public static IReadOnlyList<Lex> AllLex => allLex;
 
@@ -54,11 +57,11 @@ public abstract class Lex
     public static readonly Lex GroupOpen = Add(new Fix("⟦"));
     public static readonly Lex GroupClose = Add(new Fix("⟧"));
     public static readonly Lex Operator = Add(new Var("operator"));
-    public static readonly Lex Integer = Add(new Var("integer"));
-    public static readonly Lex Float = Add(new Var("float"));
-    public static readonly Lex String = Add(new Var("string"));
-    public static readonly Lex LongString = Add(new Var("long-string"));
-    public static readonly Lex Char = Add(new Var("char"));
+    public static readonly Lex Integer = Add(new Var("integer", isLiteral: true));
+    public static readonly Lex Float = Add(new Var("float", isLiteral: true));
+    public static readonly Lex String = Add(new Var("string", isLiteral: true));
+    public static readonly Lex LongString = Add(new Var("long-string", isLiteral: true));
+    public static readonly Lex Char = Add(new Var("char", isLiteral: true));
 
     public static readonly Lex Wildcard = Add(new Fix("wildcard"));
 
@@ -85,6 +88,8 @@ public abstract class Lex
     public static readonly Lex LessEqual = Add(new Fix("<=", isOperator: true));
     public static readonly Lex GreaterEqual = Add(new Fix(">=", isOperator: true));
 
+    public static readonly Lex OpAs = Add(new Fix("as", isOperator: true));
+
     public static readonly Lex LeftRoundBracket = Add(new Fix("(", isBracket: true));
     public static readonly Lex RightRoundBracket = Add(new Fix(")", isBracket: true));
     public static readonly Lex LeftCurlyBracket = Add(new Fix("{", isBracket: true));
@@ -107,8 +112,10 @@ public abstract class Lex
     public static readonly Lex KwBreak = Add(new Fix("break", isKeyword: true));
     public static readonly Lex KwContinue = Add(new Fix("continue", isKeyword: true));
 
-    public static readonly Lex KwAs = Add(new Fix("as", isKeyword: true));
-    public static readonly Lex KwIs = Add(new Fix("is", isKeyword: true));
+    public static readonly Lex KwVal = Add(new Fix("val", isKeyword: true));
+
+    //public static readonly Lex KwAs = Add(new Fix("as", isKeyword: true));
+    //public static readonly Lex KwIs = Add(new Fix("is", isKeyword: true));
 
     public static readonly Lex KwCase = Add(new Fix("case", isKeyword: true));
     public static readonly Lex KwClass = Add(new Fix("class", isKeyword: true));
@@ -168,14 +175,16 @@ public abstract class Lex
             bool isWhite = false,
             bool isIdentifier = false,
             bool isBracket = false,
-            bool isOperator = false)
+            bool isOperator = false,
+            bool isLiteral = false)
             : base(
                   name: name,
                   isKeyword: isKeyword,
                   isWhite: isWhite,
                   isIdentifier: isIdentifier,
                   isBracket: isBracket,
-                  isOperator: isOperator)
+                  isOperator: isOperator,
+                  isLiteral: isLiteral)
         {
         }
     }
@@ -188,14 +197,16 @@ public abstract class Lex
             bool isWhite = false,
             bool isIdentifier = false,
             bool isBracket = false,
-            bool isOperator = false)
+            bool isOperator = false,
+            bool isLiteral = false)
             : base(
                   name: name,
                   isKeyword: isKeyword,
                   isWhite: isWhite,
                   isIdentifier: isIdentifier,
                   isBracket: isBracket,
-                  isOperator: isOperator)
+                  isOperator: isOperator,
+                  isLiteral: isLiteral)
         {
         }
     }

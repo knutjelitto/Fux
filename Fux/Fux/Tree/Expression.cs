@@ -16,6 +16,80 @@ namespace Fux.Tree
         public SExpression Expression { get; }
     }
 
+    public class IfExpression : Expression
+    {
+        public IfExpression(Expression condition, Expression whenTrue, Expression whenFalse)
+        {
+            Condition = condition;
+            WhenTrue = whenTrue;
+            WhenFalse = whenFalse;
+        }
+
+        public Expression Condition { get; }
+        public Expression WhenTrue { get; }
+        public Expression WhenFalse { get; }
+    }
+
+    public class ValExpression : Expression
+    {
+        public ValExpression(Name name, Type type, Expression expression)
+        {
+            Name = name;
+            Type = type;
+            Expression = expression;
+        }
+
+        public Name Name { get; }
+        public Type Type { get; }
+        public Expression Expression { get; }
+    }
+
+    public class InfixExpression : Expression
+    {
+        public InfixExpression(Infix infix, Expression lhs, Expression rhs)
+        {
+            Infix = infix;
+            Lhs = lhs;
+            Rhs = rhs;
+        }
+
+        public Infix Infix { get; }
+        public Expression Lhs { get; }
+        public Expression Rhs { get; }
+    }
+
+    public class PrefixExpression : Expression
+    {
+        public PrefixExpression(Prefix prefix, Expression rhs)
+        {
+            Prefix = prefix;
+            Rhs = rhs;
+        }
+
+        public Prefix Prefix { get; }
+        public Expression Rhs { get; }
+    }
+
+    public class LiteralExpression : Expression
+    {
+        public LiteralExpression(Token token)
+        {
+            Token = token;
+        }
+
+        public Token Token { get; }
+    }
+
+    public class ReferenceExpression : Expression
+    {
+        public ReferenceExpression(QName qname)
+        {
+            Qname = qname;
+        }
+
+        public QName Qname { get; }
+    }
+
     public abstract class SAtom : Node { }
 
     public class SExpression : SAtom

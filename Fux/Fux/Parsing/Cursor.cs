@@ -13,12 +13,12 @@ public sealed class Cursor
         Tokens = tokens;
     }
 
-    public int Offset { get; private set; }
     public Source Unit { get; }
     public ErrorBag Errors { get; }
     public TokenSpan Tokens { get; }
 
-    public bool StartsAtomic => More() && Current.Lex.StartsAtomic;
+    public int Offset { get; private set; }
+    public int Limit => Tokens.Count;
 
     public bool StartsPrefix
     {
@@ -44,6 +44,16 @@ public sealed class Cursor
 
     public int Line => Current.Location.Line;
     public int Column => Current.Location.Column;
+
+    public Token this[int index]
+    {
+        get
+        {
+            Assert(Offset + index < Tokens.Count);
+
+            return Tokens[Offset + index];
+        }
+    }
 
     public Token Current
     {
@@ -139,7 +149,13 @@ public sealed class Cursor
         return Offset < Tokens.Count;
     }
 
-    public bool TerminatesSomething => Offset < Tokens.Count && Tokens[Offset].Lex.TerminatesSomething;
+    public void Swallow()
+    {
+        if (More())
+        {
+            Offset++;
+        }
+    }
 
     public Token Swallow(Lex lexKind, [CallerMemberName] string? member = null)
     {

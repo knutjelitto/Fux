@@ -6,7 +6,7 @@ namespace Fux.Files;
 
 public class Package
 {
-    public const string PackageFileName = "Package.json";
+    public const string PackageFileName = "FuxPackage.json";
 
     private readonly List<Package> dependencies = new();
     private readonly List<Source> exposed = new();

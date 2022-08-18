@@ -1,0 +1,10 @@
+{
+    "name": "Fux.Stdlib",
+    "summary": "Fux Standard library",
+    "sources": [
+        "/system/core/**/bytes.lys",
+        "/system/core/**/boolean.lys",
+        "/system/core/**/i8.lys"
+    ],
+    "dependencies": {}
+}

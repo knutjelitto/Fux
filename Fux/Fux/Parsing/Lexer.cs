@@ -101,6 +101,9 @@ public sealed class Lexer
             case '^':
                 return Build(Lex.OpXor, 1);
 
+            case 'a' when Is(1, 's') && !Is(2, IsLetterOrDigit):
+                return Build(Lex.OpAs, 2);
+
             case '\\' when !Next.IsSymbol():
                 return Build(Lex.Lambda, 1);
 

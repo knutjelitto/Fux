@@ -1,11 +1,12 @@
-﻿using Fux.Tree;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Fux.Tree;
 using Type = Fux.Tree.Type;
 
 #pragma warning disable IDE1006 // Naming Styles
 
 namespace Fux.Parsing
 {
-
     public partial class Parser
     {
         public Parser(Source source, ErrorBag errors)
@@ -54,6 +55,14 @@ namespace Fux.Parsing
             {
                 Element? parsed = null;
 
+                var annotationItems = new List<Annotation>();
+                while (cursor.IsIdentifier())
+                {
+                    var annotation = ParseAnnotation(cursor);
+                    annotationItems.Add(annotation);
+                }
+                var annotations = new Annotations(annotationItems);
+
                 if (cursor.Is(Lex.KwImport))
                 {
                     parsed = ParseImportDirective(cursor);
@@ -68,7 +77,7 @@ namespace Fux.Parsing
                 }
                 else if (cursor.Is(Lex.KwFun))
                 {
-                    parsed = ParseFunDirective(cursor);
+                    parsed = ParseFunDirective(cursor, annotations);
                 }
 
                 if (parsed != null)
@@ -80,7 +89,27 @@ namespace Fux.Parsing
 
                 throw Errors.Parser.NotImplementedAt(cursor.At());
             });
+        }
 
+        private Annotation ParseAnnotation(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
+            {
+                var name = ParseName(cursor);
+                var arguments = new List<Expression>();
+                if (cursor.Is(Lex.LeftRoundBracket))
+                {
+                    do
+                    {
+                        var argument = ParseExpression(cursor);
+                        arguments.Add(argument);
+                    }
+                    while (cursor.SwallowIf(Lex.Comma));
+                    _ = cursor.Swallow(Lex.RightRoundBracket);
+                }
+
+                return new Annotation(name, arguments);
+            });
         }
 
         private Element ParseImportDirective(Cursor cursor)
@@ -146,19 +175,19 @@ namespace Fux.Parsing
             throw Errors.Parser.NotImplementedAt(cursor);
         }
 
-        private FunDirective ParseFunDirective(Cursor cursor)
+        private FunDirective ParseFunDirective(Cursor cursor, Annotations annotations)
         {
             return cursor.Scope(cursor =>
             {
-                var fun = ParseFunDelaration(cursor);
+                var fun = ParseFunDelaration(cursor, annotations);
 
-                return new FunDirective(fun);
+                return new FunDirective(annotations, fun);
             });
 
             throw Errors.Parser.NotImplementedAt(cursor);
         }
 
-        private FunDeclaration ParseFunDelaration(Cursor cursor)
+        private FunDeclaration ParseFunDelaration(Cursor cursor, Annotations annotations)
         {
             return cursor.Scope(cursor =>
             {
@@ -170,12 +199,52 @@ namespace Fux.Parsing
 
                 while (cursor.More())
                 {
-                    var subCursor = cursor.Subcursor();
-
-                    var x = ParseExpression(subCursor);
+                    if (annotations.IsWasm)
+                    {
+                        var wasm = ParseWasmExpression(cursor);
+                    }
+                    else
+                    {
+                        var x = ParseExpressions(cursor);
+                    }
                 }
 
-                return new FunDeclaration(name, parameters, result);
+                return new FunDeclaration(annotations, name, parameters, result);
+            });
+        }
+
+        private Expressions ParseExpressions(Cursor cursor)
+        {
+            var expressions = new List<Expression>();
+
+            while (cursor.More())
+            {
+                if (cursor.Is(Lex.KwVal))
+                {
+                    var expression = ParseValDeclaration(cursor);
+                    expressions.Add(expression);
+                    continue;
+                }
+
+                expressions.Add(ParseExpression(cursor));
+            }
+
+
+            return new Expressions(expressions);
+        }
+
+        private Expression ParseValDeclaration(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
+            {
+                cursor.Swallow(Lex.KwVal);
+
+                var name = ParseName(cursor);
+                var type = ParseOfType(cursor);
+                cursor.Swallow(Lex.OpAssign);
+                var value = ParseExpression(cursor);
+
+                return new ValExpression(name, type, value);
             });
         }
 
@@ -196,8 +265,8 @@ namespace Fux.Parsing
                     }
                     while (cursor.SwallowIf(Lex.Comma));
 
-                    _ = cursor.Swallow(Lex.RightRoundBracket);
                 }
+                _ = cursor.Swallow(Lex.RightRoundBracket);
 
                 return new FunParameters(parameters);
             });
@@ -262,6 +331,18 @@ namespace Fux.Parsing
         {
             return cursor.Scope(cursor =>
             {
+                if (cursor.Is(Lex.LeftRoundBracket) && cursor[1].Lex.IsOperator && cursor.Is(2, Lex.RightRoundBracket))
+                {
+                    var left = cursor.Advance();
+                    Assert(!cursor.Current.WhitesBefore);
+                    Assert(cursor.Current.Lex.IsOperator);
+                    var op = cursor.Advance();
+                    Assert(!cursor.Current.WhitesBefore);
+                    Assert(cursor.Is(Lex.RightRoundBracket));
+                    var right = cursor.Advance();
+
+                    return new OpName(op);
+                }
                 var id = cursor.Is(Lex.Identifier) ? cursor.Swallow(Lex.Identifier) : cursor.Swallow(Lex.OpIdentifier);
 
                 return new Name(id);
@@ -286,60 +367,6 @@ namespace Fux.Parsing
 
                 return new Name(id);
             });
-        }
-
-        private enum Assoc
-        {
-            None,
-            Left,
-            Right
-        }
-
-        private class Infix
-        {
-            private static readonly Dictionary<string, Infix> table = new Dictionary<string, Infix>();
-
-            private static Infix add(Infix infix)
-            {
-                table.Add(infix.Name, infix);
-
-                return infix;
-            }
-
-            private static readonly Infix Assign = add(new("=", 10, Assoc.Right));
-            private static readonly Infix OrElse = add(new("||", 20, Assoc.Left));
-            private static readonly Infix AndThen = add(new("&&", 30, Assoc.Left));
-            private static readonly Infix BitOr = add(new("|", 40, Assoc.Left));
-            private static readonly Infix BitXor = add(new("^", 50, Assoc.Left));
-            private static readonly Infix BitAnd = add(new("&", 60, Assoc.Left));
-            private static readonly Infix Eq = add(new("==", 60, Assoc.Left));
-            private static readonly Infix Ne = add(new("!=", 60, Assoc.Left));
-            private static readonly Infix Lt = add(new("<", 70, Assoc.Left));
-            private static readonly Infix Le = add(new("<=", 70, Assoc.Left));
-            private static readonly Infix Gt = add(new("<", 70, Assoc.Left));
-            private static readonly Infix Ge = add(new("<=", 70, Assoc.Left));
-            private static readonly Infix AShr = add(new(">>>", 80, Assoc.Left));
-            private static readonly Infix LShr = add(new(">>", 80, Assoc.Left));
-            private static readonly Infix Shl = add(new("<<", 80, Assoc.Left));
-            private static readonly Infix Add = add(new("+", 90, Assoc.Left));
-            private static readonly Infix Sub = add(new("-", 90, Assoc.Left));
-            private static readonly Infix Mul = add(new("*", 100, Assoc.Left));
-            private static readonly Infix Div = add(new("/", 100, Assoc.Left));
-            private static readonly Infix Mod = add(new("%", 100, Assoc.Left));
-            private static readonly Infix Is = add(new("is", 110, Assoc.Left));
-            private static readonly Infix As = add(new("as", 120, Assoc.Left));
-
-            private Infix(string name, int power, Assoc assoc)
-            {
-                Name = name;
-                Power = power;
-                Assoc = assoc;
-            }
-
-            public string Name { get; }
-            public int Power { get; }
-            public Assoc Assoc { get; }
-
         }
     }
 }

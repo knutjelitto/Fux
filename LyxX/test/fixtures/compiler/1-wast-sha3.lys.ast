@@ -1,0 +1,128 @@
+
+|-DocumentNode
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::native
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="native"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::boolean
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="boolean"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::u8
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="u8"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::u16
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="u16"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::u32
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="u32"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::u64
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="u64"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::i16
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="i16"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::i32
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="i32"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::i64
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="i64"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::f32
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="f32"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::f64
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="f64"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::bytes
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="bytes"
+  |-ImportDirectiveNode
+    |-QNameNode=system::core::string
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="core"
+      |-NameIdentifierNode="string"
+  |-ImportDirectiveNode
+    |-QNameNode=system::hash::keccak
+      |-NameIdentifierNode="system"
+      |-NameIdentifierNode="hash"
+      |-NameIdentifierNode="keccak"
+  |-VarDirectiveNode
+    |-VarDeclarationNode annotations=Global(test::fixtures::compiler::1-wast-sha3::k:<no-type>)
+      |-NameIdentifierNode="k" type=(alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes)))))
+      |-FunctionCallNode type=(alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))) annotations=IsValueNode,ImplicitCall(fun "apply" () (alias Keccak))
+        |-MemberNode type=(intersection (fun "apply" ((alias bytes) (alias bytes)) (alias Keccak)) (fun "apply" () (alias Keccak)))
+          |-ReferenceNode resolvedReference=system::hash::keccak::Keccak type=(type (alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))))
+            |-QNameNode=Keccak
+              |-NameIdentifierNode="Keccak"
+          |-NameIdentifierNode="apply"
+  |-OverloadedFunctionNode annotations=Injected
+    |-NameIdentifierNode="keccak" type=(intersection (fun "keccak" ((alias bytes)) (alias bytes)))
+    |-FunDirectiveNode
+      |-DecoratorNode
+        |-NameIdentifierNode="export"
+        |-StringLiteral="keccak" type=(alias string (native string))
+      |-FunctionNode annotations=IsOverloaded
+        |-NameIdentifierNode="keccak" type=(fun "keccak" ((alias bytes)) (alias bytes)) annotations=Export
+        |-ParameterNode annotations=Local(input:<no-type>#0)
+          |-NameIdentifierNode="input" type=(alias bytes (native bytes))
+          |-ReferenceNode resolvedReference=system::core::bytes::bytes type=(type (alias bytes (native bytes)))
+            |-QNameNode=bytes
+              |-NameIdentifierNode="bytes"
+        |-ReferenceNode resolvedReference=system::core::bytes::bytes type=(type (alias bytes (native bytes)))
+          |-QNameNode=bytes
+            |-NameIdentifierNode="bytes"
+        |-BlockNode type=(alias bytes (native bytes)) annotations=IsValueNode
+          |-FunctionCallNode type=(alias void (native void)) annotations=ImplicitCall(fun "reset" ((alias Keccak)) (alias void))
+            |-MemberNode type=(intersection (fun "reset" ((alias Keccak)) (alias void)))
+              |-ReferenceNode resolvedReference=system::hash::keccak::Keccak type=(type (alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))))
+                |-QNameNode=Keccak
+                  |-NameIdentifierNode="Keccak"
+              |-NameIdentifierNode="reset"
+            |-ReferenceNode resolvedReference=k type=(alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))) annotations=IsValueNode,Global(test::fixtures::compiler::1-wast-sha3::k:<no-type>)
+              |-QNameNode=k
+                |-NameIdentifierNode="k"
+          |-FunctionCallNode type=(alias void (native void)) annotations=ImplicitCall(fun "update" ((alias Keccak) (alias bytes)) (alias void))
+            |-MemberNode type=(intersection (fun "update" ((alias Keccak) (alias bytes)) (alias void)) (fun "update" ((alias Keccak) (alias u32) (alias u32)) (alias void)))
+              |-ReferenceNode resolvedReference=system::hash::keccak::Keccak type=(type (alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))))
+                |-QNameNode=Keccak
+                  |-NameIdentifierNode="Keccak"
+              |-NameIdentifierNode="update"
+            |-ReferenceNode resolvedReference=k type=(alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))) annotations=IsValueNode,Global(test::fixtures::compiler::1-wast-sha3::k:<no-type>)
+              |-QNameNode=k
+                |-NameIdentifierNode="k"
+            |-ReferenceNode resolvedReference=input type=(alias bytes (native bytes)) annotations=IsValueNode,Local(input:<no-type>#0)
+              |-QNameNode=input
+                |-NameIdentifierNode="input"
+          |-FunctionCallNode type=(alias bytes (native bytes)) annotations=IsValueNode,ImplicitCall(fun "digest" ((alias Keccak)) (alias bytes)),IsReturnExpression
+            |-MemberNode type=(intersection (fun "digest" ((alias Keccak)) (alias bytes)))
+              |-ReferenceNode resolvedReference=system::hash::keccak::Keccak type=(type (alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))))
+                |-QNameNode=Keccak
+                  |-NameIdentifierNode="Keccak"
+              |-NameIdentifierNode="digest"
+            |-ReferenceNode resolvedReference=k type=(alias Keccak (struct data: (type (alias bytes (native bytes))) result: (type (alias bytes (native bytes))))) annotations=IsValueNode,Global(test::fixtures::compiler::1-wast-sha3::k:<no-type>)
+              |-QNameNode=k
+                |-NameIdentifierNode="k"

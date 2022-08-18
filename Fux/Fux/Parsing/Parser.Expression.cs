@@ -18,128 +18,9 @@ namespace Fux.Parsing
             });
         }
 
-        private class WasmExpressionParser : Expression
+        private Expression ParseWasmExpression(Cursor cursor)
         {
-            public static Expression Parse(Parser parser, Cursor cursor)
-            {
-                return new WasmExpressionParser(parser).Parse(cursor);
-            }
-
-            private WasmExpressionParser(Parser parser)
-            {
-                Parser = parser;
-            }
-
-            public Parser Parser { get; }
-            public ErrorBag Errors => Parser.Errors;
-
-
-            private Expression Parse(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
-                {
-                    _ = cursor.Swallow(Lex.KxWasm);
-                    var sexpression = ParseSExpression(cursor);
-
-                    return new WasmExpression(sexpression);
-                });
-            }
-
-            private SExpression ParseSExpression(Cursor cursor)
-            {
-                return cursor.Scope<SExpression>(cursor =>
-                {
-                    _ = cursor.Swallow(Lex.LeftRoundBracket);
-                    var symbol = ParseSSymbol(cursor);
-                    var atoms = new List<SAtom>();
-                    while (!cursor.SwallowIf(Lex.RightRoundBracket))
-                    {
-                        var atom = SAtom(cursor);
-                        atoms.Add(atom);
-                    }
-
-                    return new SExpression(symbol, atoms);
-                });
-            }
-
-            private SAtom SAtom(Cursor cursor)
-            {
-                return cursor.Scope<SAtom>(cursor =>
-                {
-                    if (cursor.Is(Lex.LeftRoundBracket))
-                    {
-                        return ParseSExpression(cursor);
-                    }
-                    if (cursor.Is(Lex.WasmIdentifier))
-                    {
-                        return SName(cursor);
-                    }
-                    if (cursor.Is(Lex.Integer))
-                    {
-                        return SNumber(cursor);
-                    }
-
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private SSymbol ParseSSymbol(Cursor cursor)
-            {
-                return cursor.Scope(cursor =>
-                {
-                    var names = new List<Name>();
-                    do
-                    {
-                        var name = Parser.ParseName(cursor);
-                        names.Add(name);
-                    }
-                    while (cursor.SwallowIf(Lex.Dot));
-
-                    return new SSymbol(names);
-                });
-            }
-
-            private SName SName(Cursor cursor)
-            {
-                return cursor.Scope(cursor =>
-                {
-                    var names = new List<Name>();
-                    var name = WasmName(cursor);
-                    names.Add(name);
-                    while (cursor.SwallowIf(Lex.Dot))
-                    {
-                        name = Parser.ParseName(cursor);
-                        names.Add(name);
-                    }
-
-                    var qname = new QName(names);
-
-                    return new SName(qname);
-                });
-            }
-
-            private SNumber SNumber(Cursor cursor)
-            {
-                return cursor.Scope(cursor =>
-                {
-                    if (cursor.Is(Lex.Integer))
-                    {
-                        return new SNumber(cursor.Swallow(Lex.Integer));
-                    }
-
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
-
-            private Name WasmName(Cursor cursor)
-            {
-                return cursor.Scope(cursor =>
-                {
-                    var id = cursor.Swallow(Lex.WasmIdentifier);
-
-                    return new Name(id);
-                });
-            }
+            return WasmExpressionParser.Parse(this, cursor);
         }
 
         private class ExpressionParser
@@ -174,7 +55,7 @@ namespace Fux.Parsing
                         throw Errors.Parser.NotImplementedAt(cursor);
                     }
 
-                    return OperatorExpression(cursor);
+                    return InfixExpression(cursor);
                 });
 
             }
@@ -189,33 +70,106 @@ namespace Fux.Parsing
                     {
                         var condition = Parse(cursor);
                         _ = cursor.Swallow(Lex.RightRoundBracket);
+                        var whenTrue = Parse(cursor);
+                        _ = cursor.Swallow(Lex.KwElse);
+                        var whenFalse = Parse(cursor);
+
+                        return new IfExpression(condition, whenTrue, whenFalse);
+                    }
+                    else
+                    {
+                        var condition = Parse(cursor);
+                        _ = cursor.Swallow(Lex.KwThen);
+                        var whenTrue = Parse(cursor);
+                        _ = cursor.Swallow(Lex.KwElse);
+                        var whenFalse = Parse(cursor);
+
+                        return new IfExpression(condition, whenTrue, whenFalse);
                     }
 
                     throw Errors.Parser.NotImplementedAt(cursor);
                 });
             }
 
-            private Expression OperatorExpression(Cursor cursor)
+            private Expression InfixExpression(Cursor cursor)
             {
                 return cursor.Scope<Expression>(cursor =>
                 {
                     var lhs = Unary(cursor);
 
-                    if (cursor.IsOperator())
-                    var exprs = new List<Expression>();
+                    if (cursor.IsInfix())
+                    {
+                        return Resolve(lhs, 0, cursor);
+                    }
 
-                    var expr = Or(cursor);
-                    exprs.Add(expr);
-
-                    throw Errors.Parser.NotImplementedAt(cursor);
+                    return lhs;
                 });
+
+                Expression Resolve(Expression lhs, int minPower, Cursor cursor)
+                {
+                    Assert(cursor.IsInfix());
+
+                    var lh = Infix(cursor);
+
+                    while (cursor.More() && lh.Power >= minPower)
+                    {
+                        var op = lh;
+
+                        var rhs = Unary(cursor);
+
+                        if (cursor.IsInfix())
+                        {
+                            lh = Infix(cursor);
+                            while (lh.Power > op.Power || lh.Assoc == Assoc.Right && lh.Power == op.Power)
+                            {
+                                var prec = op.Power + (lh.Power > op.Power ? 1 : 0);
+                                rhs = Resolve(rhs, prec, cursor);
+
+                                if (!cursor.IsInfix())
+                                {
+                                    break;
+                                }
+
+                                lh = Infix(cursor);
+                            }
+                        }
+
+                        lhs = new InfixExpression(lh, lhs, rhs);
+                    }
+
+                    return lhs;
+                }
+
+                Infix Infix(Cursor cursor)
+                {
+                    if (!Parsing.Infix.Find(cursor.Current, out var infix))
+                    {
+                        throw Errors.Parser.CanNotResolveInfix(cursor);
+                    }
+
+                    cursor.Swallow();
+                    
+                    return infix;
+                }
             }
 
             private Expression Unary(Cursor cursor)
             {
                 return cursor.Scope<Expression>(cursor =>
                 {
-                    throw Errors.Parser.NotImplementedAt(cursor);
+                    if (cursor.More() && cursor.Current.Lex.IsOperator)
+                    {
+                        if (!Prefix.Find(cursor.Current, out var prefix))
+                        {
+                            throw Errors.Parser.CanNotResolvePrefix(cursor);
+                        }
+
+                        var rhs = Atomic(cursor);
+
+                        return new PrefixExpression(prefix, rhs);
+                    }
+
+                    return Atomic(cursor);
                 });
             }
 
@@ -223,122 +177,23 @@ namespace Fux.Parsing
             {
                 return cursor.Scope<Expression>(cursor =>
                 {
+                    if (cursor.Current.Lex.IsLiteral)
+                    {
+                        return new LiteralExpression(cursor.Advance());
+                    }
+                    if (cursor.IsIdentifier())
+                    {
+                        return new ReferenceExpression(Parser.ParseQName(cursor));
+                    }
+                    if (cursor.SwallowIf(Lex.LeftRoundBracket))
+                    {
+                        var expression = Parse(cursor);
+                        _ = cursor.Swallow(Lex.RightRoundBracket);
+                    }
+
                     throw Errors.Parser.NotImplementedAt(cursor);
                 });
             }
-        }
-
-        private Expression ParseIfExpression(Cursor cursor)
-        {
-            return cursor.Scope<Expression>(cursor =>
-            {
-                _ = cursor.Swallow(Lex.KwIf);
-
-                if (cursor.SwallowIf(Lex.LeftRoundBracket))
-                {
-                    var condition = ParseExpression(cursor);
-                    cursor.Swallow(Lex.RightRoundBracket);
-                }
-
-                throw Errors.Parser.NotImplementedAt(cursor);
-            });
-        }
-
-        private Expression ParseWasmExpression(Cursor cursor)
-        {
-            return cursor.Scope(cursor =>
-            {
-                _ = cursor.Swallow(Lex.KxWasm);
-                var sexpression = ParseSExpression(cursor);
-
-                return new WasmExpression(sexpression);
-            });
-        }
-
-        private SExpression ParseSExpression(Cursor cursor)
-        {
-            return cursor.Scope<SExpression>(cursor =>
-            {
-                _ = cursor.Swallow(Lex.LeftRoundBracket);
-                var symbol = ParseSSymbol(cursor);
-                var atoms = new List<SAtom>();
-                while (!cursor.SwallowIf(Lex.RightRoundBracket))
-                {
-                    var atom = ParseSAtom(cursor);
-                    atoms.Add(atom);
-                }
-
-                return new SExpression(symbol, atoms);
-            });
-        }
-
-        private SAtom ParseSAtom(Cursor cursor)
-        {
-            return cursor.Scope<SAtom>(cursor =>
-            {
-                if (cursor.Is(Lex.LeftRoundBracket))
-                {
-                    return ParseSExpression(cursor);
-                }
-                if (cursor.Is(Lex.WasmIdentifier))
-                {
-                    return ParseSName(cursor);
-                }
-                if (cursor.Is(Lex.Integer))
-                {
-                    return ParseSNumber(cursor);
-                }
-
-                throw Errors.Parser.NotImplementedAt(cursor);
-            });
-        }
-
-        private SSymbol ParseSSymbol(Cursor cursor)
-        {
-            return cursor.Scope(cursor =>
-            {
-                var names = new List<Name>();
-                do
-                {
-                    var name = ParseName(cursor);
-                    names.Add(name);
-                }
-                while (cursor.SwallowIf(Lex.Dot));
-
-                return new SSymbol(names);
-            });
-        }
-
-        private SName ParseSName(Cursor cursor)
-        {
-            return cursor.Scope(cursor =>
-            {
-                var names = new List<Name>();
-                var name = ParseWasmName(cursor);
-                names.Add(name);
-                while (cursor.SwallowIf(Lex.Dot))
-                {
-                    name = ParseName(cursor);
-                    names.Add(name);
-                }
-
-                var qname = new QName(names);
-
-                return new SName(qname);
-            });
-        }
-
-        private SNumber ParseSNumber(Cursor cursor)
-        {
-            return cursor.Scope(cursor =>
-            {
-                if (cursor.Is(Lex.Integer))
-                {
-                    return new SNumber(cursor.Swallow(Lex.Integer));
-                }
-
-                throw Errors.Parser.NotImplementedAt(cursor);
-            });
         }
     }
 }

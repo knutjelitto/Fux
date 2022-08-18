@@ -94,7 +94,7 @@ internal class Program
             }
         }
 
-        Console.WriteLine($"{sep}{elements.Count - 1,5} elements");
+        Console.WriteLine($"{sep}{elements.Count - 1,5} top-elements");
 
         foreach (var element in elements)
         {
