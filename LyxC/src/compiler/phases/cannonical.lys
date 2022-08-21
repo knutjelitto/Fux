@@ -1,0 +1,359 @@
+import src::lexer::tokens
+import src::parser::parser
+import src::compiler::nodes
+import src::compiler::annotations
+
+fun nameOrEmpty(astNode: AstNode): NameIdentifierNode | EmptyNode =
+  match processNode(astNode) {
+    case name is NameIdentifierNode -> name
+    else -> EmptyNode
+  }
+
+fun nameOrError(astNode: AstNode): NameIdentifierNode | ErrorNode = {
+  val x = processNode(astNode)
+  match x {
+    case name is NameIdentifierNode -> name
+    else -> ErrorNode(NodeMeta(astNode), "A name identifier was expected, got: " ++ x.nodeName())
+  }
+}
+
+fun structOrError(astNode: AstNode): StructDeclarationNode | ErrorNode = {
+  val x = processNode(astNode)
+  match x {
+    case name is StructDeclarationNode -> name
+    else -> ErrorNode(NodeMeta(astNode), "An struct declaration was expected, got: " ++ x.nodeName())
+  }
+}
+
+fun referenceOrError(astNode: AstNode): ReferenceNode | ErrorNode = {
+  val x = processNode(astNode)
+  match x {
+    case name is ReferenceNode -> name
+    else -> ErrorNode(NodeMeta(astNode), "A reference was expected, got: " ++ x.nodeName())
+  }
+}
+
+fun funOrError(astNode: AstNode): FunctionNode | ErrorNode = {
+  val x = processNode(astNode)
+  match x {
+    case name is FunctionNode -> name
+    else -> ErrorNode(NodeMeta(astNode), "A function was expected, got: " ++ x.nodeName())
+  }
+}
+
+fun fqnOrEmpty(astNode: AstNode): QNameNode | ErrorNode = {
+  val x = processNode(astNode)
+  match x {
+    case name is QNameNode -> name
+    else -> ErrorNode(NodeMeta(astNode), "A fully qualified name was expected, got: " ++ x.nodeName())
+  }
+}
+
+fun processBinaryExpression(lhs: CodeNode, astNode: AstNode): CodeNode = {
+  match astNode {
+    case is Node(name, child) -> {
+      if (name == "Op") {
+        val operator = nameOrError(first(child))
+        val rhs = processNode(rest(child))
+        BinaryExpressionNode(NodeMeta(astNode), lhs, operator, rhs)
+      } else if (name == "As") {
+        val rhs = processNode(child)
+        AsExpressionNode(NodeMeta(astNode), lhs, rhs)
+      } else if (name == "Is") {
+        val rhs = processNode(child)
+        IsExpressionNode(NodeMeta(astNode), lhs, rhs)
+      } else {
+        BinaryExpressionNode(NodeMeta(astNode), lhs, ErrorNode(NodeMeta(astNode), "Error processing bin op named: " ++ name), processNode(child))
+      }
+    }
+    case is AstCons(head, tail) -> {
+      processBinaryExpression(processBinaryExpression(lhs, head), tail)
+    }
+    else -> {
+      BinaryExpressionNode(NodeMeta(astNode), lhs, ErrorNode(NodeMeta(astNode), "Error processing bin op"), processNode(astNode))
+    }
+  }
+}
+
+fun processAtomicExpressionChild(lhs: CodeNode, astNode: AstNode): CodeNode = {
+  match astNode {
+    case is AstCons(head, tail) -> {
+      processAtomicExpressionChild(
+        processAtomicExpressionChild(lhs, head),
+        tail
+      )
+    }
+    case is Node(name, child) -> {
+      match name {
+        case "CallArguments" -> {
+          FunctionCallNode(NodeMeta(child), lhs, processNode(child), EmptyNode)
+        }
+        case "MemberExpression" -> {
+          MemberNode(NodeMeta(child), lhs, textOf(first(child)), processNode(rest(child)))
+        }
+        case "IndexExpression" -> {
+          BinaryExpressionNode(NodeMeta(astNode), lhs, NameIdentifierNode(NodeMeta(child), "[]"), processNode(child))
+        }
+        else -> {
+          // This should never happen, but you know.. we must make the type checker happy
+          ErrorNode(NodeMeta(astNode), "No handler for " ++ name)
+        }
+      }
+    }
+    else -> {
+      // This should never happen, but you know.. we must make the type checker happy
+      ErrorNode(NodeMeta(astNode), "No handler for not Node nor AstCons")
+    }
+  }
+}
+
+fun processTraitDirectives(directive: CodeNode): void = match directive {
+  case is FunDirectiveNode(function) -> {
+    match function {
+      case is FunctionNode(body) -> {
+        if (body is EmptyNode) {
+          val x: CodeNode = function
+          x.annotate(SignatureDeclaration)
+        }
+      }
+      else -> { /* noop */ }
+    }
+  }
+  case is CodeNodeCons(head, tail) -> {
+    processTraitDirectives(head)
+    processTraitDirectives(tail)
+  }
+}
+
+fun processNode(astNode: AstNode): CodeNode = match astNode {
+  case is Rule0 -> EmptyNode
+  case is UnexpectedToken -> EmptyNode
+  case is SyntaxError -> EmptyNode
+  case is Leaf(token, value) -> processNode(astNode, token, value)
+  case is AstCons(head, tail) -> CodeNodeCons(processNode(head), processNode(tail))
+  case is Node(name, child) -> match name {
+    case "NameIdentifier" -> processNode(child)
+    case "Document" -> Document(NodeMeta(astNode), processNode(child))
+    case "PrivateModifier" -> PrivateModifierNode(NodeMeta(astNode))
+    case "NoModifier" -> NoModifierNode(NodeMeta(astNode))
+    case "ImportDirective" -> ImportDirectiveNode(NodeMeta(astNode), fqnOrEmpty(first(child)), nameOrEmpty(second(child)))
+    case "QName" -> QNameNode(NodeMeta(astNode), processNode(child))
+    case "UnionType" -> UnionTypeNode(NodeMeta(astNode), processNode(child))
+    case "IntersectionType" -> IntersectionTypeNode(NodeMeta(astNode), processNode(child))
+    case "Reference" -> ReferenceNode(NodeMeta(astNode), fqnOrEmpty(child))
+    case "MatchExpression" -> PatternMatcherNode(NodeMeta(astNode), processNode(first(child)), processNode(rest(child)))
+    case "TraitDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+
+      val directives = processNode(second(resto))
+      processTraitDirectives(directives)
+
+      TraitDirectiveNode(NodeMeta(astNode), modifier, nameOrError(first(resto)), directives)
+    }
+    case "NegNumberLiteral" -> FloatLiteralNode(NodeMeta(astNode), textOf(astNode))
+    case "IfExpression" -> {
+      var condition = processNode(first(child))
+      var truePart = processNode(second(child))
+      var falsePart = processNode(third(child))
+      IfNode(NodeMeta(astNode), condition, truePart, falsePart)
+    }
+
+    case "Type" -> processNode(child)
+    case "FunctionParamsList" -> processNode(child)
+    case "Decorators" -> processNode(child)
+    case "TraitDeclElements" -> processNode(child)
+    case "TypeParameters" -> processNode(child)
+    case "ReturnType" -> processNode(child)
+    case "FunctionBody" -> processNode(child)
+    case "FunOperator" -> NameIdentifierNode(NodeMeta(astNode), textOf(astNode))
+    case "Destructure" -> processNode(child)
+    case "ReferencedType" -> processNode(child)
+    case "DeclaredName" -> processNode(child)
+    case "Literal" -> processNode(child)
+    case "MatchBody" -> processNode(child)
+    case "ContinueStatement" -> ContinueNode(NodeMeta(astNode))
+    case "BreakStatement" -> ContinueNode(NodeMeta(astNode))
+    case "LoopExpression" -> LoopNode(NodeMeta(astNode), processNode(child))
+    case "Decorator" -> DecoratorNode(NodeMeta(astNode), nameOrError(first(child)), processNode(rest(child)))
+
+    case "AtomicExpression" -> {
+      var resto = child
+      var ret = processNode(first(resto))
+      resto = rest(resto)
+
+      loop {
+        val head = first(resto)
+        resto = rest(resto)
+
+        ret = processAtomicExpressionChild(ret, head)
+
+        if (!(resto is Rule0)) {
+          continue
+        }
+      }
+
+      ret
+    }
+
+    case "WasmExpression" -> WasmExpressionNode(NodeMeta(astNode), processNode(child))
+    case "SExpression" -> WasmAtomNode(NodeMeta(astNode), textOf(first(child)), processNode(rest(child)))
+
+    case "FunctionDirective" -> {
+      val decorators = processNode(first(child))
+      var resto = rest(child)
+      val modifier = processNode(first(resto))
+
+      FunDirectiveNode(NodeMeta(astNode), decorators, modifier, funOrError(second(resto)))
+    }
+    case "FunDeclaration" -> {
+      var resto = child
+      val name = nameOrError(first(resto))
+      resto = rest(resto)
+      val typeParameters = processNode(first(resto))
+      resto = rest(resto)
+      val parameters = processNode(first(resto))
+      resto = rest(resto)
+      val returnType = processNode(first(resto))
+      resto = rest(resto)
+      val body = processNode(first(resto))
+
+      FunctionNode(NodeMeta(astNode), name, parameters, returnType, body)
+    }
+    case "StructLiteral" -> StructTypeNode(NodeMeta(astNode), processNode(child))
+    case "UnaryExpression" -> UnaryExpressionNode(NodeMeta(astNode), nameOrError(first(child)), processNode(rest(child)))
+    case "Parameter" -> ParameterNode(NodeMeta(astNode), nameOrError(first(child)), processNode(rest(child)))
+    case "EnumDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+
+      EnumDirectiveNode(NodeMeta(astNode), modifier, nameOrError(first(resto)), processNode(rest(resto)))
+    }
+    case "ImplDirective" -> {
+      var firstName = referenceOrError(first(child))
+      var secondChild = processNode(second(child))
+
+      match secondChild {
+        case r is ReferenceNode ->
+          ImplDirectiveNode(NodeMeta(astNode), r, firstName, processNode(third(child)))
+        else ->
+          ImplDirectiveNode(NodeMeta(astNode), EmptyNode, firstName, secondChild)
+      }
+    }
+    case "InjectedLiteral" -> InjectedLiteralNode(NodeMeta(astNode))
+    case "StackLiteral" -> StackLiteralNode(NodeMeta(astNode), processNode(child))
+    case "NameLiteralPair" -> NameLiteralPairNode(NodeMeta(astNode), nameOrError(first(child)), processNode(rest(child)))
+    case "StructDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+      StructDirectiveNode(NodeMeta(astNode), modifier, structOrError(resto))
+    }
+    case "StructDeclaration" -> StructDeclarationNode(NodeMeta(astNode), nameOrError(first(child)), processNode(rest(child)))
+    case "BooleanLiteral" -> BooleanLiteralNode(NodeMeta(astNode), textOf(astNode) == "true")
+    case "ParenExpression" -> processNode(child)
+    case "CaseCondition" -> {
+      var resto = child
+      val name = nameOrEmpty(first(resto))
+      resto = rest(resto)
+      val condition = processNode(first(resto))
+      resto = rest(resto)
+      val body = processNode(resto)
+      MatchConditionNode(NodeMeta(astNode), name, condition, body)
+    }
+    case "CaseLiteral" -> {
+      val literal = processNode(first(child))
+      val body = processNode(rest(child))
+      MatchLiteralNode(NodeMeta(astNode), literal, body)
+    }
+    case "CaseIs" -> {
+      var resto = child
+      val name = nameOrEmpty(first(resto))
+      resto = rest(resto)
+      val typeReference = processNode(first(resto))
+      resto = rest(resto)
+      val destructure = processNode(first(resto))
+      resto = rest(resto)
+      val body = processNode(resto)
+      MatchCaseIsNode(NodeMeta(astNode), name, typeReference, destructure, body)
+    }
+    case "CaseElse" -> {
+      val name = nameOrEmpty(first(child))
+      val body = processNode(rest(child))
+      MatchDefaultNode(NodeMeta(astNode), name, body)
+    }
+    case "AsExpression" -> processBinaryExpression(processNode(first(child)), rest(child))
+    case "IsExpression" -> processBinaryExpression(processNode(first(child)), rest(child))
+    case "BinaryOpExpression" -> processBinaryExpression(processNode(first(child)), rest(child))
+    case "CodeBlock" -> BlockNode(NodeMeta(astNode), processNode(child))
+    case "(List)" -> processNode(child)
+    case "TypeParen" -> processNode(child)
+    case "TypeDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+      TypeDirectiveNode(NodeMeta(astNode), modifier, nameOrError(first(resto)), processNode(second(resto)))
+    }
+    case "VarDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+
+      var decl: VarDeclarationNode | EmptyNode = EmptyNode
+
+      match processNode(resto) {
+        case x is VarDeclarationNode -> decl = x
+        else -> { /* error */ }
+      }
+
+      VarDirectiveNode(NodeMeta(astNode), modifier, decl)
+    }
+    case "ValDirective" -> {
+      val modifier = processNode(first(child))
+      val resto = rest(child)
+
+      var decl: VarDeclarationNode | EmptyNode = EmptyNode
+
+      match processNode(resto) {
+        case x is VarDeclarationNode -> decl = x
+        else -> { /* error */ }
+      }
+
+      VarDirectiveNode(NodeMeta(astNode), modifier, decl)
+    }
+    case "VarDeclaration" -> {
+      var name = nameOrError(first(child))
+
+      var node: CodeNode = match rest(child) {
+        case is AstCons(head, tail) -> VarDeclarationNode(NodeMeta(astNode), name, processNode(head), processNode(tail))
+        case ast is AstNode -> VarDeclarationNode(NodeMeta(astNode), name, EmptyNode, processNode(ast))
+      }
+
+      node.annotate(src::compiler::annotations::MutableDeclaration)
+
+      node
+    }
+    case "ValDeclaration" -> {
+      var name = nameOrError(first(child))
+
+      match rest(child) {
+        case is AstCons(head, tail) -> VarDeclarationNode(NodeMeta(astNode), name, processNode(head), processNode(tail))
+        case ast is AstNode -> VarDeclarationNode(NodeMeta(astNode), name, EmptyNode, processNode(ast))
+      }
+    }
+    else -> {
+      ErrorNode(NodeMeta(astNode), "No handler for " ++ name)
+    }
+  }
+}
+
+
+fun processNode(astNode: AstNode, node: Token, value: string): CodeNode = match node.tokenType {
+  case is StringLiteral -> StringLiteralNode(NodeMeta(astNode), value)
+  case is Identifier -> NameIdentifierNode(NodeMeta(astNode), value)
+  case is Operator -> NameIdentifierNode(NodeMeta(astNode), value)
+  case is NumberLiteral -> FloatLiteralNode(NodeMeta(astNode), value)
+  case is Keyword -> match value {
+    case "true" -> BooleanLiteralNode(NodeMeta(astNode), true)
+    case "false" -> BooleanLiteralNode(NodeMeta(astNode), false)
+    else -> NameIdentifierNode(NodeMeta(astNode), value)
+  }
+  else -> EmptyNode
+}

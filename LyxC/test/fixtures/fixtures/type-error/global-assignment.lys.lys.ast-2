@@ -1,0 +1,28 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=x
+      |-EmptyNode
+      |-FloatLiteralNode value=1
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=addOne
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=i32
+      |-BlockNode
+        |-BinaryExpressionNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=x
+          |-NameIdentifierNode name==
+          |-BinaryExpressionNode
+            |-ReferenceNode
+              |-QNameNode
+                |-NameIdentifierNode name=x
+            |-NameIdentifierNode name=+
+            |-BooleanLiteralNode value=false

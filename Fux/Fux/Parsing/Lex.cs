@@ -78,9 +78,12 @@ public abstract class Lex
 
     public static readonly Lex OpAssign = Add(new Fix("=", isOperator: true));
 
-    public static readonly Lex OpOr = Add(new Fix("|", isOperator: true));
-    public static readonly Lex OpAnd = Add(new Fix("&", isOperator: true));
+    public static readonly Lex OpBitOr = Add(new Fix("|", isOperator: true));
+    public static readonly Lex OpBitAnd = Add(new Fix("&", isOperator: true));
     public static readonly Lex OpXor = Add(new Fix("^", isOperator: true));
+
+    public static readonly Lex OpNot = Add(new Fix("!", isOperator: true));
+    public static readonly Lex OpBitNot = Add(new Fix("~", isOperator: true));
 
     public static readonly Lex OpOrElse = Add(new Fix("||", isOperator: true));
     public static readonly Lex OpAndThen = Add(new Fix("&&", isOperator: true));
@@ -90,9 +93,19 @@ public abstract class Lex
     public static readonly Lex LessEqual = Add(new Fix("<=", isOperator: true));
     public static readonly Lex GreaterEqual = Add(new Fix(">=", isOperator: true));
 
+    public static readonly Lex OpAdd = Add(new Fix("+", isOperator: true));
+    public static readonly Lex OpSub = Add(new Fix("-", isOperator: true));
+
+    public static readonly Lex OpMul = Add(new Fix("*", isOperator: true));
+    public static readonly Lex OpDiv = Add(new Fix("/", isOperator: true));
+    public static readonly Lex OpMod = Add(new Fix("%", isOperator: true));
+
     public static readonly Lex OpShl = Add(new Fix("<<", isOperator: true));
 
+
     public static readonly Lex OpAs = Add(new Fix("as", isOperator: true));
+
+    public static readonly Lex OpIndex = Add(new Fix("[]", isOperator: true));
 
     public static readonly Lex LeftRoundBracket = Add(new Fix("(", isBracket: true));
     public static readonly Lex RightRoundBracket = Add(new Fix(")", isBracket: true));
@@ -100,35 +113,41 @@ public abstract class Lex
     public static readonly Lex RightCurlyBracket = Add(new Fix("}", isBracket: true));
     public static readonly Lex LeftSquareBracket = Add(new Fix("[", isBracket: true));
     public static readonly Lex RightSquareBracket = Add(new Fix("]", isBracket: true));
-    public static readonly Lex LeftAngleBracket = Add(new Fix("<", isBracket: true));
-    public static readonly Lex RightAngleBracket = Add(new Fix(">", isBracket: true));
+    public static readonly Lex LeftAngleBracket = Add(new Fix("<", isBracket: true, isOperator: true));
+    public static readonly Lex RightAngleBracket = Add(new Fix(">", isBracket: true, isOperator: true));
 
     public static readonly Lex KxStack = Add(new Fix("%stack", isKeyword: true));
-    public static readonly Lex KxWasm = Add(new Fix("%wasm", isKeyword: true));
+    public static readonly Lex KxInjected = Add(new Fix("%injected", isKeyword: true));
+
+
+    public static readonly Lex KwFor = Add(new Fix("for", isKeyword: true));
+    public static readonly Lex KwFun = Add(new Fix("fun", isKeyword: true));
+    public static readonly Lex KwType = Add(new Fix("type", isKeyword: true));
+    public static readonly Lex KwTrait = Add(new Fix("trait", isKeyword: true));
+    public static readonly Lex KwStruct = Add(new Fix("struct", isKeyword: true));
+    public static readonly Lex KwEnum = Add(new Fix("enum", isKeyword: true));
 
     public static readonly Lex KwIf = Add(new Fix("if", isKeyword: true));
     public static readonly Lex KwThen = Add(new Fix("then", isKeyword: true));
     public static readonly Lex KwElse = Add(new Fix("else", isKeyword: true));
 
-    public static readonly Lex KwMatch = Add(new Fix("match", isKeyword: true));
+    public static readonly Lex KwCase = Add(new Fix("case", isKeyword: true));
+    public static readonly Lex KwOf = Add(new Fix("of", isKeyword: true));
 
     public static readonly Lex KwLoop = Add(new Fix("loop", isKeyword: true));
     public static readonly Lex KwBreak = Add(new Fix("break", isKeyword: true));
     public static readonly Lex KwContinue = Add(new Fix("continue", isKeyword: true));
 
     public static readonly Lex KwVal = Add(new Fix("val", isKeyword: true));
+    public static readonly Lex KwVar = Add(new Fix("var", isKeyword: true));
+    public static readonly Lex KwWasm = Add(new Fix("wasm", isKeyword: true));
 
-    //public static readonly Lex KwAs = Add(new Fix("as", isKeyword: true));
-    //public static readonly Lex KwIs = Add(new Fix("is", isKeyword: true));
+    public static readonly Lex KwAs = Add(new Fix("as", isKeyword: true, isOperator: true));
+    public static readonly Lex KwIs = Add(new Fix("is", isKeyword: true, isOperator: true));
 
-    public static readonly Lex KwCase = Add(new Fix("case", isKeyword: true));
-    public static readonly Lex KwClass = Add(new Fix("class", isKeyword: true));
-    public static readonly Lex KwFun = Add(new Fix("fun", isKeyword: true));
     public static readonly Lex KwImpl = Add(new Fix("impl", isKeyword: true));
-    public static readonly Lex KwOf = Add(new Fix("of", isKeyword: true));
     public static readonly Lex KwLet = Add(new Fix("let", isKeyword: true));
     public static readonly Lex KwIn = Add(new Fix("in", isKeyword: true));
-    public static readonly Lex KwType = Add(new Fix("type", isKeyword: true));
     public static readonly Lex KwModule = Add(new Fix("module", isKeyword: true));
     public static readonly Lex KwImport = Add(new Fix("import", isKeyword: true));
     public static readonly Lex KwInfix = Add(new Fix("infix", isKeyword: true));
@@ -137,6 +156,7 @@ public abstract class Lex
     public static readonly Lex KwExposing = Add(new Fix("exposing", isKeyword: true));
     public static readonly Lex KwPort = Add(new Fix("port", isKeyword: true));
     public static readonly Lex KwWhere = Add(new Fix("where", isKeyword: true));
+    public static readonly Lex KwWhen = Add(new Fix("when", isKeyword: true));
     public static readonly Lex KwInstance = Add(new Fix("instance", isKeyword: true));
     public static readonly Lex KwNamespace = Add(new Fix("namespace", isKeyword: true));
 

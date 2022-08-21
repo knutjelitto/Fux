@@ -1,0 +1,15 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=a
+      |-EmptyNode
+      |-FloatLiteralNode value=1
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=i32
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=a

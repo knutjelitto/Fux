@@ -1,0 +1,11 @@
+|-Document
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=test
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=f32
+      |-BooleanLiteralNode value=false

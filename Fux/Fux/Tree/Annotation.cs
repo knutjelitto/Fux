@@ -1,15 +1,15 @@
 ﻿namespace Fux.Tree
 {
-    public class Annotation : Node
+    public class Annotation : NodeBase
     {
-        public Annotation(Name name, IReadOnlyList<Expression> arguments)
+        public Annotation(Name name, Expressions arguments)
         {
             Name = name;
             Arguments = arguments;
         }
 
         public Name Name { get; }
-        public IReadOnlyList<Expression> Arguments { get; }
+        public Expressions Arguments { get; }
 
         public override string ToString()
         {
@@ -22,6 +22,11 @@
     {
         public Annotations(IEnumerable<Annotation> annotations)
             : base(annotations)
+        {
+        }
+
+        public Annotations()
+            : base(Enumerable.Empty<Annotation>())
         {
         }
 

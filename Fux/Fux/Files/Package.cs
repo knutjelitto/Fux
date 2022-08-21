@@ -2,130 +2,129 @@
 using Microsoft.Extensions.FileSystemGlobbing;
 using Microsoft.Extensions.FileSystemGlobbing.Abstractions;
 
-namespace Fux.Files;
-
-public class Package
+namespace Fux.Files
 {
-    public const string PackageFileName = "FuxPackage.json";
-
-    private readonly List<Package> dependencies = new();
-    private readonly List<Source> exposed = new();
-    private readonly Dictionary<string, Source> exposedIndex = new();
-    private readonly List<Source> intern = new();
-    private readonly Dictionary<string, Source> internIndex = new();
-
-    public Package(Repository repo, Path path)
+    public class Package
     {
-        Repo = repo;
-        Path = path;
+        public const string PackageFileName = "FuxPackage.json";
 
-        Json = Bind();
-        Glob();
-    }
+        private readonly List<Package> dependencies = new();
+        private readonly List<Source> exposed = new();
+        private readonly Dictionary<string, Source> exposedIndex = new();
+        private readonly List<Source> intern = new();
+        private readonly Dictionary<string, Source> internIndex = new();
 
-    public Repository Repo { get; }
-    public Path Path { get; }
-    public string Name => Json.Name;
-    public List<Source> Sources { get; } = new();
-    public List<Package> Dependencies { get; } = new();
-    public PackageConfig Json { get; }
-    public Path FullPath => Repo.Root / Path;
-    public Path FullPackageFileName => FullPath / PackageFileName;
-    public Path FullSourceFileName(Source sourceFile) => FullPath / sourceFile.Path;
-
-    public IReadOnlyList<Source> Exposed => exposed;
-    public IReadOnlyList<Source> Intern => intern;
-    public IEnumerable<Source> Modules => exposed.Concat(intern);
-
-    private void Glob()
-    {
-        var matcher = new Matcher();
-        foreach (var pattern in Json.Sources)
+        public Package(Repository repo, Path path)
         {
-            _ = matcher.AddInclude(pattern);
+            Repo = repo;
+            Path = path;
+
+            Json = Bind();
+            Glob();
         }
 
-        var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(FullPath)));
+        public Repository Repo { get; }
+        public Path Path { get; }
+        public string Name => Json.Name;
+        public List<Source> Sources { get; } = new();
+        public List<Package> Dependencies { get; } = new();
+        public PackageConfig Json { get; }
+        public Path FullPath => Repo.Root / Path;
+        public Path FullPackageFileName => FullPath / PackageFileName;
+        public Path FullSourceFileName(Source sourceFile) => FullPath / sourceFile.Path;
 
-        foreach (var sourceFile in matches.Files.Select(sm => new Source(this, sm.Path)))
+        public IReadOnlyList<Source> Exposed => exposed;
+        public IReadOnlyList<Source> Intern => intern;
+        public IEnumerable<Source> Modules => exposed.Concat(intern);
+
+        private void Glob()
         {
-            Sources.Add(sourceFile);
-        }
-    }
+            var matcher = new Matcher();
+            matcher.AddIncludePatterns(Json.Include);
+            matcher.AddExcludePatterns(Json.Exclude);
 
-    private PackageConfig Bind()
-    {
-        var cfg = new ConfigurationBuilder()
-            .AddJsonFile(FullPackageFileName)
-            .Build();
+            var matches = matcher.Execute(new DirectoryInfoWrapper(new IO.DirectoryInfo(FullPath)));
 
-        return cfg.Get<PackageConfig>();
-    }
-
-    public void AddDependency(Package dependency) => dependencies.Add(dependency);
-
-    public void AddExposed(Source module)
-    {
-        exposed.Add(module);
-        exposedIndex.Add(module.Name, module);
-    }
-
-    public void AddIntern(Source module)
-    {
-        intern.Add(module);
-        internIndex.Add(module.Name, module);
-    }
-
-    public Source? TryGetExposed(string name) => exposedIndex.TryGetValue(name, out var module) ? module : null;
-
-    public Source? FindImport(string importPath)
-    {
-        var module = FindIntern(importPath);
-
-        if (module == null)
-        {
-            foreach (var dependency in dependencies)
+            foreach (var sourceFile in matches.Files.Select(sm => new Source(this, sm.Path)))
             {
-                module = dependency.FindExtern(importPath);
+                Sources.Add(sourceFile);
+            }
+        }
 
-                if (module != null)
+        private PackageConfig Bind()
+        {
+            var cfg = new ConfigurationBuilder()
+                .AddJsonFile(FullPackageFileName)
+                .Build();
+
+            return cfg.Get<PackageConfig>();
+        }
+
+        public void AddDependency(Package dependency) => dependencies.Add(dependency);
+
+        public void AddExposed(Source module)
+        {
+            exposed.Add(module);
+            exposedIndex.Add(module.Name, module);
+        }
+
+        public void AddIntern(Source module)
+        {
+            intern.Add(module);
+            internIndex.Add(module.Name, module);
+        }
+
+        public Source? TryGetExposed(string name) => exposedIndex.TryGetValue(name, out var module) ? module : null;
+
+        public Source? FindImport(string importPath)
+        {
+            var module = FindIntern(importPath);
+
+            if (module == null)
+            {
+                foreach (var dependency in dependencies)
                 {
-                    break;
+                    module = dependency.FindExtern(importPath);
+
+                    if (module != null)
+                    {
+                        break;
+                    }
                 }
             }
-        }
 
-        if (module == null)
-        {
-            foreach (var dependency in dependencies)
+            if (module == null)
             {
-                module = dependency.FindIntern(importPath);
-
-                if (module != null)
+                foreach (var dependency in dependencies)
                 {
-                    break;
+                    module = dependency.FindIntern(importPath);
+
+                    if (module != null)
+                    {
+                        break;
+                    }
                 }
             }
+
+            return module;
         }
 
-        return module;
-    }
+        private Source? FindIntern(string name) => exposedIndex.TryGetValue(name, out var module) ? module : internIndex.TryGetValue(name, out module) ? module : module;
 
-    private Source? FindIntern(string name) => exposedIndex.TryGetValue(name, out var module) ? module : internIndex.TryGetValue(name, out module) ? module : module;
+        private Source? FindExtern(string importPath) => exposedIndex.TryGetValue(importPath, out var module) ? module : null;
 
-    private Source? FindExtern(string importPath) => exposedIndex.TryGetValue(importPath, out var module) ? module : null;
+        public override string ToString() => Name;
 
-    public override string ToString() => Name;
-
-    public void Dump(Writer writer, IEnumerable<Source> files)
-    {
-        writer.WriteLine($"package {Name} ({FullPackageFileName})");
-        writer.Indent(() =>
+        public void Dump(Writer writer, IEnumerable<Source> files)
         {
-            foreach (var module in files)
+            writer.WriteLine($"package {Name} ({FullPackageFileName})");
+            writer.Indent(() =>
             {
-                module.Dump(writer);
-            }
-        });
+                foreach (var module in files)
+                {
+                    module.Dump(writer);
+                }
+            });
+        }
     }
 }

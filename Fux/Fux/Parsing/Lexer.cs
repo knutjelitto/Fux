@@ -87,22 +87,19 @@ public sealed class Lexer
                 }
 
             case '|' when Next != '|':
-                return Build(Lex.OpOr, 1);
+                return Build(Lex.OpBitOr, 1);
 
             case '|' when Next == '|':
                 return Build(Lex.OpOrElse, 2);
 
             case '&' when Next != '&':
-                return Build(Lex.OpAnd, 1);
+                return Build(Lex.OpBitAnd, 1);
 
             case '&' when Next == '&':
                 return Build(Lex.OpAndThen, 2);
 
             case '^':
                 return Build(Lex.OpXor, 1);
-
-            case 'a' when Is(1, 's') && !Is(2, IsLetterOrDigit):
-                return Build(Lex.OpAs, 2);
 
             case '\\' when !Next.IsSymbol():
                 return Build(Lex.Lambda, 1);
@@ -112,6 +109,27 @@ public sealed class Lexer
 
             case '=' when Next == '>':
                 return Build(Lex.BoldArrow, 2);
+
+            case '+' when Next != '+':
+                return Build(Lex.OpAdd, 1);
+
+            case '-':
+                return Build(Lex.OpSub, 1);
+
+            case '*':
+                return Build(Lex.OpMul, 1);
+
+            case '%' when Is(1, IsLower):
+                return XIdentifier();
+
+            case '%':
+                return Build(Lex.OpMod, 1);
+
+            case '/':
+                return Build(Lex.OpDiv, 1);
+
+            case '~':
+                return Build(Lex.OpBitNot, 1);
 
             case '"' when Next == '"' && Is(2, '"'):
                 return LongString();
@@ -128,8 +146,11 @@ public sealed class Lexer
             case '}':
                 return Build(Lex.RightCurlyBracket, 1);
 
-            case '[':
+            case '[' when Next != ']':
                 return Build(Lex.LeftSquareBracket, 1);
+
+            case '[' when Next == ']':
+                return Build(Lex.OpIndex, 2);
 
             case ']':
                 return Build(Lex.RightSquareBracket, 1);
@@ -140,14 +161,23 @@ public sealed class Lexer
             case '!' when Next == '=':
                 return Build(Lex.Unequal, 2);
 
+            case '!':
+                return Build(Lex.OpNot, 1);
+
             case '<' when Next == '=':
                 return Build(Lex.LessEqual, 2);
 
             case '<' when Next == '<':
                 return Build(Lex.OpShl, 2);
 
+            case '<':
+                return Build(Lex.LeftAngleBracket, 1);
+
             case '>' when Next == '=':
                 return Build(Lex.GreaterEqual, 2);
+
+            case '>':
+                return Build(Lex.RightAngleBracket, 1);
 
             case '.' when !Is(1, '^'):
                 return Build(Lex.Dot, 1);
@@ -160,9 +190,6 @@ public sealed class Lexer
 
             case ':' when !Next.IsSymbol():
                 return Build(Lex.Colon, 1);
-
-            case '%' when Is(1, IsLower):
-                return XIdentifier();
 
             case '=':
                 return Build(Lex.OpAssign, 1);
@@ -197,10 +224,12 @@ public sealed class Lexer
                 {
                     return Build(Number());
                 }
+#if false
                 else if (Current.IsSymbol())
                 {
                     return Build(Operator());
                 }
+#endif
                 break;
         }
 

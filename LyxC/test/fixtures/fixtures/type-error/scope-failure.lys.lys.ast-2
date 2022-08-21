@@ -1,0 +1,28 @@
+|-Document
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=isComplex
+      |-ParameterNode
+        |-NameIdentifierNode name=number
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=ref
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=boolean
+      |-PatternMatcherNode
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=number
+        |-MatchCaseIsNode
+          |-NameIdentifierNode name=x
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=Real
+          |-NameIdentifierNode name=_
+          |-BooleanLiteralNode value=false
+        |-MatchDefaultNode
+          |-EmptyNode
+          |-BooleanLiteralNode value=false

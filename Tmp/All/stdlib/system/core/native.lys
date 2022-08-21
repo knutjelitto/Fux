@@ -1,4 +1,4 @@
-import system::core::boolean
+import system::core::bool
 import system::core::u32
 import system::core::i32
 import system::core::u64
@@ -8,80 +8,71 @@ type ref = %injected
 type never = %injected
 type UnsafeCPointer = %stack { lowLevelType="i32" byteSize=4 }
 
-fun addressFromRef(pointer: ref): u32 = %wasm {
-  (i32.wrap_i64 (get_local $pointer))
-}
+fun addressFromRef(pointer: ref): u32 => wasm
+    (i32.wrap_i64 (local.get $pointer))
 
-fun panic(): never = %wasm { (unreachable) }
+fun panic(): never => wasm (unreachable)
+fun identity<T>(x: T): i32 => x
 
-impl never {
-  fun apply(): never = %wasm {
-    (unreachable)
-  }
-}
+impl never
+    fun apply(): never => wasm (unreachable)
 
-trait Reference {
-  fun is(lhs: ref): boolean
-  fun as(lhs: ref): ref
-}
+trait Reference
+    fun as (lhs: ref): ref
+    fun is (lhs: ref): bool
 
-impl Reference for ref {
-  fun is(lhs: ref): boolean = true
-  fun as(lhs: ref): ref = lhs
-}
+trait Equateable<T>
+    fun == (lhs: T, rhs: T): bool
+    fun != (lhs: T, rhs: T): bool => !(lhs == rhs)
 
-impl ref {
-  fun ==(lhs: ref, rhs: ref): boolean = %wasm { (i64.eq (get_local $lhs) (get_local $rhs)) }
-  fun !=(lhs: ref, rhs: ref): boolean = %wasm { (i64.ne (get_local $lhs) (get_local $rhs)) }
+trait Comparable<T> : Equateable<T>
+    fun <= (lhs: T, rhs: T): bool
+    fun >= (lhs: T, rhs: T): bool
+    fun <  (lhs: T, rhs: T): bool
+    fun > (lhs: T, rhs: T): bool
 
-  /**
-   * CPointer implicit coercion.
-   */
-  fun as(self: ref): UnsafeCPointer = %wasm {
-    (call $addressFromRef (get_local $self))
-  }
+impl Reference for ref
+    fun is (lhs: ref): bool => true
+    fun as (lhs: ref): ref => lhs
 
-  /**
-   * Gets the discriminant of a reference pointer.
-   */
-  #[inline]
-  fun getDiscriminant(reference: ref): u32 = %wasm {
-    (i32.wrap_i64
-      (i64.shr_u
-        (local.get $reference)
-        (i64.const 32)
-      )
-    )
-  }
+impl Equateable for ref
+    fun == (lhs: ref, rhs: ref): bool => wasm (i64.eq (local.get $lhs) (local.get $rhs))
+    fun != (lhs: ref, rhs: ref): bool => wasm (i64.ne (local.get $lhs) (local.get $rhs))
 
-  fun store(lhs: ref, rhs: ref): void = %wasm {
-    (i64.store (call $addressFromRef (get_local $lhs)) (get_local $rhs))
-  }
+impl ref
+    /**
+     * CPointer implicit coercion.
+     */
+    fun as (self: ref): UnsafeCPointer => wasm (call $addressFromRef (local.get $self))
 
-  fun store(lhs: ref, rhs: ref, offset: u32): void = %wasm {
-    (i64.store
-      (i32.add
-        (get_local $offset)
-        (call $addressFromRef (get_local $lhs))
-      )
-      (get_local $rhs)
-    )
-  }
+    /**
+     * Gets the discriminant of a reference pointer.
+     */
+    inline fun getDiscriminant(reference: ref): u32 => wasm
+        (i32.wrap_i64
+            (i64.shr_u
+                (local.get $reference)
+                (i64.const 32)))
 
-  fun load(lhs: ref): ref = %wasm {
-    (i64.load (call $addressFromRef (get_local $lhs)))
-  }
+    fun store(lhs: ref, rhs: ref): void => wasm
+        (i64.store (call $addressFromRef (local.get $lhs)) (local.get $rhs))
 
-  fun load(lhs: ref, offset: u32): ref = %wasm {
-    (i64.load
-      (i32.add
-        (get_local $offset)
-        (call $addressFromRef (get_local $lhs))
-      )
-    )
-  }
-}
+    fun store(lhs: ref, rhs: ref, offset: u32): void => wasm
+        (i64.store
+            (i32.add
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs)))
+            (local.get $rhs))
 
+    fun load(lhs: ref): ref => wasm
+        (i64.load (call $addressFromRef (local.get $lhs)))
+
+    fun load(lhs: ref, offset: u32): ref => wasm
+        (i64.load
+            (i32.add
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs))))
+  
 /**
  * Safe conversions:
  *   u8     i16, u16, i32, u32, i64, u64, f32, f64

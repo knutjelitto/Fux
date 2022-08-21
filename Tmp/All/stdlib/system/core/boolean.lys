@@ -2,53 +2,52 @@ import system::core::native
 import system::core::u32
 import system::core::i32
 
-type boolean = %stack { lowLevelType="i32" byteSize=1 }
+type bool = %stack { lowLevelType="i32" byteSize=1 }
 
-impl boolean
-    
-    wasm fun (&&) (lhs: boolean, rhs: boolean): boolean
-        (i32.and
-            (i32.ne (get_local $lhs) (i32.const 0))
-            (i32.ne (get_local $rhs) (i32.const 0)))
-
-    wasm fun (||) (lhs: boolean, rhs: boolean): boolean
-        (i32.or
-            (i32.ne (get_local $lhs) (i32.const 0))
-            (i32.ne (get_local $rhs) (i32.const 0)))
-
-    wasm fun (==) (lhs: boolean, rhs: boolean): boolean 
+impl bool
+    fun == (lhs: bool, rhs: bool): bool => wasm
         (i32.eq
-            (i32.eqz (get_local $lhs))
-            (i32.eqz (get_local $rhs)))
+            (i32.eqz (local.get $lhs))
+            (i32.eqz (local.get $rhs)))
 
-    wasm fun (!=) (lhs: boolean, rhs: boolean): boolean 
+    fun != (lhs: bool, rhs: bool): bool => wasm
         (i32.ne
-            (i32.eqz (get_local $lhs))
-            (i32.eqz (get_local $rhs)))
+            (i32.eqz (local.get $lhs))
+            (i32.eqz (local.get $rhs)))
+
+    fun && (lhs: bool, rhs: bool): bool => wasm
+        (i32.and
+            (i32.ne (local.get $lhs) (i32.const 0))
+            (i32.ne (local.get $rhs) (i32.const 0)))
+
+    fun || (lhs: bool, rhs: bool): bool => wasm
+        (i32.or
+            (i32.ne (local.get $lhs) (i32.const 0))
+            (i32.ne (local.get $rhs) (i32.const 0)))
 
 
-    fun (!) (rhs: boolean): boolean
+    fun ! (rhs: bool): bool =>
         if rhs then false else true
 
-    wasm fun store(lhs: ref, rhs: boolean): void 
+    fun store(lhs: ref, rhs: bool): void => wasm
         (i32.store8
-            (call $addressFromRef (get_local $lhs))
-            (get_local $rhs))
+            (call $addressFromRef (local.get $lhs))
+            (local.get $rhs))
 
-    wasm fun store(lhs: ref, rhs: boolean, offset: u32): void 
+    fun store(lhs: ref, rhs: bool, offset: u32): void => wasm
         (i32.store8
             (i32.add
-                (get_local $offset)
-                (call $addressFromRef (get_local $lhs))
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs))
             )
-            (get_local $rhs))
+            (local.get $rhs))
 
-    wasm fun load(lhs: ref): boolean
-        (i32.load8_u (call $addressFromRef (get_local $lhs)))
+    fun load(lhs: ref): bool => wasm
+        (i32.load8_u (call $addressFromRef (local.get $lhs)))
 
-    wasm fun load(lhs: ref, offset: u32): boolean 
+    fun load(lhs: ref, offset: u32): bool => wasm
         (i32.load8_u
             (i32.add
-                (get_local $offset)
-                (call $addressFromRef (get_local $lhs))
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs))
             ))

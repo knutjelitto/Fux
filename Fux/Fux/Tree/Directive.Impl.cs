@@ -1,13 +1,16 @@
-﻿namespace Fux.Tree;
-
-public class ImplDirective : Directive
+﻿namespace Fux.Tree
 {
-    public ImplDirective(Name name, IReadOnlyList<Element> elements)
+    public class ImplDirective : Directive
     {
-        Name = name;
-        Elements = elements;
-    }
+        public ImplDirective(Name name, NominalType? forType, Elements elements)
+        {
+            Name = name;
+            ForType = forType;
+            Elements = elements;
+        }
 
-    public Name Name { get; }
-    public IReadOnlyList<Element> Elements { get; }
+        public Name Name { get; }
+        public NominalType? ForType { get; }
+        public Elements Elements { get; }
+    }
 }

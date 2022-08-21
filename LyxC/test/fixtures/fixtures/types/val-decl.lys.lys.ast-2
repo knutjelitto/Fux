@@ -1,0 +1,21 @@
+|-Document
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=test
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=i32
+      |-BlockNode
+        |-VarDeclarationNode
+          |-NameIdentifierNode name=test
+          |-EmptyNode
+          |-FloatLiteralNode value=1
+        |-BinaryExpressionNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=test
+          |-NameIdentifierNode name=+
+          |-FloatLiteralNode value=2

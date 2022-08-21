@@ -1,0 +1,17 @@
+import support::env
+import support::test
+
+#[export]
+fun test(): void = {
+
+  // print blank lines until it covers the screen
+  support::env::printf("\u001B[2J")
+
+  // clear the scrollback
+  support::env::printf("\u001b[H\u001b[2J\u001b[3J")
+
+  test::suite::helpers::testHelpers()
+  test::suite::parser::test()
+  test::suite::grammar::test()
+  test::suite::language::test()
+}

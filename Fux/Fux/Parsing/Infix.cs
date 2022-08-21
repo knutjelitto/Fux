@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Fux.Tree;
+
 namespace Fux.Parsing
 {
     public enum Assoc
@@ -14,7 +16,7 @@ namespace Fux.Parsing
         Right
     }
 
-    public class Prefix
+    public class Prefix : NodeBase, Leaf
     {
         private static readonly Dictionary<string, Prefix> table = new();
 
@@ -30,8 +32,13 @@ namespace Fux.Parsing
             return table.TryGetValue(token.Text, out infix);
         }
 
+        public static bool Find(string text, [MaybeNullWhen(false)] out Prefix infix)
+        {
+            return table.TryGetValue(text, out infix);
+        }
+
         private static readonly Prefix Not = add(new("!"));
-        private static readonly Prefix BinNot = add(new("~"));
+        private static readonly Prefix BitNot = add(new("~"));
         private static readonly Prefix Negate = add(new("-"));
 
         private Prefix(string name)
@@ -40,9 +47,10 @@ namespace Fux.Parsing
         }
 
         public string Name { get; }
+        public string Text => Name;
     }
 
-    public class Infix
+    public class Infix : NodeBase, Leaf
     {
         private static readonly Dictionary<string, Infix> table = new Dictionary<string, Infix>();
 
@@ -56,6 +64,11 @@ namespace Fux.Parsing
         public static bool Find(Token token, [MaybeNullWhen(false)] out Infix infix)
         {
             return table.TryGetValue(token.Text, out infix);
+        }
+
+        public static bool Find(string text, [MaybeNullWhen(false)] out Infix infix)
+        {
+            return table.TryGetValue(text, out infix);
         }
 
         private static readonly Infix Assign = add(new("=", 10, Assoc.Right));
@@ -91,5 +104,12 @@ namespace Fux.Parsing
         public string Name { get; }
         public int Power { get; }
         public Assoc Assoc { get; }
+
+        public string Text => Name;
+
+        public override string ToString()
+        {
+            return $"[{Name}:{Power}:{Assoc}]";
+        }
     }
 }

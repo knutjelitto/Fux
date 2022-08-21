@@ -1,0 +1,27 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode name=a
+      |-EmptyNode
+      |-StringLiteralNode value="asdasd"
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode
+      |-NameIdentifierNode name=b
+      |-EmptyNode
+      |-StringLiteralNode value="utf «【】»"
+  |-FunDirectiveNode
+    |-DecoratorNode
+      |-NameIdentifierNode name=export
+      |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=main
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=string
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=a

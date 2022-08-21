@@ -1,0 +1,79 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=a
+      |-EmptyNode
+      |-FloatLiteralNode value=1
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=b
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=a
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=c
+      |-EmptyNode
+      |-FloatLiteralNode value=1
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=d
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=c
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=x1
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=i32
+      |-BlockNode
+        |-FunctionNode
+          |-NameIdentifierNode name=Y
+          |-EmptyNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=i32
+          |-FloatLiteralNode value=1
+        |-FunctionCallNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=Y
+          |-EmptyNode
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=x2
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=i32
+      |-BlockNode
+        |-VarDeclarationNode MutableDeclaration
+          |-NameIdentifierNode name=n
+          |-EmptyNode
+          |-FloatLiteralNode value=1
+        |-FunctionNode
+          |-NameIdentifierNode name=Y
+          |-EmptyNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=i32
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=n
+        |-FunctionCallNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=Y
+          |-EmptyNode

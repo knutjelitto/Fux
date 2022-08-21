@@ -8,7 +8,7 @@ using Fux.TypeSystem.Abstract;
 
 namespace Fux.Tree
 {
-    public class ListOf<T> : Node, IReadOnlyList<T>
+    public class ListOf<T> : NodeBase, IReadOnlyList<T>
     {
         protected readonly List<T> items;
 

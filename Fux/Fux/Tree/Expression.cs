@@ -1,22 +1,110 @@
 ﻿using Fux.Parsing;
 
+#pragma warning disable IDE1006 // Naming Styles
+
 namespace Fux.Tree
 {
-    public abstract class Expression : Node
+    public interface Expression : Node
     {
     }
 
-    public class WasmExpression : Expression
+    public class Expressions : ListOf<Expression>
     {
-        public WasmExpression(SExpression expression)
+        public Expressions(IEnumerable<Expression> items) : base(items)
+        {
+        }
+    }
+
+    public class ExpressionBase : NodeBase, Expression
+    { }
+
+    public class WasmExpression : ListOf<SExpression>, Expression
+    {
+        public WasmExpression(IEnumerable<SExpression> items) : base(items)
+        {
+        }
+    }
+
+    public class Block : ListOf<Expression>, Expression
+    {
+        public Block(IEnumerable<Expression> expressions)
+            : base(expressions)
+        {
+        }
+        public Block(Expression expression)
+            : base(Enumerable.Repeat(expression, 1))
+        {
+        }
+
+        public override string ToString() => string.Join(" ; ", this);
+    }
+
+    public class CaseExpression : ExpressionBase
+    {
+        public CaseExpression(Expression value, CaseMatches cases)
+        {
+            Value = value;
+            Cases = cases;
+        }
+
+        public Expression Value { get; }
+        public CaseMatches Cases { get; }
+    }
+
+    public class CaseMatch : NodeBase
+    {
+        public CaseMatch(Expression pattern, Expression value)
+        {
+            Pattern = pattern;
+            Value = value;
+        }
+
+        public Expression Pattern { get; }
+        public Expression Value { get; }
+    }
+
+    public class CaseMatches : ListOf<CaseMatch>
+    {
+        public CaseMatches(IEnumerable<CaseMatch> items) : base(items)
+        {
+        }
+    }
+
+    public class LoopExpression : ExpressionBase
+    {
+        public LoopExpression(Expression expression)
         {
             Expression = expression;
         }
 
-        public SExpression Expression { get; }
+        public Expression Expression { get; }
     }
 
-    public class IfExpression : Expression
+    public class WhenExpression : ExpressionBase
+    {
+        public WhenExpression(Expression condition, Expression whenTrue)
+        {
+            Condition = condition;
+            WhenTrue = whenTrue;
+        }
+
+        public Expression Condition { get; }
+        public Expression WhenTrue { get; }
+    }
+
+    public class BreakExpression : ExpressionBase
+    {
+        public BreakExpression(Expression value, Expression? condition)
+        {
+            Value = value;
+            Condition = condition;
+        }
+
+        public Expression Value { get; }
+        public Expression? Condition { get; }
+    }
+
+    public class IfExpression : ExpressionBase
     {
         public IfExpression(Expression condition, Expression whenTrue, Expression whenFalse)
         {
@@ -30,9 +118,9 @@ namespace Fux.Tree
         public Expression WhenFalse { get; }
     }
 
-    public class ValExpression : Expression
+    public class ValExpression : ExpressionBase
     {
-        public ValExpression(Name name, Type type, Expression expression)
+        public ValExpression(Name name, Type? type, Expression expression)
         {
             Name = name;
             Type = type;
@@ -40,11 +128,37 @@ namespace Fux.Tree
         }
 
         public Name Name { get; }
-        public Type Type { get; }
+        public Type? Type { get; }
         public Expression Expression { get; }
+
+        public override string ToString()
+        {
+            var type = Type is null ? "" : ": {Type}";
+            return $"val {Name}{type} = {Expression}";
+        }
     }
 
-    public class InfixExpression : Expression
+    public class VarExpression : ExpressionBase
+    {
+        public VarExpression(Name name, Type? type, Expression value)
+        {
+            Name = name;
+            Type = type;
+            Value = value;
+        }
+
+        public Name Name { get; }
+        public Type? Type { get; }
+        public Expression Value { get; }
+
+        public override string ToString()
+        {
+            var type = Type is null ? "" : ": {Type}";
+            return $"var {Name}{type} = {Value}";
+        }
+    }
+
+    public class InfixExpression : ExpressionBase
     {
         public InfixExpression(Infix infix, Expression lhs, Expression rhs)
         {
@@ -56,9 +170,11 @@ namespace Fux.Tree
         public Infix Infix { get; }
         public Expression Lhs { get; }
         public Expression Rhs { get; }
+
+        public override string ToString() => $"({Lhs} {Infix.Name} {Rhs})";
     }
 
-    public class PrefixExpression : Expression
+    public class PrefixExpression : ExpressionBase
     {
         public PrefixExpression(Prefix prefix, Expression rhs)
         {
@@ -70,7 +186,7 @@ namespace Fux.Tree
         public Expression Rhs { get; }
     }
 
-    public class MemberExpression : Expression
+    public class MemberExpression : ExpressionBase
     {
         public MemberExpression(Expression primary, Name member)
         {
@@ -80,9 +196,11 @@ namespace Fux.Tree
 
         public Expression Primary { get; }
         public Name Member { get; }
+
+        public override string ToString() => $"{Primary}.{Member}";
     }
 
-    public class SpecialMemberExpression : Expression
+    public class SpecialMemberExpression : ExpressionBase
     {
         public SpecialMemberExpression(Expression primary, Name member)
         {
@@ -94,7 +212,7 @@ namespace Fux.Tree
         public Name Member { get; }
     }
 
-    public class IndexExpression : Expression
+    public class IndexExpression : ExpressionBase
     {
         public IndexExpression(Expression primary, Expression index)
         {
@@ -106,19 +224,21 @@ namespace Fux.Tree
         public Expression Index { get; }
     }
 
-    public class CallExpression : Expression
+    public class CallExpression : ExpressionBase
     {
-        public CallExpression(Expression primary, CallArguments arguments)
+        public CallExpression(Expression primary, Expressions arguments)
         {
             Primary = primary;
             Arguments = arguments;
         }
 
         public Expression Primary { get; }
-        public CallArguments Arguments { get; }
+        public Expressions Arguments { get; }
+
+        public override string ToString() => $"{Primary}({string.Join(", ", Arguments)})";
     }
 
-    public class LiteralExpression : Expression
+    public class LiteralExpression : ExpressionBase, Leaf
     {
         public LiteralExpression(Token token)
         {
@@ -126,30 +246,43 @@ namespace Fux.Tree
         }
 
         public Token Token { get; }
+
+        public string Text => Token.Text;
+
+        public override string ToString() => $"lit:{Token.Text}";
     }
 
-    public class ReferenceExpression : Expression
+    public class ReferenceExpression : ExpressionBase
     {
         public ReferenceExpression(QName qname)
         {
-            Qname = qname;
+            QName = qname;
         }
 
-        public QName Qname { get; }
+        public QName QName { get; }
+
+        public override string ToString() => $"{QName}";
     }
 
-    public abstract class SAtom : Node { }
+    public abstract class SAtom : NodeBase { }
 
     public class SExpression : SAtom
     {
-        public SExpression(SSymbol symbol, IReadOnlyList<SAtom> atoms)
+        public SExpression(SSymbol symbol, SAtoms atoms)
         {
             Symbol = symbol;
             Atoms = atoms;
         }
 
         public SSymbol Symbol { get; }
-        public IReadOnlyList<SAtom> Atoms { get; }
+        public SAtoms Atoms { get; }
+    }
+
+    public class SAtoms : ListOf<SAtom>
+    {
+        public SAtoms(IEnumerable<SAtom> items) : base(items)
+        {
+        }
     }
 
     public class SName : SAtom
@@ -162,27 +295,40 @@ namespace Fux.Tree
         public QName Name { get; }
     }
 
-    public class SNumber : SAtom
+    public class SNumber : SAtom, Leaf
     {
-        public SNumber(Token token)
+        public SNumber(Token token, bool minus)
         {
             Token = token;
+            Minus = minus;
         }
 
         public Token Token { get; }
+        public bool Minus { get; }
+
+        public string Text
+        {
+            get
+            {
+                var sign = Minus ? "-" : "";
+                return $"{sign}{Token.Text}";
+            }
+        }
     }
 
-    public class SSymbol : SAtom
+    public class SSymbol : SAtom, Leaf
     {
-        public SSymbol(IReadOnlyList<Name> name)
+        public SSymbol(IReadOnlyList<Name> names)
         {
-            Name = name;
+            Names = names;
         }
 
-        public IReadOnlyList<Name> Name { get; }
+        public IReadOnlyList<Name> Names { get; }
+
+        public string Text => string.Join(".", Names.Select(n => n.Text));
     }
 
-    public class OpNode : Node
+    public class OpNode : NodeBase
     {
         public OpNode(Token op, Expression next)
         {

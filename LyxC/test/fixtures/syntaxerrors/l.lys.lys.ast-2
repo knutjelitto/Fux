@@ -1,0 +1,13 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=a
+      |-EmptyNode
+      |-PatternMatcherNode
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=x
+        |-MatchDefaultNode
+          |-EmptyNode
+          |-EmptyNode

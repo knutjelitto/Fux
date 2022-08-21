@@ -1,0 +1,32 @@
+fun != (lhs: bytes, rhs: bytes): boolean =>
+    !(lhs == rhs)
+
+fun ! (rhs: boolean): boolean =>
+    if rhs then false else true
+
+fun == (x: bytes, y: bytes): boolean =>
+    if x.length == y.length then
+        if x.ptr == y.ptr then
+            true
+        else
+            var len = x.length
+            var index = 0
+            loop
+                break true when index == len
+                break false when x[len] != y[len] 
+                index = index + 1
+    else
+        false
+
+
+fun [](data: bytes, at: u32): u8 =>
+    panic(at < 0 as u32)
+
+fun [](data: bytes, at: u32): u8 =>
+    panic(at > data.length)
+
+getter fun ptr(self: bytes): u32 =>
+    toAddr(self) + 4 as u32
+
+getter fun length(self: bytes): u32 =>
+    u32.load(self as ref)

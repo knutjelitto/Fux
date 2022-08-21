@@ -1,11 +1,9 @@
-﻿namespace Fux.Tree;
-
-public class Document : Node
+﻿namespace Fux.Tree
 {
-    public Document(IReadOnlyList<Element> elements)
+    public class Document : ListOf<Element>
     {
-        Elements = elements;
+        public Document(IEnumerable<Element> items) : base(items)
+        {
+        }
     }
-
-    public IReadOnlyList<Element> Elements { get; }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Fux.Tree;
 
-public class Unit : Node
+public class Unit : NodeBase
 {
     public Unit(IEnumerable<Element> elements)
     {

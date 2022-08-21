@@ -1,13 +1,16 @@
-﻿namespace Fux.Tree;
-
-public class NominalType : Type
+﻿namespace Fux.Tree
 {
-    public NominalType(Name name)
+    public class NominalType : TypeBase
     {
-        Name = name;
+        public NominalType(Name name, TypeArguments? typeArguments)
+        {
+            Name = name;
+            TypeArguments = typeArguments;
+        }
+
+        public Name Name { get; }
+        public TypeArguments? TypeArguments { get; }
+
+        public override string ToString() => $"{Name}";
     }
-
-    public Name Name { get; }
-
-    public override string ToString() => $"{Name}";
 }

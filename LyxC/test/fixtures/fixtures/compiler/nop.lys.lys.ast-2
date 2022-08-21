@@ -1,0 +1,18 @@
+|-Document
+  |-TypeDirectiveNode
+    |-NoModifierNode
+    |-NameIdentifierNode name=void
+    |-InjectedLiteralNode
+  |-FunDirectiveNode
+    |-DecoratorNode
+      |-NameIdentifierNode name=export
+      |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=x
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=void
+      |-BlockNode
+        |-EmptyNode

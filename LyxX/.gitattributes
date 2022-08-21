@@ -1,4 +1,0 @@
-*.lys linguist-language=DataWeave
-*.wast linguist-generated=true
-*.ast linguist-generated=true
-*.lys.desugar linguist-language=DataWeave linguist-generated=true

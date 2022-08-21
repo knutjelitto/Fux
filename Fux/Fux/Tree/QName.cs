@@ -1,6 +1,6 @@
 ﻿namespace Fux.Tree;
 
-public class QName : Node
+public class QName : NodeBase, Leaf
 {
     public QName(IReadOnlyList<Name> names)
     {
@@ -10,4 +10,11 @@ public class QName : Node
     }
 
     public IReadOnlyList<Name> Names { get; }
+
+    public string Text => string.Join("::", Names);
+
+    public override string ToString()
+    {
+        return Text;
+    }
 }

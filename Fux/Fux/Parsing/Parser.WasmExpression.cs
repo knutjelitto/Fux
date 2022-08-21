@@ -4,132 +4,144 @@
 
 namespace Fux.Parsing
 {
-    public partial class Parser
+    public class WasmExpressionParser : ExpressionBase
     {
-        private class WasmExpressionParser : Expression
+        public WasmExpressionParser(Parser parser)
         {
-            public static Expression Parse(Parser parser, Cursor cursor)
+            Parser = parser;
+        }
+
+        public Parser Parser { get; }
+        public ErrorBag Errors => Parser.Errors;
+
+        public Expression Parse(Cursor cursor)
+        {
+            return cursor.Scope<Expression>(cursor =>
             {
-                return new WasmExpressionParser(parser).Parse(cursor);
-            }
-
-            private WasmExpressionParser(Parser parser)
-            {
-                Parser = parser;
-            }
-
-            public Parser Parser { get; }
-            public ErrorBag Errors => Parser.Errors;
-
-
-            private Expression Parse(Cursor cursor)
-            {
-                return cursor.Scope<Expression>(cursor =>
+                var items = new List<SExpression>();
+                do
                 {
-                    var sexpression = SExpression(cursor);
+                    var item = SExpression(cursor);
+                    items.Add(item);
+                }
+                while (cursor.Is(Lex.LeftRoundBracket));
 
-                    return new WasmExpression(sexpression);
-                });
-            }
+                return new WasmExpression(items);
+            });
+        }
 
-            private SExpression SExpression(Cursor cursor)
+        private SExpression SExpression(Cursor cursor)
+        {
+            return cursor.Scope<SExpression>(cursor =>
             {
-                return cursor.Scope<SExpression>(cursor =>
+                _ = cursor.Swallow(Lex.LeftRoundBracket);
+                var symbol = SSymbol(cursor);
+                var atomItems = new List<SAtom>();
+                while (!cursor.SwallowIf(Lex.RightRoundBracket))
                 {
-                    _ = cursor.Swallow(Lex.LeftRoundBracket);
-                    var symbol = SSymbol(cursor);
-                    var atoms = new List<SAtom>();
-                    while (!cursor.SwallowIf(Lex.RightRoundBracket))
-                    {
-                        var atom = SAtom(cursor);
-                        atoms.Add(atom);
-                    }
+                    var atomItem = SAtom(cursor);
+                    atomItems.Add(atomItem);
+                }
 
-                    return new SExpression(symbol, atoms);
-                });
-            }
+                return new SExpression(symbol, new SAtoms(atomItems));
+            });
+        }
 
-            private SAtom SAtom(Cursor cursor)
+        private SAtom SAtom(Cursor cursor)
+        {
+            return cursor.Scope<SAtom>(cursor =>
             {
-                return cursor.Scope<SAtom>(cursor =>
+                if (cursor.Is(Lex.LeftRoundBracket))
                 {
-                    if (cursor.Is(Lex.LeftRoundBracket))
-                    {
-                        return SExpression(cursor);
-                    }
-                    if (cursor.Is(Lex.Identifier, Lex.WasmIdentifier))
-                    {
-                        return SName(cursor);
-                    }
-                    if (cursor.Is(Lex.Integer))
-                    {
-                        return SNumber(cursor);
-                    }
+                    return SExpression(cursor);
+                }
+                if (cursor.Is(Lex.Identifier, Lex.WasmIdentifier))
+                {
+                    return SName(cursor);
+                }
+                if (cursor.Is(Lex.Integer) || cursor.IsPrefixMinus())
+                {
+                    return SNumber(cursor);
+                }
 
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
+                throw Errors.Parser.NotImplementedAt(cursor);
+            });
+        }
 
-            private SSymbol SSymbol(Cursor cursor)
+        private SSymbol SSymbol(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
             {
-                return cursor.Scope(cursor =>
+                var names = new List<Name>();
+                do
                 {
-                    var names = new List<Name>();
-                    do
+                    if (cursor.IsKeyword())
+                    {
+                        var kw = new KwName(cursor.Swallow());
+                        names.Add(kw);
+                    }
+                    else
                     {
                         var name = Parser.ParseName(cursor);
                         names.Add(name);
                     }
-                    while (cursor.SwallowIf(Lex.Dot));
+                }
+                while (cursor.SwallowIf(Lex.Dot));
 
-                    return new SSymbol(names);
-                });
-            }
+                return new SSymbol(names);
+            });
+        }
 
-            private SName SName(Cursor cursor)
+        private SName SName(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
             {
-                return cursor.Scope(cursor =>
+                var names = new List<Name>();
+                var name = WasmName(cursor);
+                names.Add(name);
+                while (cursor.SwallowIf(Lex.CoCo))
                 {
-                    var names = new List<Name>();
-                    var name = WasmName(cursor);
+                    name = Parser.ParseName(cursor);
                     names.Add(name);
-                    while (cursor.SwallowIf(Lex.CoCo))
-                    {
-                        name = Parser.ParseName(cursor);
-                        names.Add(name);
-                    }
+                }
 
-                    var qname = new QName(names);
+                var qname = new QName(names);
 
-                    return new SName(qname);
-                });
-            }
+                return new SName(qname);
+            });
+        }
 
-            private SNumber SNumber(Cursor cursor)
+        private SNumber SNumber(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
             {
-                return cursor.Scope(cursor =>
+                var minus = false;
+                if (cursor.IsPrefixMinus())
                 {
-                    if (cursor.Is(Lex.Integer))
-                    {
-                        return new SNumber(cursor.Swallow(Lex.Integer));
-                    }
+                    cursor.Swallow();
+                    minus = true;
+                }
 
-                    throw Errors.Parser.NotImplementedAt(cursor);
-                });
-            }
+                if (cursor.Is(Lex.Integer))
+                {
+                    return new SNumber(cursor.Swallow(Lex.Integer), minus);
+                }
 
-            private Name WasmName(Cursor cursor)
+                throw Errors.Parser.NotImplementedAt(cursor);
+            });
+        }
+
+        private Name WasmName(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
             {
-                return cursor.Scope(cursor =>
+                if (cursor.Is(Lex.Identifier))
                 {
-                    if (cursor.Is(Lex.Identifier))
-                    {
-                        return new Name(cursor.Swallow(Lex.Identifier));
-                    }
+                    return new IdName(cursor.Swallow(Lex.Identifier));
+                }
 
-                    return new Name(cursor.Swallow(Lex.WasmIdentifier));
-                });
-            }
+                return new IdName(cursor.Swallow(Lex.WasmIdentifier));
+            });
         }
     }
 }

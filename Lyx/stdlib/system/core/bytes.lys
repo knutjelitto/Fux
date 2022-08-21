@@ -1,4 +1,4 @@
-import system::core::boolean
+import system::core::bool
 import system::core::f32
 import system::core::f64
 import system::core::i16
@@ -14,150 +14,112 @@ import system::core::u8
 type bytes = %stack { lowLevelType="i64" byteSize=8 }
 
 impl bytes
-    private fun bytesDiscriminant(): u64
+    private fun bytesDiscriminant(): u64 =>
         val discriminant: u32 = bytes.^discriminant
         discriminant as u64 << 32
 
     // bytes
-    wasm fun apply(size: u32): bytes
+    fun apply(size: u32): bytes => wasm
         (local $allocation i32)
         (local $allocationSize i32)
         
         // allocate header + size
-        (local.set $allocationSize (i32.add (get_local $size) (i32.const 4)))
+        (local.set $allocationSize (i32.add (local.get $size) (i32.const 4)))
 
         // allocate the memory and save the pointer
         (local.set $allocation
             (call $system::core::memory::malloc (local.get $allocationSize)))
 
         (call $system::core::memory::memset
-            (get_local $allocation)
+            (local.get $allocation)
             (i32.const 0)
             (local.get $allocationSize))
 
         // store the size in the first int
-        (i32.store (get_local $allocation) (get_local $size))
+        (i32.store (local.get $allocation) (local.get $size))
 
         (i64.or
             (call $bytesDiscriminant)
-            (i64.extend_i32_u (get_local $allocation)))
+            (i64.extend_i32_u (local.get $allocation)))
 
-    private wasm fun toAddr(str: bytes): u32
-        (call $addressFromRef (get_local $str))
+    private fun toAddr(str: bytes): u32 => wasm
+        (call $addressFromRef (local.get $str))
 
-    explicit wasm fun (as) (lhs: bytes): ref
-        (get_local $lhs)
+    explicit fun as (lhs: bytes): ref => wasm (local.get $lhs)
 
     getter fun length(self: bytes): u32
-        u32.load(self as ref)
+        => u32.load(self as ref)
 
-  #[getter]
-  fun ptr(self: bytes): u32 = {
-    toAddr(self) + 4 as u32
-  }
+    getter fun ptr(self: bytes): u32
+        => toAddr(self) + 4 as u32
 
-  /**
-   * CPointer implicit coercion.
-   */
-  fun as(self: bytes): UnsafeCPointer = %wasm {
-    (i32.add
-      (i32.const 4)
-      (call $addressFromRef (get_local $self))
-    )
-  }
+    /**
+     * CPointer implicit coercion.
+     */
+    fun as (self: bytes): UnsafeCPointer => wasm
+        (i32.add
+            (i32.const 4)
+            (call $addressFromRef (local.get $self)))
 
-  fun [](data: bytes, at: u32): u8 = {
-    if (at > data.length) {
-      panic()
-    }
-    if (at < 0 as u32) {
-      panic()
-    }
-    u8.load(data.ptr as ref, at)
-  }
+    fun [](data: bytes, at: u32): u8 =>
+        panic(at > data.length)
+        panic(at < 0 as u32)
+        u8.load(data.ptr as ref, at)
 
-  fun [](data: bytes, at: u32, value: u8): void = {
-    if (at > data.length) {
-      panic()
-    }
-    if (at < 0 as u32) {
-      panic()
-    }
-    u8.store(data.ptr as ref, value, at)
-  }
+    fun [](data: bytes, at: u32, value: u8): void =>
+        panic(at > data.length)
+        panic(at < 0 as u32)
+        u8.store(data.ptr as ref, value, at)
 
-  fun fromString(str: string): bytes = %wasm {
-    (get_local $str)
-  }
+    fun fromString(str: string): bytes => wasm
+        (local.get $str)
 
-  fun get(data: bytes, at: u32): u8 = {
-    if (at > data.length) {
-      panic()
-    }
-    u8.load(data.ptr as ref, at)
-  }
+    fun get(data: bytes, at: u32): u8 =>
+        panic(at > data.length)
+        u8.load(data.ptr as ref, at)
 
-  fun set(data: bytes, at: u32, value: u16): void = {
-    if (at + 1 as u32 > data.length) {
-      panic()
-    }
-    u16.store(data.ptr as ref, value, at)
-  }
+    fun set(data: bytes, at: u32, value: u16): void =>
+        panic(at + 1 as u32 > data.length)
+        u16.store(data.ptr as ref, value, at)
 
-  fun set(data: bytes, at: u32, value: u8): void = {
-    if (at > data.length) {
-      panic()
-    }
-    u8.store(data.ptr as ref, value, at)
-  }
+    fun set(data: bytes, at: u32, value: u8): void =>
+        panic(at > data.length)
+        u8.store(data.ptr as ref, value, at)
 
-  fun store(lhs: ref, rhs: bytes): void = %wasm {
-    (i64.store (call $addressFromRef (get_local $lhs)) (get_local $rhs))
-  }
+    fun store(lhs: ref, rhs: bytes): void => wasm
+        (i64.store
+            (call $addressFromRef (local.get $lhs))
+            (local.get $rhs))
 
-  fun store(lhs: ref, rhs: bytes, offset: u32): void = %wasm {
-    (i64.store
-      (i32.add
-        (get_local $offset)
-        (call $addressFromRef (get_local $lhs))
-      )
-      (get_local $rhs)
-    )
-  }
+    fun store(lhs: ref, rhs: bytes, offset: u32): void => wasm
+        (i64.store
+            (i32.add
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs)))
+            (local.get $rhs))
 
-  fun load(lhs: ref): bytes = %wasm {
-    (i64.load (call $addressFromRef (get_local $lhs)))
-  }
+    fun load(lhs: ref): bytes => wasm
+        (i64.load (call $addressFromRef (local.get $lhs)))
 
-  fun load(lhs: ref, offset: u32): bytes = %wasm {
-    (i64.load
-      (i32.add
-        (get_local $offset)
-        (call $addressFromRef (get_local $lhs))
-      )
-    )
-  }
+    fun load(lhs: ref, offset: u32): bytes => wasm
+        (i64.load
+            (i32.add
+                (local.get $offset)
+                (call $addressFromRef (local.get $lhs))))
 
-  fun !=(lhs: bytes, rhs: bytes): boolean = !(lhs == rhs)
-  fun ==(lhs: bytes, rhs: bytes): boolean = {
-    if (lhs.length == rhs.length) {
-      if (lhs.ptr == rhs.ptr) {
-        true
-      } else {
-        var len = lhs.length
-        var equals = true
-        loop {
-          len = len - 1 as u32
-          if (bytes.get(lhs, len) != bytes.get(rhs, len)) {
-            equals = false
-            break
-          }
-          if (len > 0 as u32) continue
-        }
-        equals
-      }
-    } else {
-      false
-    }
-  }
-}
+    fun == (lhs: bytes, rhs: bytes): bool =>
+        if lhs.length == rhs.length then
+            if lhs.ptr == rhs.ptr then
+                true
+            else
+                val len = lhs.length
+                var index = 0
+                loop
+                    break true when index == len
+                    break false when (bytes.get(lhs, len) != bytes.get(rhs, len))
+                    len = len - 1
+        else
+            false
+
+    fun != (lhs: bytes, rhs: bytes): bool =>
+        !(lhs == rhs)

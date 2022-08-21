@@ -1,0 +1,24 @@
+|-Document
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=test
+      |-EmptyNode
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=f32
+      |-BlockNode
+        |-VarDeclarationNode MutableDeclaration
+          |-NameIdentifierNode name=test
+          |-EmptyNode
+          |-BooleanLiteralNode value=false
+        |-BinaryExpressionNode
+          |-ReferenceNode
+            |-QNameNode
+              |-NameIdentifierNode name=test
+          |-NameIdentifierNode name==
+          |-FloatLiteralNode value=12
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=test

@@ -1,0 +1,13 @@
+|-Document
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=x
+      |-EmptyNode
+      |-EmptyNode
+  |-VarDirectiveNode
+    |-NoModifierNode
+    |-VarDeclarationNode MutableDeclaration
+      |-NameIdentifierNode name=y
+      |-EmptyNode
+      |-FloatLiteralNode value=1

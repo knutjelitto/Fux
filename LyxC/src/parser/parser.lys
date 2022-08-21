@@ -1,0 +1,307 @@
+import src::helpers
+import src::lexer::tokens
+import src::lexer::lexer
+import src::parser::grammar
+import src::stringbuilder
+
+// AST definitions
+
+enum AstNode {
+  Rule0
+  Leaf(token: Token, value: string)
+  Node(name: string, child: AstNode, start: u32, end: u32)
+  SyntaxError(token: Token, message: string)
+  UnexpectedToken(token: Token, value: string)
+  AstCons(head: AstNode, tail: AstNode)
+}
+
+fun first(astNode: AstNode): AstNode = match astNode {
+  case is AstCons(head, tail) -> head
+  else -> astNode
+}
+
+fun second(astNode: AstNode): AstNode = first(rest(astNode))
+fun third(astNode: AstNode): AstNode = second(rest(astNode))
+
+fun rest(astNode: AstNode): AstNode = match astNode {
+  case is AstCons(head, tail) -> tail
+  else -> Rule0
+}
+
+fun getChild(astNode: AstNode): AstNode = match astNode {
+  case is Node(_, child) -> child
+  else -> astNode
+}
+
+fun getAstNodeName(astNode: AstNode): string = match astNode {
+  case is Node(name) -> name
+  else -> "?"
+}
+
+fun textOf(astNode: AstNode): string = match astNode {
+  case x is Rule0 -> ""
+  case x is Leaf(token, value) -> value
+  case is AstCons(head, tail) -> textOf(head) ++ textOf(tail)
+  case is Node(name, child) -> textOf(child)
+  else -> ""
+}
+
+fun printAst(ast: AstNode | Nil): string = {
+  val sb = StringBuilder()
+  printAst(ast, 0, sb)
+  sb.toString()
+}
+
+fun printAst(ast: AstNode | Nil, level: i32, sb: StringBuilder): void = match ast {
+  case is Nil -> {
+    sb.append(repeat("  ", level))
+      .append("<EMPTY>")
+  }
+  case is Rule0 -> {
+    sb.append(repeat("  ", level))
+      .append("<Rule0>")
+  }
+  case is SyntaxError(token, message) -> {
+    sb.append(repeat("  ", level))
+      .append("|-<SyntaxError>=")
+      .append(message)
+  }
+  case is Node(name, child, start, end) -> {
+    sb.append(repeat("  ", level))
+      .append("|-")
+      .append(name)
+      .append("(")
+      .append(string.stringify(start))
+      .append(",")
+      .append(string.stringify(end))
+      .append(")\n")
+      printAst(child, level + 1, sb)
+  }
+  case is Leaf(token, value) -> {
+    sb.append(repeat("  ", level))
+      .append("|-")
+      .append(TokenType.toString(token.tokenType))
+      .append("=")
+      .append(value)
+  }
+  case is UnexpectedToken(token, value) -> {
+    sb.append(repeat("  ", level))
+      .append("|-<UNEXPECTED TOKEN>=")
+      .append(value)
+  }
+  case is AstCons(head, tail) -> {
+    sb.append(repeat("  ", level))
+      .append("|-(AstCons)\n")
+    printAst(head, level + 1, sb)
+    sb.append("\n")
+    printAst(tail, level + 1, sb)
+  }
+}
+
+// Parser definitions
+
+fun list(lhs: AstNode, rhs: AstNode): AstNode = match lhs {
+  case is Rule0 -> rhs
+  else -> match rhs {
+    case is Rule0 -> lhs
+    else -> AstCons(lhs, rhs)
+  }
+}
+
+struct Parser(lexer: Lexer, grammar: Grammar)
+
+fun parse(source: string, rule: string, grammar: Grammar): AstNode | Nil = {
+  parse(rule, Parser(Lexer(source), grammar), 0)
+}
+
+fun parse(ruleName: string, parser: Parser, level: i32): AstNode | Nil = {
+  match parser.grammar.findRule(ruleName) {
+    case rule is ParserRule -> parse(rule, parser, level)
+    else -> {
+      support::env::printf("MISSING RULE " ++ ruleName ++ "!")
+      Rule0
+    }
+  }
+}
+
+fun eatUnexpectedToken(lexer: Lexer): AstNode = {
+  val token = lexer.eat()
+  val tokenValue = token.textIn(lexer.source)
+  UnexpectedToken(token, tokenValue)
+}
+
+val TEST = false
+
+fun parse(rule: ParserRule, parser: Parser, level: i32): AstNode | Nil = {
+  var backtrack = parser.lexer.pos
+
+  val result = match rule {
+    case is Terminal(tokenType) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Terminal(" ++ TokenType.toString(tokenType) ++ ")")
+      if (TEST) support::env::printf(repeat("| ", level) ++ "|   from:" ++ parser.lexer.source.substring(parser.lexer.pos as i32))
+      val lexer = parser.lexer
+      val token = lexer.peek()
+      if (token.tokenType == tokenType) {
+        lexer.eat()
+        Leaf(token, token.textIn(lexer.source))
+      } else
+        Nil
+    }
+    case is StrictTerminal(tokenType, value) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| StrictTerminal(" ++ TokenType.toString(tokenType) ++ ")")
+      if (TEST) support::env::printf(repeat("| ", level) ++ "|   from:" ++ parser.lexer.source.substring(parser.lexer.pos as i32))
+      val lexer = parser.lexer
+      val token = lexer.peek()
+      val tokenValue = token.textIn(lexer.source)
+      if (token.tokenType == tokenType && value == tokenValue) {
+        lexer.eat()
+        Leaf(token, tokenValue)
+      } else
+        Nil
+    }
+    case is Or(lhs, rhs) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Or")
+      match parse(lhs, parser, level + 1) {
+        case is Nil -> parse(rhs, parser, level + 1)
+        case ast is AstNode -> ast
+      }
+    }
+    case is Cons(head, tail) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Cons")
+      match parse(head, parser, level + 1) {
+        case is Nil -> Nil
+        case astHead is AstNode -> match parse(tail, parser, level + 1) {
+          case is Nil -> Nil
+          case astTail is AstNode -> list(astHead, astTail)
+        }
+      }
+    }
+    case is Cut(head, tail) -> {
+      // similar to Cons but with cut semantics
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Cut")
+      match parse(head, parser, level + 1) {
+        case is Nil -> Nil
+        case astHead is AstNode -> {
+          val lexer = parser.lexer
+          var ret: AstNode = astHead
+          loop {
+            match parse(tail, parser, level + 1) {
+              case is Nil -> {
+                ret = list(ret, eatUnexpectedToken(lexer))
+                if (lexer.hasNext()) continue
+              }
+              case ast is AstNode -> ret = list(ret, ast)
+            }
+          }
+          ret
+        }
+      }
+    }
+    case is Discard(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Discard")
+      match parse(rule, parser, level + 1) {
+        case is Nil -> Nil
+        case ast is AstNode -> Rule0
+      }
+    }
+    case is Optional(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| Optional")
+      match parse(rule, parser, level + 1) {
+        case is Nil -> Rule0
+        case ast is AstNode -> ast
+      }
+    }
+    case is NonTerminal(name) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| NonTerminal("++name++")")
+      // support::env::printf(repeat("  ", level) ++ name)
+      parse(name, parser, level + 1)
+    }
+    case is OneOrMore(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| OneOrMore")
+      var ret: AstNode | Nil = Nil
+
+      loop {
+        match parse(rule, parser, level + 1) {
+          case is Nil -> break
+          case ast is AstNode -> {
+            match ret {
+              case is Nil -> ret = ast
+              case x is AstNode -> ret = list(x, ast)
+            }
+            continue
+          }
+        }
+      }
+
+      ret
+    }
+    case is ZeroOrMore(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| ZeroOrMore")
+      var ret: AstNode = Rule0
+
+      loop {
+        match parse(rule, parser, level + 1) {
+          case is Nil -> break
+          case ast is AstNode -> {
+            ret = list(ret, ast)
+            continue
+          }
+        }
+      }
+
+      ret
+    }
+    case is LookAhead(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| LookAhead")
+      val ret = parse(rule, parser, level + 1)
+      // rewind
+      parser.lexer.seek(backtrack)
+      match ret {
+        case is Nil -> Nil
+        else -> Rule0
+      }
+    }
+    case is NegativeLookAhead(rule) -> {
+      if (TEST) support::env::printf(repeat("| ", level) ++ "| NegativeLookAhead")
+      val ret = parse(rule, parser, level + 1)
+      // rewind
+      parser.lexer.seek(backtrack)
+      match ret {
+        case is Nil -> Rule0
+        else -> Nil
+      }
+    }
+    case is Fail(message) -> {
+      SyntaxError(parser.lexer.peek(), message)
+    }
+    case is Push(name, rule) -> {
+      val start = parser.lexer.pos
+      val ret = parse(rule, parser, level + 1)
+      match ret {
+        case is Nil -> Nil
+        case ast is AstNode -> Node(name, ast, start, parser.lexer.pos)
+      }
+    }
+    case is PushIfManyChildren(name, rule) -> {
+      val start = parser.lexer.pos
+      val ret = parse(rule, parser, level + 1)
+      match ret {
+        case is Nil -> Nil
+        case ast is AstCons -> Node(name, ast, start, parser.lexer.pos)
+        case ast is AstNode -> ast
+      }
+    }
+  }
+
+  if (result is Nil) {
+    if (parser.lexer.pos != backtrack){
+      if (TEST) support::env::printf(repeat("| ", level) ++ "|<- backtracking from:" ++ parser.lexer.source.substring(parser.lexer.pos as i32))
+      parser.lexer.seek(backtrack)
+      if (TEST) support::env::printf(repeat("| ", level) ++ "|<- backtracking to:" ++ parser.lexer.source.substring(parser.lexer.pos as i32))
+    }
+  } else {
+    if (TEST) support::env::printf(repeat("| ", level) ++ "| push. new string:" ++ parser.lexer.source.substring(parser.lexer.pos as i32))
+  }
+
+  result
+}

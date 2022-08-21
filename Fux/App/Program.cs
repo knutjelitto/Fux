@@ -2,6 +2,7 @@
 using Fux.ErrorHandling;
 using Fux.Files;
 using Fux.Parsing;
+using Fux.Reports;
 using Fux.Tools;
 
 namespace App;
@@ -24,35 +25,33 @@ internal class Program
         Console.WriteLine("===");
         foreach (var source in repo.Sources)
         {
-            var writerPath = tmp.Sub("All") / source.Package.Path / source.Path;
-            using (var writer = writerPath.Writer())
-            {
-                Console.WriteLine($"{source.Package} - {source}");
+            var shadowFile = tmp.Sub("All") / source.Package.Path / source.Path;
 
-                try
+            Console.WriteLine($"{source.Package} - {source}");
+
+            try
+            {
+                Lexx(shadowFile, source);
+            }
+            catch (DiagnosticException diagnostics)
+            {
+                Console.WriteLine();
+                Console.WriteLine("===");
+                foreach (var diagnostic in diagnostics.Diagnostics)
                 {
-                    Lexx(writer, source);
-                }
-                catch (DiagnosticException diagnostics)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("===");
-                    foreach (var diagnostic in diagnostics.Diagnostics)
+                    foreach (var line in diagnostic.Report())
                     {
-                        foreach (var line in diagnostic.Report())
-                        {
-                            Console.WriteLine($"{line}");
-                        }
+                        Console.WriteLine($"{line}");
                     }
-                    break;
                 }
+                break;
             }
         }
 
         WaitKey();
     }
 
-    private static void Lexx(Writer writer, Source source)
+    private static void Lexx(Path shadow, Source source)
     {
         const string ind = "  ";
         const string sep = $"{ind}-";
@@ -96,22 +95,30 @@ internal class Program
 
         Console.WriteLine($"{sep}{elements.Count - 1,5} top-elements");
 
-        foreach (var element in elements)
+        using (var writer = shadow.Writer())
         {
-            foreach (var token in element)
+            foreach (var element in elements)
             {
-                foreach (var white in token.Whites)
+                foreach (var token in element)
                 {
-                    _ = white.Text;
-                    writer.Write($"{white.Text}");
+                    foreach (var white in token.Whites)
+                    {
+                        _ = white.Text;
+                        writer.Write($"{white.Text}");
+                    }
+                    writer.Write($"{token.Text}");
                 }
-                writer.Write($"{token.Text}");
             }
         }
 
         var parser = new Parser(source, errors);
 
         var document = parser.Parse();
+
+        using (var writer = (shadow + ".tree").Writer())
+        {
+            ParseTreeWriter.Write(writer, document);
+        }
     }
 
     private static void WaitKey()

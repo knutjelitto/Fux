@@ -1,9 +1,4 @@
 import system::core::native
 
-fun retain(reference: ref): void = {
-
-}
-
-fun release(reference: ref): void = {
-
-}
+fun retain(reference: ref): void => wasm (nop)
+fun release(reference: ref): void => wasm (nop)

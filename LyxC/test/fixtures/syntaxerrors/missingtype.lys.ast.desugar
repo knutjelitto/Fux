@@ -1,0 +1,14 @@
+|-Document(0,10)
+  |-(AstCons)
+    |-VarDirective(0,10)
+      |-(AstCons)
+        |-NoModifier(0,0)
+          <Rule0>
+        |-VarDeclaration(0,10)
+          |-(AstCons)
+            |-NameIdentifier(4,5)
+              |-Identifier=x
+            |-(AstCons)
+              |-<SyntaxError>=A type or effect was expected
+              |-NumberLiteral=1
+    |-EndOfFile=

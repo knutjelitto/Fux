@@ -2,6 +2,7 @@
 
 public class TokenSpan : IReadOnlyList<Token>
 {
+    [DebuggerStepThrough]
     public TokenSpan(TokenList tokens, int start, int limit)
     {
         Tokens = tokens;
@@ -18,6 +19,7 @@ public class TokenSpan : IReadOnlyList<Token>
 
     public Token this[int index] => Tokens[Start + index];
     public int Count => Limit - Start;
+    public string Text => string.Join("", this);
 
     public TokenList Tokens { get; }
     public int Start { get; }

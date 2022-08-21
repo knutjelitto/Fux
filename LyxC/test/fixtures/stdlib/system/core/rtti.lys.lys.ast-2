@@ -1,0 +1,37 @@
+|-Document
+  |-ImportDirectiveNode
+    |-QNameNode
+      |-NameIdentifierNode name=system
+      |-NameIdentifierNode name=core
+      |-NameIdentifierNode name=native
+    |-EmptyNode
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=retain
+      |-ParameterNode
+        |-NameIdentifierNode name=reference
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=ref
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=void
+      |-BlockNode
+        |-EmptyNode
+  |-FunDirectiveNode
+    |-EmptyNode
+    |-NoModifierNode
+    |-FunctionNode
+      |-NameIdentifierNode name=release
+      |-ParameterNode
+        |-NameIdentifierNode name=reference
+        |-ReferenceNode
+          |-QNameNode
+            |-NameIdentifierNode name=ref
+      |-ReferenceNode
+        |-QNameNode
+          |-NameIdentifierNode name=void
+      |-BlockNode
+        |-EmptyNode

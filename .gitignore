@@ -350,8 +350,10 @@ MigrationBackup/
 .ionide/
 
 /Old
-/Tmp/All/Core
+/Tmp/**/*.*
+
 /Runtime/musl
 /Runtime/nul.d
+
 /OpenLibm/**/*.c.d
 /OpenLibm/nul.d

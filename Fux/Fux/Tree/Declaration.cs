@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace Fux.Tree;
 
-public class Declaration : Node
+public class Declaration : NodeBase
 {
 }
