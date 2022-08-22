@@ -64,7 +64,7 @@ namespace Fux.Parsing
                     return SNumber(cursor);
                 }
 
-                throw Errors.Parser.NotImplementedAt(cursor);
+                throw Errors.Parser.NotImplementedAt(cursor.Current);
             });
         }
 
@@ -127,7 +127,7 @@ namespace Fux.Parsing
                     return new SNumber(cursor.Swallow(Lex.Integer), minus);
                 }
 
-                throw Errors.Parser.NotImplementedAt(cursor);
+                throw Errors.Parser.NotImplementedAt(cursor.Current);
             });
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace Fux.Tree
 {
-    public class StructDeclaration : Declaration
+    public class StructDeclaration : DeclarationBase
     {
         public StructDeclaration(Annotations annotations, Name name, TypeParameters? typeParameters, StructFields fields)
         {

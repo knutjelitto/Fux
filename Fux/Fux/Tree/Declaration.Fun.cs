@@ -1,6 +1,6 @@
 ﻿namespace Fux.Tree
 {
-    public class FunDeclaration : Declaration
+    public class FunDeclaration : DeclarationBase
     {
         public FunDeclaration(Annotations annotations, Name name, TypeParameters? typeParameters, FunParameters funParameters, Type result, Expression? expression)
         {

@@ -6,63 +6,56 @@ import src::stringbuilder
 import src::compiler::linemapper
 import src::compiler::stringlist
 
-enum ModuleMap {
-  EmptyModule
-  Module(
-    moduleName: string,
-    path: string,
-    source: string,
-    ast: AstNode,
-    document: CodeNode,
-    phase: i32,
-    errors: i32,
-    lineMapper: LineMapper
-  )
-  ModuleCons(head: Module, tail: ModuleMap)
-}
+enum ModuleMap
+    EmptyModule
+    Module
+        moduleName: string
+        path: string
+        source: string
+        ast: AstNode
+        document: CodeNode
+        phase: i32
+        errors: i32
+        lineMapper: LineMapper
+    ModuleCons
+        head: Module
+        tail: ModuleMap
 
-struct CompilerContext(
-  messageCollector: MessageCollector,
-  modules: ModuleMap,
-  workingDirectory: string,
-  paths: StringLinkedList
-)
+struct CompilerContext
+    messageCollector: MessageCollector
+    modules: ModuleMap
+    workingDirectory: string
+    paths: StringLinkedList
 
-impl ModuleMap {
-  #[method]
-  fun findModuleByPath(self: ModuleMap, path: string): Module | EmptyModule = {
-    match self {
-      case x is EmptyModule -> x
-      case theModule is Module ->
-        if (theModule.path == path)
-          theModule
-        else
-          EmptyModule
-      case is ModuleCons(head, tail) ->
-        if (head.path == path)
-          head
-        else
-          tail.findModuleByPath(path)
-    }
-  }
+impl ModuleMap
+    method fun findModuleByPath(self: ModuleMap, path: string): Module | EmptyModule =>
+        case self of
+            EmptyModule as x -> x
+            Module as theModule ->
+                if theModule.path == path then
+                    theModule
+                else
+                    EmptyModule
+            ModuleCons(head, tail) ->
+                if head.path == path then
+                    head
+                else
+                    tail.findModuleByPath(path)
 
-  #[method]
-  fun findModule(self: ModuleMap, moduleName: string): Module | EmptyModule = {
-    match self {
-      case x is EmptyModule -> x
-      case theModule is Module ->
-        if (theModule.moduleName == moduleName)
-          theModule
-        else
-          EmptyModule
-      case is ModuleCons(head, tail) ->
-        if (head.moduleName == moduleName)
-          head
-        else
-          tail.findModule(moduleName)
-    }
-  }
-}
+    method fun findModule(self: ModuleMap, moduleName: string): Module | EmptyModule =>
+        case self of {
+            case x is EmptyModule -> x
+            case theModule is Module ->
+                if (theModule.moduleName == moduleName)
+                    theModule
+                else
+                    EmptyModule
+            case is ModuleCons(head, tail) ->
+                if (head.moduleName == moduleName)
+                    head
+                else
+                    tail.findModule(moduleName)
+        }
 
 impl CompilerContext {
   fun apply(): CompilerContext = CompilerContext(MessageCollector(), EmptyModule, "/", None)

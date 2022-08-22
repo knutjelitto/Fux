@@ -2,19 +2,21 @@
 {
     public class StackTypeDirective : Directive
     {
-        public StackTypeDirective(Name name, NameValues nameValues)
+        public StackTypeDirective(Annotations annotations, Name name, NameValues nameValues)
         {
+            Annotations = annotations;
             Name = name;
             NameValues = nameValues;
         }
 
+        public Annotations Annotations { get; }
         public Name Name { get; }
         public NameValues NameValues { get; }
     }
 
     public class InjectedTypeDirective : Directive
     {
-        public InjectedTypeDirective(Name name)
+        public InjectedTypeDirective(Annotations annotations, Name name)
         {
             Name = name;
         }
@@ -24,7 +26,7 @@
 
     public class NameTypeDirective : Directive
     {
-        public NameTypeDirective(Name name, Type type)
+        public NameTypeDirective(Annotations annotations, Name name, Type type)
         {
             Name = name;
             Type = type;

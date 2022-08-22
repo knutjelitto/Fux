@@ -40,11 +40,11 @@ namespace Fux.Parsing
             var tokens = Liner.GetElement();
 
             var elements = new List<Element>();
-            while (!tokens.Eof)
+            while (!tokens.EOF)
             {
-                var cursor = new Cursor(Source, Errors, tokens);
+                var cursor = new SimCursor(Source, Errors, tokens);
 
-                var element = Parse(cursor);
+                var element = ParseElement(cursor);
 
                 elements.Add(element);
 
@@ -52,6 +52,40 @@ namespace Fux.Parsing
             }
 
             return new Document(elements);
+        }
+
+        private Element ParseElement(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
+            {
+                while (cursor.More)
+                {
+                    var subCursor = cursor.SubCursor();
+
+                    var annotationItems = new List<Annotation>();
+                    Annotations(subCursor, annotationItems);
+                    if (!subCursor.More)
+                    {
+                        continue;
+                    }
+
+                    var element = Parse(subCursor);
+
+                    return element;
+                }
+
+                Assert(false);
+                return new InjectedTypeDirective(new Annotations(), new DummyName("<unexpected-eos>"));
+            });
+
+            void Annotations(Cursor cursor, List<Annotation> annotationItems)
+            {
+                while (cursor.IsIdentifier())
+                {
+                    var annotation = ParseAnnotation(cursor);
+                    annotationItems.Add(annotation);
+                }
+            }
         }
 
         private Annotations Annotations(Cursor cursor)
@@ -70,19 +104,10 @@ namespace Fux.Parsing
             });
         }
 
-        private Element Parse(TokenSpan tokens)
-        {
-            var cursor = new Cursor(Source, Errors, tokens);
-
-            return Parse(cursor);
-        }
-
         private Element Parse(Cursor cursor)
         {
-            return cursor.Scope(cursor =>
+            var element = cursor.Scope(cursor =>
             {
-                Element? parsed = null;
-
                 var annotationItems = new List<Annotation>();
                 while (cursor.IsIdentifier())
                 {
@@ -93,31 +118,31 @@ namespace Fux.Parsing
 
                 if (cursor.Is(Lex.KwImport))
                 {
-                    parsed = ParseImportDirective(cursor);
+                    return ParseImportDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwType))
                 {
-                    parsed = ParseTypeDirective(cursor);
+                    return ParseTypeDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwImpl))
                 {
-                    parsed = ParseImplDirective(cursor);
+                    return ParseImplDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwTrait))
                 {
-                    parsed = TraitDirective(cursor, annotations);
+                    return TraitDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwFun))
                 {
-                    parsed = ParseFunDirective(cursor, annotations);
+                    return ParseFunDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwVal))
                 {
-                    parsed = ValDirective(cursor, annotations);
+                    return ValDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwVar))
                 {
-                    parsed = VarDirective(cursor, annotations);
+                    return VarDirective(cursor, annotations);
                 }
                 else if (cursor.Is(Lex.KwStruct))
                 {
@@ -128,15 +153,12 @@ namespace Fux.Parsing
                     return EnumDirective(cursor, annotations);
                 }
 
-                if (parsed != null)
-                {
-                    Assert(parsed.Span!.Limit == cursor.Tokens.Limit);
-
-                    return parsed;
-                }
-
                 throw Errors.Parser.NotImplementedAt(cursor.At());
             });
+
+            Assert(!cursor.More);
+
+            return element;
         }
 
         private StructDirective StructDirective(Cursor cursor, Annotations annotations)
@@ -144,7 +166,7 @@ namespace Fux.Parsing
             return cursor.Scope(cursor =>
             {
                 cursor.Swallow(Lex.KwStruct);
-                var declaration = StructDeclaration(cursor, annotations);
+                var declaration = StructDeclaration(cursor.SubCursor(), annotations);
 
                 return new StructDirective(annotations, declaration);
             });
@@ -156,23 +178,26 @@ namespace Fux.Parsing
             {
                 var name = ParseName(cursor);
                 var typeParameters = TypeParametersOptional(cursor);
-                var fieldItems = new List<StructField>();
-                if (cursor.SwallowIf(Lex.LeftRoundBracket))
-                {
-                    if (cursor.IsNot(Lex.RightRoundBracket))
-                    {
-                        do
-                        {
-                            var field = StructField(cursor);
-                            fieldItems.Add(field);
-                        }
-                        while (cursor.SwallowIf(Lex.Comma));
-                    }
-                    _ = cursor.Swallow(Lex.RightRoundBracket);
-                }
-                var fields = new StructFields(fieldItems);
+                var fields = StructFields(cursor);
 
                 return new StructDeclaration(annotations, name, typeParameters, fields);
+            });
+        }
+
+        private StructFields StructFields(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
+            {
+                var fieldItems = new List<StructField>();
+                while (cursor.More)
+                {
+                    var field = StructField(cursor);
+                    fieldItems.Add(field);
+                }
+
+                var fields = new StructFields(fieldItems);
+
+                return fields;
             });
         }
 
@@ -192,7 +217,7 @@ namespace Fux.Parsing
             return cursor.Scope(cursor =>
             {
                 cursor.Swallow(Lex.KwEnum);
-                var declaration = EnumDeclaration(cursor, annotations);
+                var declaration = EnumDeclaration(cursor.SubCursor(), annotations);
 
                 return new EnumDirective(annotations, declaration);
             });
@@ -204,52 +229,25 @@ namespace Fux.Parsing
             {
                 var name = ParseName(cursor);
                 var typeParameters = TypeParametersOptional(cursor);
-#if true
-                var memberItems = new List<EnumMember>();
-                while (cursor.More())
-                {
-                    var member = EnumMember(cursor);
-                    memberItems.Add(member);
-                }
-                var members = new EnumMembers(memberItems);
-#else
-                cursor.Swallow(Lex.LeftCurlyBracket);
-                var memberItems = new List<EnumMember>();
-                while (cursor.IsNot(Lex.RightCurlyBracket))
-                {
-                    var member = EnumMember(cursor);
-                    memberItems.Add(member);
-                }
-                cursor.Swallow(Lex.RightCurlyBracket);
-                var members = new EnumMembers(memberItems);
-#endif
+                var members = EnumMembers(cursor);
 
                 return new EnumDeclaration(annotations, name, typeParameters, members);
             });
         }
 
-        private EnumMember EnumMember(Cursor cursor)
+        private EnumMembers EnumMembers(Cursor cursor)
         {
             return cursor.Scope(cursor =>
             {
-                var name = ParseName(cursor);
-                var fieldItems = new List<StructField>();
-                if (cursor.SwallowIf(Lex.LeftRoundBracket))
+                var memberItems = new List<StructDeclaration>();
+                while (cursor.More)
                 {
-                    if (cursor.IsNot(Lex.RightRoundBracket))
-                    {
-                        do
-                        {
-                            var field = StructField(cursor);
-                            fieldItems.Add(field);
-                        }
-                        while (cursor.SwallowIf(Lex.Comma));
-                    }
-                    _ = cursor.Swallow(Lex.RightRoundBracket);
+                    var member = StructDeclaration(cursor.SubCursor(), new Annotations());
+                    memberItems.Add(member);
                 }
-                var fields = new StructFields(fieldItems);
+                var members = new EnumMembers(memberItems);
 
-                return new EnumMember(name, fields);
+                return members;
             });
         }
 
@@ -274,7 +272,7 @@ namespace Fux.Parsing
             });
         }
 
-        private Element ParseImportDirective(Cursor cursor)
+        private Element ParseImportDirective(Cursor cursor, Annotations annotations)
         {
             return cursor.Scope(cursor =>
             {
@@ -282,11 +280,11 @@ namespace Fux.Parsing
 
                 var qname = ParseQName(cursor);
 
-                return new ImportDirective(qname);
+                return new ImportDirective(annotations, qname);
             });
         }
 
-        private Directive ParseTypeDirective(Cursor cursor)
+        private Directive ParseTypeDirective(Cursor cursor, Annotations annotations)
         {
             return cursor.Scope<Directive>(cursor =>
             {
@@ -307,20 +305,20 @@ namespace Fux.Parsing
                     }
                     _ = cursor.Swallow(Lex.RightCurlyBracket);
 
-                    return new StackTypeDirective(name, new NameValues(items));
+                    return new StackTypeDirective(annotations, name, new NameValues(items));
                 }
                 else if (cursor.SwallowIf(Lex.KxInjected))
                 {
-                    return new InjectedTypeDirective(name);
+                    return new InjectedTypeDirective(annotations, name);
                 }
                 else if (cursor.Is(Lex.Identifier))
                 {
                     var type = ParseType(cursor);
 
-                    return new NameTypeDirective(name, type);
+                    return new NameTypeDirective(annotations, name, type);
                 }
 
-                throw Errors.Parser.NotImplementedAt(cursor);
+                throw Errors.Parser.NotImplementedAt(cursor.Current);
             });
         }
 
@@ -336,7 +334,7 @@ namespace Fux.Parsing
             });
         }
 
-        private ImplDirective ParseImplDirective(Cursor cursor)
+        private ImplDirective ParseImplDirective(Cursor cursor, Annotations annotations)
         {
             return cursor.Scope(cursor =>
             {
@@ -351,18 +349,16 @@ namespace Fux.Parsing
                 }
 
                 var elementItems = new List<Element>();
-                while (cursor.More())
+                while (cursor.More)
                 {
-                    var subCursor = cursor.SubCursor();
-
-                    var elementItem = Parse(subCursor);
+                    var elementItem = ParseElement(cursor);
                     elementItems.Add(elementItem);
                 }
 
-                return new ImplDirective(name, forType, new Elements(elementItems));
+                return new ImplDirective(annotations, name, forType, new Elements(elementItems));
             });
 
-            throw Errors.Parser.NotImplementedAt(cursor);
+            throw Errors.Parser.NotImplementedAt(cursor.Current);
         }
 
         private TraitDirective TraitDirective(Cursor cursor, Annotations annotations)
@@ -386,11 +382,9 @@ namespace Fux.Parsing
                 }
 
                 var elementItems = new List<Element>();
-                while (cursor.More())
+                while (cursor.More)
                 {
-                    var subCursor = cursor.SubCursor();
-
-                    var elementItem = Parse(subCursor);
+                    var elementItem = ParseElement(cursor);
                     elementItems.Add(elementItem);
                 }
 
@@ -454,7 +448,7 @@ namespace Fux.Parsing
                 return new FunDirective(annotations, fun);
             });
 
-            throw Errors.Parser.NotImplementedAt(cursor);
+            throw Errors.Parser.NotImplementedAt(cursor.Current);
         }
 
         private FunDeclaration ParseFunDelaration(Cursor cursor, Annotations annotations)
@@ -468,7 +462,7 @@ namespace Fux.Parsing
                 var parameters = FunParameters(cursor);
                 var result = OfType(cursor);
                 var expr = (Expression?)null;
-                if (cursor.More())
+                if (cursor.More)
                 {
                     cursor.Swallow(Lex.BoldArrow);
                     expr = Expr.Block(cursor);
@@ -482,14 +476,39 @@ namespace Fux.Parsing
         {
             return cursor.Scope(cursor =>
             {
+                cursor.Swallow(Lex.KwVal);
+
+                var declaration = ValDeclaration(cursor.SubCursor(), annotations);
+
+                return new ValDirective(annotations, declaration);
+            });
+        }
+
+        public ValDeclaration ValDeclaration(Cursor cursor, Annotations annotations)
+        {
+            return cursor.Scope(cursor =>
+            {
+                var name = ParseName(cursor);
+                var type = OfTypeOptional(cursor);
+                _ = cursor.Swallow(Lex.OpAssign);
+                var value = Expr.Block(cursor);
+
+                return new ValDeclaration(annotations, name, type, value);
+            });
+        }
+
+        public Expression ValDeclaration(Cursor cursor)
+        {
+            return cursor.Scope(cursor =>
+            {
                 _ = cursor.Swallow(Lex.KwVal);
 
                 var name = ParseName(cursor);
                 var type = OfTypeOptional(cursor);
                 _ = cursor.Swallow(Lex.OpAssign);
-                var value = Expr.Parse(cursor);
+                var value = Expr.Block(cursor);
 
-                return new ValDirective(annotations, name, type, value);
+                return new ValExpression(name, type, value);
             });
         }
 
@@ -505,25 +524,6 @@ namespace Fux.Parsing
                 var value = Expr.Parse(cursor);
 
                 return new VarDirective(annotations, name, type, value);
-            });
-        }
-
-        public Expression ValDeclaration(Cursor cursor)
-        {
-            return cursor.Scope(cursor =>
-            {
-                _ = cursor.Swallow(Lex.KwVal);
-
-                var name = ParseName(cursor);
-                var type = (Type?)null;
-                if (cursor.Is(Lex.Colon))
-                {
-                    type = OfType(cursor);
-                }
-                _ = cursor.Swallow(Lex.OpAssign);
-                var value = Expr.Parse(cursor);
-
-                return new ValExpression(name, type, value);
             });
         }
 
@@ -569,7 +569,7 @@ namespace Fux.Parsing
                 return new FunParameters(parameters);
             });
 
-            throw Errors.Parser.NotImplementedAt(cursor);
+            throw Errors.Parser.NotImplementedAt(cursor.Current);
         }
 
         private FunParameter ParseFunParameter(Cursor cursor)

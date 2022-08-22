@@ -1,0 +1,29 @@
+// args: string[]
+// newLine: string
+// useCaseSensitiveFileNames: bool
+// write(s: string): void
+// writeOutputIsTTY?(): bool
+// readFile(path: string, encoding?: string): string | void
+// getFileSize?(path: string): number
+// writeFile(path: string, data: string, writeByteOrderMark?: bool): void
+// resolvePath(...path: string[]): string
+// fileExists(path: string): bool
+// directoryExists(path: string): bool
+// createDirectory(path: string): void
+// getCurrentDirectory(): string
+// getDirectories?(path: string): string[]
+// relative(from: string, to: string): string
+
+fun newLine(): bool => "\n"
+fun useCaseSensitiveFileNames(): bool => true
+fun write(str: string): void => wasm (nop)
+fun writeOutputIsTTY(): bool => true
+fun readFile(path: string): bytes => bytes(0)
+fun getFileSize(path: string): u32 => 0x0
+fun writeFile(path: string, data: bytes, writeByteOrderMark: bool): bool => false
+fun resolve(from: string, to: string): string => from ++ to
+fun fileExists(path: string): bool => false
+fun directoryExists(path: string): bool => false
+fun createDirectory(path: string): bool => false
+fun getCurrentDirectory(): string => "/"
+fun relative(from: string, to: string): string => from ++ to

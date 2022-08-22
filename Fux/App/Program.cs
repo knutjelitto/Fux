@@ -17,10 +17,10 @@ internal class Program
         Console.WriteLine($"top: {top}");
         var tmp = top.Sub("Tmp").EnshureFolder();
         Console.WriteLine($"tmp: {tmp}");
-        var src = top.Sub("Lyx").EnshureFolder();
-        Console.WriteLine($"src: {src}");
+        var corePackage = top.Sub("Lyx").EnshureFolder();
+        Console.WriteLine($"src: {corePackage}");
 
-        var repo = new Repository(src);
+        var repo = new Repository(corePackage);
 
         Console.WriteLine("===");
         foreach (var source in repo.Sources)
@@ -87,7 +87,7 @@ internal class Program
             var element = liner.GetElement();
             elements.Add(element);
 
-            if (element.Eof)
+            if (element.EOF)
             {
                 break;
             }
@@ -109,6 +109,25 @@ internal class Program
                     writer.Write($"{token.Text}");
                 }
             }
+        }
+
+        using (var writer = (shadow + ".line").Writer())
+        {
+            lexer = new Lexer(errors, text.Clone());
+            var upper = new LinerUpper(errors, lexer);
+
+            do
+            {
+                var element = upper.GetElement();
+
+                element.Write(writer);
+
+                if (element.EOS)
+                {
+                    break;
+                }
+            }
+            while (true);
         }
 
         var parser = new Parser(source, errors);

@@ -43,7 +43,7 @@ namespace Fux.Parsing
                 cursor.Swallow(Lex.KwOf);
 
                 var caseItems = new List<CaseMatch>();
-                while (cursor.More())
+                while (cursor.More)
                 {
                     var caseItem = Match(cursor);
                     caseItems.Add(caseItem);
@@ -56,9 +56,17 @@ namespace Fux.Parsing
             {
                 return cursor.SubCursor().Scope(cursor =>
                 {
-                    var pattern = Parse(cursor);
+                    var pattern = (Expression?)null;
+                    if (cursor.Is(Lex.KwElse))
+                    {
+                        pattern = new WildcardExpression(cursor.Swallow());
+                    }
+                    else
+                    {
+                        pattern = Parse(cursor);
+                    }
                     cursor.Swallow(Lex.LightArrow);
-                    var value = Parse(cursor);
+                    var value = Block(cursor);
 
                     return new CaseMatch(pattern, value);
                 });
@@ -81,13 +89,80 @@ namespace Fux.Parsing
         {
             if (cursor.Current.Line > cursor.Previous.Line)
             {
+                //TODO: Sub or Sub2 ?
                 cursor = cursor.SubCursor2();
+
+                if (cursor.Current.Text == "if")
+                {
+                    Assert(true);
+                }
             }
+#if true
+            var expressions = new List<Expression>();
+            while (cursor.More)
+            {
+                var expression = cursor.Scope(cursor =>
+                {
+                    if (cursor.Is(Lex.KwVal))
+                    {
+                        return Parser.ValDeclaration(cursor);
+                    }
+                    if (cursor.Is(Lex.KwVar))
+                    {
+                        return Parser.VarDeclaration(cursor);
+                    }
+                    if (cursor.Is(Lex.KwBreak))
+                    {
+                        cursor.Swallow(Lex.KwBreak);
+
+                        var value = (Expression?)null;
+                        if (cursor.IsExpression())
+                        {
+                            value = Parse(cursor);
+                        }
+                        return new BreakExpression(value);
+                    }
+                    if (cursor.Is(Lex.KwContinue))
+                    {
+                        cursor.Swallow(Lex.KwContinue);
+                        return new ContinueExpression();
+                    }
+                    if (cursor.Is(Lex.KwWhen))
+                    {
+                        cursor.Swallow(Lex.KwWhen);
+
+                        var condition = Parse(cursor);
+                        var then = Block(cursor);
+
+                        return new WhenExpression(condition, then);
+                    }
+                    if (cursor.Is(Lex.KwWasm))
+                    {
+                        cursor.Swallow(Lex.KwWasm);
+
+                        return Wasm.Parse(cursor);
+                    }
+                    if (cursor.IsExpression())
+                    {
+                        return Parse(cursor);
+                    }
+                    else
+                    {
+                        throw Errors.Parser.NotImplementedAt(cursor.Current);
+                    }
+                });
+
+                expressions.Add(expression);
+            }
+
+            Assert(expressions.Count >= 1);
+            return new Block(expressions);
+#else
             return cursor.Scope(cursor =>
             {
                 var expressions = new List<Expression>();
 
-                while (cursor.More())
+                while (cursor.More)
                 {
                     if (cursor.Is(Lex.KwVal))
                     {
@@ -105,14 +180,18 @@ namespace Fux.Parsing
                     {
                         cursor.Swallow(Lex.KwBreak);
 
-                        var value = Parse(cursor);
-                        var condition = (Expression?)null;
-
-                        if (cursor.SwallowIf(Lex.KwWhen))
+                        var value = (Expression?)null;
+                        if (cursor.IsExpression())
                         {
-                            condition = Parse(cursor);
+                            value = Parse(cursor);
                         }
-                        expressions.Add(new BreakExpression(value, condition));
+                        expressions.Add(new BreakExpression(value));
+                        continue;
+                    }
+                    if (cursor.Is(Lex.KwContinue))
+                    {
+                        cursor.Swallow(Lex.KwContinue);
+                        expressions.Add(new ContinueExpression());
                         continue;
                     }
                     if (cursor.Is(Lex.KwWhen))
@@ -146,12 +225,12 @@ namespace Fux.Parsing
 
                 if (expressions.Count == 0)
                 {
-                    throw Errors.Parser.NotImplementedAt(cursor);
+                    throw Errors.Parser.NotImplementedAt(cursor.Current);
                 }
 
                 return new Block(expressions);
             });
-
+#endif
         }
 
         private Expression If(Cursor cursor)
@@ -212,7 +291,7 @@ namespace Fux.Parsing
                 {
                     if (!Parsing.Infix.Find(opName.Text, out var infix))
                     {
-                        throw Errors.Parser.CanNotResolveInfix(cursor);
+                        throw Errors.Parser.CanNotResolveInfix(cursor.Current);
                     }
 
                     return (infix, opName.Tokens.Count);
@@ -222,41 +301,41 @@ namespace Fux.Parsing
 
                 OpName? PeekOpName(Cursor cursor)
                 {
-                    var offset = cursor.Offset;
-                    var name = (OpName?)null;
-
-                    if (cursor.IsOperator())
+                    using (cursor.Speculate())
                     {
-                        if (cursor.Is(Lex.RightAngleBracket))
+                        var name = (OpName?)null;
+
+                        if (cursor.IsOperator())
                         {
-                            var angle1 = cursor.Swallow();
-                            if (cursor.Is(Lex.RightAngleBracket) && !cursor.Current.WhitesBefore)
+                            if (cursor.Is(Lex.RightAngleBracket))
                             {
-                                var angle2 = cursor.Swallow();
+                                var angle1 = cursor.Swallow();
                                 if (cursor.Is(Lex.RightAngleBracket) && !cursor.Current.WhitesBefore)
                                 {
-                                    var angle3 = cursor.Swallow();
+                                    var angle2 = cursor.Swallow();
+                                    if (cursor.Is(Lex.RightAngleBracket) && !cursor.Current.WhitesBefore)
+                                    {
+                                        var angle3 = cursor.Swallow();
 
-                                    name = new OpName(angle1, angle2, angle3);
+                                        name = new OpName(angle1, angle2, angle3);
+                                    }
+                                    else
+                                    {
+                                        name = new OpName(angle1, angle2);
+                                    }
                                 }
                                 else
                                 {
-                                    name = new OpName(angle1, angle2);
+                                    name = new OpName(angle1);
                                 }
                             }
                             else
                             {
-                                name = new OpName(angle1);
+                                name = new OpName(cursor.Swallow());
                             }
                         }
-                        else
-                        {
-                            name = new OpName(cursor.Swallow());
-                        }
+                        return name;
                     }
-
-                    cursor.Offset = offset;
-                    return name;
                 }
             }
         }
@@ -269,7 +348,7 @@ namespace Fux.Parsing
                 {
                     if (!Parsing.Prefix.Find(cursor.Current, out var prefix))
                     {
-                        throw Errors.Parser.CanNotResolvePrefix(cursor);
+                        throw Errors.Parser.CanNotResolvePrefix(cursor.Current);
                     }
                     
                     cursor.Advance();
@@ -371,7 +450,11 @@ namespace Fux.Parsing
                 }
                 if (cursor.IsIdentifier())
                 {
-                    return new ReferenceExpression(Parser.ParseQName(cursor));
+                    return new ExpressionReference(Parser.ParseQName(cursor));
+                }
+                if (cursor.Is(Lex.Wildcard))
+                {
+                    return new WildcardExpression(cursor.Swallow());
                 }
                 if (cursor.SwallowIf(Lex.LeftRoundBracket))
                 {
@@ -379,8 +462,12 @@ namespace Fux.Parsing
                     _ = cursor.Swallow(Lex.RightRoundBracket);
                     return expression;
                 }
+                if (cursor.Is(Lex.KwIf))
+                {
+                    return Block(cursor);
+                }
 
-                throw Errors.Parser.NotImplementedAt(cursor);
+                throw Errors.Parser.NotImplementedAt(cursor.Current);
             }
         }
     }

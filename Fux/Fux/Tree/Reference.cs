@@ -8,16 +8,35 @@ using Fux.Parsing;
 
 namespace Fux.Tree
 {
-    public class Reference : NodeBase, Leaf
+    public abstract class Reference : NodeBase
     {
-        public Reference(TokenSpan tokens)
+        public Reference(Name name)
         {
-            Tokens = tokens;
-            Text = Tokens.Text;
+            Name = name;
         }
 
-        public TokenSpan Tokens { get; }
+        public Name Name { get; }
 
-        public string Text { get; };
+        public string Text => Name.Text;
+    }
+
+    public class ExpressionReference : Reference, Expression
+    {
+        public ExpressionReference(Name name)
+            : base(name)
+        {
+        }
+
+        public static implicit operator ExpressionReference(Name name) => new ExpressionReference(name);
+    }
+
+    public class TypeReference : Reference, Type
+    {
+        public TypeReference(Name name)
+            : base(name)
+        {
+        }
+
+        public static implicit operator TypeReference(Name name) => new TypeReference(name);
     }
 }

@@ -21,6 +21,7 @@ public static class LexerPredicates
     public static bool IsLetter(this int rune) => rune is >= 'a' and <= 'z' or >= 'A' and <= 'Z';
     public static bool IsDigit(this int rune) => rune is >= '0' and <= '9';
     public static bool IsLetterOrDigit(this int rune) => rune is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9';
+    public static bool IsLetterOrDigitOrUnderscore(this int rune) => IsLetterOrDigit(rune) || rune == '_' ;
     public static bool IsPosDigit(this int rune) => rune is >= '1' and <= '9';
     public static bool IsHexDigit(this int rune) => 'a' <= rune && rune <= 'f' || 'A' <= rune && rune <= 'F' || rune.IsDigit();
     public static bool IsSymbol(this int rune) => symbols.Contains(rune);

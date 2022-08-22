@@ -1,0 +1,26 @@
+// The language definitely needs type parameters
+
+/*
+*/
+enum StringLinkedList
+    None
+    Element
+        str: string
+        next: StringLinkedList
+
+impl StringLinkedList
+    method fun append(self: StringLinkedList, str: string): StringLinkedList =>
+        case self of
+            None -> Element(str, None)
+            Element(str, next) -> Element(str, next.append(str))
+
+    method fun prepend(self: StringLinkedList, str: string): StringLinkedList =>
+        Element(str, self)
+
+    getter fun head(self: StringLinkedList): StringLinkedList =>
+        self
+
+    getter fun tail(self: StringLinkedList): StringLinkedList =>
+        case self of
+            None                -> None
+            Element(str, next)  -> next

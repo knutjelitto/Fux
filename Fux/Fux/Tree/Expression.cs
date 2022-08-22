@@ -70,6 +70,20 @@ namespace Fux.Tree
         }
     }
 
+    public class WildcardExpression : ExpressionBase, Leaf
+    {
+        public WildcardExpression(Token wildcard)
+        {
+            Assert(wildcard.Lex == Lex.Wildcard || wildcard.Lex == Lex.KwElse);
+            Wildcard = wildcard;
+        }
+
+        public Token Wildcard { get; }
+
+        public string Text => "_";
+    }
+
+
     public class LoopExpression : ExpressionBase
     {
         public LoopExpression(Expression expression)
@@ -94,14 +108,21 @@ namespace Fux.Tree
 
     public class BreakExpression : ExpressionBase
     {
-        public BreakExpression(Expression value, Expression? condition)
+        public BreakExpression(Expression? value)
         {
             Value = value;
-            Condition = condition;
         }
 
-        public Expression Value { get; }
-        public Expression? Condition { get; }
+        public Expression? Value { get; }
+    }
+
+    public class ContinueExpression : ExpressionBase, Leaf
+    {
+        public ContinueExpression()
+        {
+        }
+
+        public string Text => "continue";
     }
 
     public class IfExpression : ExpressionBase
@@ -250,18 +271,6 @@ namespace Fux.Tree
         public string Text => Token.Text;
 
         public override string ToString() => $"lit:{Token.Text}";
-    }
-
-    public class ReferenceExpression : ExpressionBase
-    {
-        public ReferenceExpression(QName qname)
-        {
-            QName = qname;
-        }
-
-        public QName QName { get; }
-
-        public override string ToString() => $"{QName}";
     }
 
     public abstract class SAtom : NodeBase { }

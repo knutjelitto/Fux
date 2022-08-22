@@ -9,15 +9,6 @@ public sealed class Lexer
         Offset = 0;
     }
 
-    private static readonly HashSet<int> symbols = new()
-    {
-        '+',  '-',  '*',  '/',
-        '%',  '^',  '$',  '&',
-        '~',  '!',  '\\', '#',
-        '=',  '.',  ':',  '?',
-        '<',  '>',  '|',
-    };
-
     private static readonly Dictionary<string, (string name, Lex kwLex)> keywords = new();
 
     static Lexer()
@@ -101,9 +92,6 @@ public sealed class Lexer
             case '^':
                 return Build(Lex.OpXor, 1);
 
-            case '\\' when !Next.IsSymbol():
-                return Build(Lex.Lambda, 1);
-
             case '-' when Next == '>':
                 return Build(Lex.LightArrow, 2);
 
@@ -112,6 +100,9 @@ public sealed class Lexer
 
             case '+' when Next != '+':
                 return Build(Lex.OpAdd, 1);
+
+            case '+' when Next == '+':
+                return Build(Lex.OpAppend, 2);
 
             case '-':
                 return Build(Lex.OpSub, 1);
@@ -156,16 +147,16 @@ public sealed class Lexer
                 return Build(Lex.RightSquareBracket, 1);
 
             case '=' when Next == '=':
-                return Build(Lex.Equal, 2);
+                return Build(Lex.OpEqual, 2);
 
             case '!' when Next == '=':
-                return Build(Lex.Unequal, 2);
+                return Build(Lex.OpUnequal, 2);
 
             case '!':
                 return Build(Lex.OpNot, 1);
 
             case '<' when Next == '=':
-                return Build(Lex.LessEqual, 2);
+                return Build(Lex.OpLessEqual, 2);
 
             case '<' when Next == '<':
                 return Build(Lex.OpShl, 2);
@@ -174,7 +165,7 @@ public sealed class Lexer
                 return Build(Lex.LeftAngleBracket, 1);
 
             case '>' when Next == '=':
-                return Build(Lex.GreaterEqual, 2);
+                return Build(Lex.OpGreaterEqual, 2);
 
             case '>':
                 return Build(Lex.RightAngleBracket, 1);
@@ -202,8 +193,8 @@ public sealed class Lexer
             case '\'':
                 return Char();
 
-            case '_' when !Next.IsLetterOrDigit():
-                return Wildcard();
+            case '_' when !Next.IsLetterOrDigitOrUnderscore():
+                return Build(Lex.Wildcard, 1);
 
             case '#':
                 {
@@ -356,20 +347,6 @@ public sealed class Lexer
                 Offset += 1;
             }
         }
-    }
-
-    private Lex Operator()
-    {
-        Assert(Current.IsSymbol());
-
-        Offset += 1;
-
-        while (Current.IsSymbol())
-        {
-            Offset += 1;
-        }
-
-        return Lex.Operator;
     }
 
     private Lex Number()
@@ -679,5 +656,4 @@ public sealed class Lexer
     public static bool IsLetterOrDigit(int rune) => rune is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9';
     public static bool IsPosDigit(int rune) => rune is >= '1' and <= '9';
     public static bool IsHexDigit(int rune) => 'a' <= rune && rune <= 'f' || 'A' <= rune && rune <= 'F' || IsDigit(rune);
-    public static bool IsSymbol(int rune) => symbols.Contains(rune);
 }

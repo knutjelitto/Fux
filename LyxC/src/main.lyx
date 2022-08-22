@@ -1,0 +1,48 @@
+import support::ffi
+import src::lexer::lexer
+import src::parser::lysgrammar
+import src::parser::parser
+import src::stringbuilder
+import src::compiler::nodes
+
+export("startLexer") fun startLexer(strAddress: UnsafeCPointer): void =>
+    instantiate(UCS2.fromPtr(strAddress))
+
+export("eat") fun externalEat(): UnsafeCPointer =>
+    eat() as UnsafeCPointer
+
+export("parseAst") fun parseAst(strAddress: UnsafeCPointer): UnsafeCPointer =>
+    val sb = StringBuilder()
+    printAst(parse(UCS2.fromPtr(strAddress), "Document", getGrammar()), 0, sb)
+    sb.toString() as UnsafeCPointer
+
+export("parseAstDesugar") fun parseAstDesugar(strAddress: UnsafeCPointer): UnsafeCPointer =>
+    val ctx = src::compiler::context::CompilerContext()
+
+    case parse(UCS2.fromPtr(strAddress), "Document", getGrammar()) of
+        AstNode ->
+            val sb = StringBuilder()
+            printAst(src::compiler::phases::transformation::runPhase("mod", "mod", ast, ctx), 0, sb)
+            sb.toString() as UnsafeCPointer
+        _ -> "" as UnsafeCPointer
+
+export("parseAndEmitErrors") fun parseAndEmitErrors(moduleName: UnsafeCPointer, path: UnsafeCPointer, strAddress: UnsafeCPointer): UnsafeCPointer =>
+    val ctx = src::compiler::context::CompilerContext()
+    val sb = StringBuilder()
+    ctx.getModuleByContent(UCS2.fromPtr(path), UCS2.fromPtr(moduleName), UCS2.fromPtr(strAddress))
+    ctx.printErrors(sb)
+    sb.toString() as UnsafeCPointer
+
+export("parseAndEmitAst") fun parseAndEmitAst(moduleName: UnsafeCPointer, path: UnsafeCPointer, strAddress: UnsafeCPointer): UnsafeCPointer =>
+    val ctx = src::compiler::context::CompilerContext()
+    val sb = StringBuilder()
+    val module = ctx.getModuleByContent(UCS2.fromPtr(path), UCS2.fromPtr(moduleName), UCS2.fromPtr(strAddress))
+    CodeNode.printAst(module.document, sb, 0)
+    sb.toString() as UnsafeCPointer
+
+export("parseAndEmitDesugar") fun parseAndEmitDesugar(moduleName: UnsafeCPointer, path: UnsafeCPointer, strAddress: UnsafeCPointer): UnsafeCPointer =>
+    val ctx = src::compiler::context::CompilerContext()
+    val sb = StringBuilder()
+    val module = ctx.getModuleByContent(UCS2.fromPtr(path), UCS2.fromPtr(moduleName), UCS2.fromPtr(strAddress))
+    CodeNode.printNode(module.document, sb, 0)
+    sb.toString() as UnsafeCPointer

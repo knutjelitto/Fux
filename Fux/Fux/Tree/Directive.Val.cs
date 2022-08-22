@@ -2,16 +2,12 @@
 
 public class ValDirective : Directive
 {
-    public ValDirective(Annotations annotations, Name name, Type? type, Expression value)
+    public ValDirective(Annotations annotations, ValDeclaration declaration)
     {
         Annotations = annotations;
-        Name = name;
-        Type = type;
-        Value = value;
+        Declaration = declaration;
     }
 
     public Annotations Annotations { get; }
-    public Name Name { get; }
-    public Type? Type { get; }
-    public Expression Value { get; }
+    public ValDeclaration Declaration { get; }
 }

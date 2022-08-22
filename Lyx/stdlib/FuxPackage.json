@@ -2,12 +2,17 @@
     "name": "Fux.Stdlib",
     "summary": "Fux Standard library",
     "include": [
-        "system/test/**/*.lys",
-        "system/core/**/*.lys",
-        "support/**/*.lys"
+        "system/test/**/*.lyx",
+        "system/core/**/*.lyx",
+        "system/charset/**/*.lyx",
+        "support/**/*.lyx",
+        "../../LyxC/src/*.lyx",
+        "../../LyxC/src/lexer/*.lyx",
+        "../../LyxC/src/parser/*.lyx",
+        "../../LyxC/src/compiler/*.lyx"
     ],
     "exclude": [
-        "/system/core/**/string.lys"
+        "/system/core/**/string.lyx"
     ],
     "dependencies": {}
 }

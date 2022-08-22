@@ -1,0 +1,259 @@
+import src::lexer::tokens
+import src::helpers
+
+// Parsing rules definitions
+
+enum ParserRule
+    /*
+    * Matches a tokenType from the lexer.
+    * execution of this node returns Leaf | Nil
+    */
+    Terminal
+        tokenType: TokenType
+
+    /*
+    * Matches a tokenType from the lexer and also its value.
+    * execution of this node returns Leaf | Nil
+    */
+    StrictTerminal
+        tokenType: TokenType
+        value: string
+
+    /*
+    * Matches a grammatical construction by name
+    * execution of this node returns AstNode | Nil
+    */
+    NonTerminal
+        name: string
+
+    /*
+    * Matches the first rule,
+    * if it returns Nil, matches the second rule and returns its value
+    * execution of this node returns AstNode | Nil
+    */
+    Or
+        lhs: ParserRule
+        rhs: ParserRule
+
+    /*
+    * Matches the rule, one or more times.
+    * Returns an AstCons with the list of results.
+    * execution of this node returns AstCons | AstNode | Nil
+    */
+    OneOrMore
+        rule: ParserRule
+
+    /*
+    * Matches the rule, zero or more times.
+    * Returns an AstCons with the list of results.
+    * execution of this node returns AstCons | AstNode | Rule0
+    */
+    ZeroOrMore
+        rule: ParserRule
+
+    /*
+    * Matches the head rule, then it tries to match the tail rule.
+    * Returns an AstCons with the list of results.
+    * execution of this node returns AstCons | Nil
+    */
+    Cons
+        head: ParserRule
+        tail: ParserRule
+
+    /*
+    * Matches the head rule, then it tries to match the tail rule.
+    * If the tail rule fails, it will consume UnexpectedTokens until it matches the
+    * tail rule.
+    * Returns an AstCons with the list of results.
+    * execution of this node returns AstCons | Nil
+    */
+    Cut
+        head: ParserRule
+        tail: ParserRule
+
+    /*
+    * Matches the rule, if it doesn't match, returns Rule0.
+    * execution of this node returns AstCons | Nil
+    */
+    Optional
+        rule: ParserRule
+
+    /*
+    * Execution of this rule eats a token and returns a SyntaxError
+    * execution of this node returns SyntaxError
+    */
+    Fail
+        message: string
+
+    /*
+    * Matches the rule, returns Rule0 if it succeeds, Nil if it fails.
+    * After matching the rule, it rewinds the cursor of the lexer.
+    * execution of this node returns Rule0 | Nil
+    */
+    LookAhead
+        rule: ParserRule
+
+    /*
+    * Matches the rule, returns Nil if it succeeds, Rule0 if it fails.
+    * After matching the rule, it rewinds the cursor of the lexer.
+    * execution of this node returns Rule0 | Nil
+    */
+    NegativeLookAhead
+        rule: ParserRule
+
+    /*
+    * Matches the rule, returns Rule0 if it succeeds, Nil if it fails.
+    * execution of this node returns Rule0 | Nil
+    */
+    Discard
+        rule: ParserRule
+
+    /*
+    * Matches the rule, if it succeeds, pushes a named Node to the AST
+    * execution of this node returns Node | Nil
+    */
+    Push
+        name: string
+        rule: ParserRule
+
+    /*
+    * Matches the rule, if it succeeds and it has many children,
+    * pushes a named Node to the AST
+    * execution of this node returns Node | Nil
+    */
+    PushIfManyChildren
+        name: string
+        rule: ParserRule
+
+impl Cons
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule, a9: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, Cons(a4, Cons(a5, Cons(a6, Cons(a7, Cons(a8, a9))))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, Cons(a4, Cons(a5, Cons(a6, Cons(a7, a8)))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, Cons(a4, Cons(a5, Cons(a6, a7))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, Cons(a4, Cons(a5, a6)))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, Cons(a4, a5))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, Cons(a3, a4)))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule): ParserRule =>
+        Cons(a1, Cons(a2, a3))
+
+impl Cut
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule, a9: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, Cut(a4, Cut(a5, Cut(a6, Cut(a7, Cut(a8, a9))))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, Cut(a4, Cut(a5, Cut(a6, Cut(a7, a8)))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, Cut(a4, Cut(a5, Cut(a6, a7))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, Cut(a4, Cut(a5, a6)))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, Cut(a4, a5))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, Cut(a3, a4)))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule): ParserRule =>
+        Cut(a1, Cut(a2, a3))
+
+impl Or
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule, a9: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, Or(a4, Or(a5, Or(a6, Or(a7, Or(a8, a9))))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule, a8: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, Or(a4, Or(a5, Or(a6, Or(a7, a8)))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule, a7: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, Or(a4, Or(a5, Or(a6, a7))))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule, a6: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, Or(a4, Or(a5, a6)))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule, a5: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, Or(a4, a5))))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule, a4: ParserRule): ParserRule =>
+        Or(a1, Or(a2, Or(a3, a4)))
+    fun apply(a1: ParserRule, a2: ParserRule, a3: ParserRule): ParserRule =>
+        Or(a1, Or(a2, a3))
+
+impl ParserRule
+    method fun toString(self: ParserRule): string => case self of
+        Terminal(tokenType) -> "<" ++ tokenType.toString() ++ ">"
+        StrictTerminal(tokenType, value) -> "\"" ++ value ++ "\""
+        NonTerminal(name) -> name
+
+        Or(lhs, rhs) -> "or(" ++ lhs.toString() ++ ", " ++ rhs.toString() ++ ")"
+        Cons(head, tail) -> "cons(" ++ head.toString() ++ ", " ++ tail.toString() ++ ")"
+        Cut(head, tail) -> "cut(" ++ head.toString() ++ ", " ++ tail.toString() ++ ")"
+
+        OneOrMore(rule) -> "oneOrMore(" ++ rule.toString() ++ ")"
+        ZeroOrMore(rule) -> "zeroOrMore(" ++ rule.toString() ++ ")"
+        Optional(rule) -> "optional(" ++ rule.toString() ++ ")"
+
+        Fail(message) -> "fail(`" ++ message ++ "`)"
+        LookAhead(rule) -> "&(" ++ rule.toString() ++ ")"
+        NegativeLookAhead(rule) -> "!(" ++ rule.toString() ++ ")"
+        Discard(rule) -> "discard(" ++ rule.toString() ++ ")"
+        Push(name, rule) -> "push('" ++ name ++ "', " ++ rule.toString() ++ ")"
+        PushIfManyChildren(name, rule) -> "pushIfManyChildren('" ++ name ++ "', " ++ rule.toString() ++ ")"
+
+// Grammar definitions
+
+enum Grammar
+    Nominal
+        name: string
+        rule: ParserRule
+    GrammarConj
+        tail: Grammar
+        head: Nominal
+
+impl Grammar
+    fun ++ (tail: Grammar, head: Nominal): Grammar => GrammarConj(tail, head)
+
+    method fun toString(self: Grammar): string => case self of
+        Nominal(name, rule) -> name ++ "\t ::= " ++ ParserRule.toString(rule)
+        GrammarConj(head, tail) -> Grammar.toString(tail) ++ "\n" ++ Grammar.toString(head)
+
+    method fun findRule(self: Grammar, ruleName: string): ParserRule | Nil =>
+        case self of
+            Nominal(name, rule) ->
+                if (name == ruleName) then rule else Nil
+            GrammarConj(tail, head) ->
+                if (head.name == ruleName) then
+                    head.rule
+                else
+                    tail.findRule(ruleName)
+
+    method fun compile(fullGrammar: Grammar, ruleName: string): ParserRule | Nil =>
+        case fullGrammar.findRule(ruleName) of
+            Nil -> Nil
+            ParserRule as rule -> optimize(fullGrammar, rule)
+
+    fun optimize(fullGrammar: Grammar, rule: ParserRule): ParserRule =>
+        case rule of
+            NonTerminal(name) ->
+                case fullGrammar.findRule(name) of
+                    Nil ->
+                        support::env::printf("optimize(rule,fullGrammar): missing rule: " ++ name)
+                        panic()
+                        rule
+                    ParserRule ->
+                        optimize(fullGrammar, rule)
+            Or(lhs, rhs) -> Or(optimize(fullGrammar, lhs), optimize(fullGrammar, lhs))
+            Cons(head, tail) -> Cons(optimize(fullGrammar, head), optimize(fullGrammar, tail))
+            Cut(head, tail) -> Cut(optimize(fullGrammar, head), optimize(fullGrammar, tail))
+
+            OneOrMore(rule) -> OneOrMore(optimize(fullGrammar, rule))
+            ZeroOrMore(rule) -> ZeroOrMore(optimize(fullGrammar, rule))
+            Optional(rule) -> Optional(optimize(fullGrammar, rule))
+
+            LookAhead(rule) -> LookAhead(optimize(fullGrammar, rule))
+            NegativeLookAhead(rule) -> NegativeLookAhead(optimize(fullGrammar, rule))
+            Discard(rule) -> Discard(optimize(fullGrammar, rule))
+            Push(name, rule) -> Push(name, optimize(fullGrammar, rule))
+            PushIfManyChildren(name, rule) -> PushIfManyChildren(name, optimize(fullGrammar, rule))
+            else ->
+                support::env::printf("?? " ++ rule.toString())
+                rule
+
+impl Nominal
+    fun ++ (lhs: Grammar, rhs: Nominal): Grammar =>
+        GrammarConj(lhs, rhs)
+

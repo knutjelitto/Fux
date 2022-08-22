@@ -10,13 +10,6 @@ public class TokenSpan : IReadOnlyList<Token>
         Limit = limit;
     }
 
-    public TokenSpan Add()
-    {
-        Limit += 1;
-
-        return this;
-    }
-
     public Token this[int index] => Tokens[Start + index];
     public int Count => Limit - Start;
     public string Text => string.Join("", this);
@@ -25,7 +18,7 @@ public class TokenSpan : IReadOnlyList<Token>
     public int Start { get; }
     public int Limit { get; private set; }
 
-    public bool Eof => Start == Tokens.Count - 1 && Tokens[Start].Lex == Lex.EOF;
+    public bool EOF => Start == Tokens.Count - 1 && Tokens[Start].Lex == Lex.EOF;
 
     public IEnumerator<Token> GetEnumerator()
     {

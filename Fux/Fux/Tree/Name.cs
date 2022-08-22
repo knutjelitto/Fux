@@ -48,4 +48,33 @@ namespace Fux.Tree
         public IReadOnlyList<Token> Tokens { get; }
         public override string Text => string.Join("", Tokens.Select(t => t.Text));
     }
+
+    public class DummyName : Name
+    {
+        public DummyName(string text)
+        {
+            Text = text;
+        }
+        public override string Text { get; }
+    }
+
+    public class QName : Name
+    {
+        public QName(IReadOnlyList<Name> names)
+        {
+            Assert(names.Count >= 1);
+
+            Names = names;
+        }
+
+        public IReadOnlyList<Name> Names { get; }
+
+        public override string Text => string.Join("::", Names);
+
+        public override string ToString()
+        {
+            return Text;
+        }
+    }
+
 }

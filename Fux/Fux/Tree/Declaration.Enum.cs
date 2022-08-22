@@ -1,6 +1,6 @@
 ﻿namespace Fux.Tree
 {
-    public class EnumDeclaration : Declaration
+    public class EnumDeclaration : DeclarationBase
     {
         public EnumDeclaration(Annotations annotations, Name name, TypeParameters? typeParameters, EnumMembers members)
         {
@@ -18,19 +18,17 @@
 
     public class EnumMember : NodeBase
     {
-        public EnumMember(Name name, StructFields fields)
+        public EnumMember(StructDeclaration @struct)
         {
-            Name = name;
-            Fields = fields;
+            Struct = @struct;
         }
 
-        public Name Name { get; }
-        public StructFields Fields { get; }
+        public StructDeclaration Struct { get; }
     }
 
-    public class EnumMembers : ListOf<EnumMember>
+    public class EnumMembers : ListOf<StructDeclaration>
     {
-        public EnumMembers(IEnumerable<EnumMember> items)
+        public EnumMembers(IEnumerable<StructDeclaration> items)
             : base(items)
         {
         }

@@ -1,4 +1,0 @@
-import system::core::native
-
-fun retain(reference: ref): void => wasm (nop)
-fun release(reference: ref): void => wasm (nop)

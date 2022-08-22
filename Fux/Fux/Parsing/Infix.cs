@@ -16,40 +16,6 @@ namespace Fux.Parsing
         Right
     }
 
-    public class Prefix : NodeBase, Leaf
-    {
-        private static readonly Dictionary<string, Prefix> table = new();
-
-        private static Prefix add(Prefix prefix)
-        {
-            table.Add(prefix.Name, prefix);
-
-            return prefix;
-        }
-
-        public static bool Find(Token token, [MaybeNullWhen(false)] out Prefix infix)
-        {
-            return table.TryGetValue(token.Text, out infix);
-        }
-
-        public static bool Find(string text, [MaybeNullWhen(false)] out Prefix infix)
-        {
-            return table.TryGetValue(text, out infix);
-        }
-
-        private static readonly Prefix Not = add(new("!"));
-        private static readonly Prefix BitNot = add(new("~"));
-        private static readonly Prefix Negate = add(new("-"));
-
-        private Prefix(string name)
-        {
-            Name = name;
-        }
-
-        public string Name { get; }
-        public string Text => Name;
-    }
-
     public class Infix : NodeBase, Leaf
     {
         private static readonly Dictionary<string, Infix> table = new Dictionary<string, Infix>();
@@ -87,6 +53,7 @@ namespace Fux.Parsing
         private static readonly Infix LShr = add(new(">>", 80, Assoc.Left));
         private static readonly Infix Shl = add(new("<<", 80, Assoc.Left));
         private static readonly Infix Add = add(new("+", 90, Assoc.Left));
+        private static readonly Infix Append = add(new("++", 90, Assoc.Left));
         private static readonly Infix Sub = add(new("-", 90, Assoc.Left));
         private static readonly Infix Mul = add(new("*", 100, Assoc.Left));
         private static readonly Infix Div = add(new("/", 100, Assoc.Left));

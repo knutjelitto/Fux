@@ -1,0 +1,57 @@
+enum TokenType
+    EndOfFile
+    Identifier
+    Unknown
+    NewLine
+    Whitespace
+    StringLiteral
+    NumberLiteral
+    ParenthesesOpen
+    ParenthesesClose
+    MacroDecoration
+    VectorOpen
+    VectorClose
+    Operator
+    LineComment
+    MultiLineComment
+    CurlyBracesOpen
+    CurlyBracesClose
+    Comma
+    Keyword
+
+
+struct Token
+    tokenType: TokenType
+    start: u32
+    end: u32
+
+impl TokenType
+    method fun toString(self: TokenType): string =>
+        
+        case self of
+            EndOfFile -> "EndOfFile"
+            Identifier -> "Identifier"
+            Unknown -> "Unknown"
+            NewLine -> "NewLine"
+            Whitespace -> "Whitespace"
+            StringLiteral -> "StringLiteral"
+            NumberLiteral -> "NumberLiteral"
+            LineComment -> "LineComment"
+            MultiLineComment -> "MultiLineComment"
+            ParenthesesOpen -> "ParenthesesOpen"
+            ParenthesesClose -> "ParenthesesClose"
+            MacroDecoration -> "MacroDecoration"
+            VectorOpen -> "VectorOpen"
+            VectorClose -> "VectorClose"
+            Operator -> "Operator"
+            CurlyBracesOpen -> "CurlyBracesOpen"
+            CurlyBracesClose -> "CurlyBracesClose"
+            Comma -> "Comma"
+            Keyword -> "Keyword"
+
+impl Token
+    method fun textIn(self: Token, source: string): string =>
+        source.substring(self.start as i32, self.end as i32)
+
+    method fun toString(self: Token): string =>
+        TokenType.toString(self.tokenType) ++ "(" ++ string.stringify(self.start) ++ "," ++ string.stringify(self.end) ++ ")"

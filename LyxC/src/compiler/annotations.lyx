@@ -1,0 +1,95 @@
+import src::helpers
+import src::compiler::nodes
+
+enum NodeAnnotation
+    NoAnnotation
+    AnnotationCons
+        list: NodeAnnotation
+        element: NodeAnnotation
+    IsTailRec
+    Injected
+    IsOverloaded
+    Inline
+    Getter
+    Setter
+    Method
+    MethodCall
+    SignatureDeclaration
+    Explicit
+    ByPassFunction
+    Extern
+        module: string
+        fn: string
+    Export
+        exportedName: string
+    MutableDeclaration
+    LabelId
+        label: string
+    LocalIdentifier
+        local: Local | Global
+    IsTailRecCall
+    CurrentLoop
+        theLoop: LoopNode
+    ImplicitCall
+        implicitCall: FunctionCallNode
+    IsUnreachable
+    IsValueNode
+    IsAssignationLHS
+    IsTypeNode
+    NoStd
+    IsReturnExpression
+        targetLocal: Local | Nil
+
+impl NodeAnnotation
+    getter fun name(self: NodeAnnotation): string =>
+        case self of
+            NoAnnotation -> "NoAnnotation"
+            AnnotationCons -> "AnnotationCons"
+            IsTailRec -> "IsTailRec"
+            Injected -> "Injected"
+            IsOverloaded -> "IsOverloaded"
+            Inline -> "Inline"
+            Getter -> "Getter"
+            Setter -> "Setter"
+            Method -> "Method"
+            MethodCall -> "MethodCall"
+            SignatureDeclaration -> "SignatureDeclaration"
+            Explicit -> "Explicit"
+            ByPassFunction -> "ByPassFunction"
+            Extern -> "Extern"
+            Export -> "Export"
+            MutableDeclaration -> "MutableDeclaration"
+            LabelId -> "LabelId"
+            LocalIdentifier -> "LocalIdentifier"
+            IsTailRecCall -> "IsTailRecCall"
+            CurrentLoop -> "CurrentLoop"
+            ImplicitCall -> "ImplicitCall"
+            IsUnreachable -> "IsUnreachable"
+            IsValueNode -> "IsValueNode"
+            IsAssignationLHS -> "IsAssignationLHS"
+            IsTypeNode -> "IsTypeNode"
+            NoStd -> "NoStd"
+            IsReturnExpression -> "IsReturnExpression"
+
+    method fun toString(self: NodeAnnotation): string =>
+        case self of
+            NoAnnotation -> ""
+            AnnotationCons(list, element) -> list.toString() ++ "," ++ element.toString()
+            else -> self.name
+
+    method fun get(self: NodeAnnotation, findDiscriminant: u32): NodeAnnotation =>
+        if (ref.getDiscriminant(self as ref) == findDiscriminant) then
+            self
+        else
+            case self of
+                AnnotationCons(list, element) ->
+                    val result = element.get(findDiscriminant)
+                    if (result is NoAnnotation) then
+                        list.get(findDiscriminant)
+                    else
+                        result
+                else ->
+                    NoAnnotation
+
+    method fun has(self: NodeAnnotation, findDiscriminant: u32): boolean =>
+        !(self.get(findDiscriminant) is NoAnnotation)

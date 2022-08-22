@@ -1,13 +1,12 @@
 ﻿namespace Fux.Parsing
 {
-    public sealed class Liner
+    public sealed class LinerUpper
     {
         private int current = 0;
 
         private readonly TokenList tokens = new();
-        private readonly List<TokenSpan> elements = new();
 
-        public Liner(ErrorBag errors, Lexer lexer)
+        public LinerUpper(ErrorBag errors, Lexer lexer)
         {
             Errors = errors;
             Lexer = lexer;
@@ -18,24 +17,24 @@
         public Lexer Lexer { get; }
         public Text Source => Lexer.Source;
         public int TokenCount => tokens.Count;
-        public int Count => elements.Count;
+        public bool Done { get; private set; }
 
-        public TokenSpan GetElement()
+        public Line GetElement()
         {
+            if (Done)
+            {
+                throw new InvalidOperationException();
+            }
+
             if (current == tokens.Count - 1)
             {
-                Assert(tokens[current].Lex == Lex.EOF);
-                return Add(new TokenSpan(tokens, current, current + 1));
+                Done = true;
+                var line = new Line(new TokenSpan(tokens, current, current + 1), Enumerable.Empty<Line>().ToList());
+                Assert(line.EOS);
+                return line;
             }
 
             return ParseLine(0);
-        }
-
-        private TokenSpan Add(TokenSpan element)
-        {
-            elements.Add(element);
-
-            return element;
         }
 
         private int Consume(int indent)
@@ -45,34 +44,36 @@
             return current;
         }
 
-        private TokenSpan ParseLine(int indent)
+        private Line ParseLine(int indent)
         {
             var starter = current;
-
-            tokens[current].First = true;
 
             while (current < tokens.Count && !tokens[current].EOF && tokens[current].Line == tokens[starter].Line)
             {
                 current = Consume(indent);
             }
 
-            tokens[current - 1].Last = true;
+            var content = new TokenSpan(tokens, starter, current);
+
+            var subLines = new List<Line>();
 
             if (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
             {
                 indent++;
 
-                _ = ParseLine(indent);
+                var subLine = ParseLine(indent);
+                subLines.Add(subLine);
 
                 while (current < tokens.Count && !tokens[current].EOF && tokens[current].Column > tokens[starter].Column)
                 {
-                    _ = ParseLine(indent);
+                    subLine = ParseLine(indent);
+                    subLines.Add(subLine);
                 }
             }
 
             Assert(current > starter);
 
-            return Add(new TokenSpan(tokens, starter, current));
+            return new Line(content, subLines);
         }
 
         private void CreateTokenList()
@@ -101,6 +102,40 @@
                     break;
                 }
                 current = Lexer.GetNext();
+            }
+        }
+    }
+
+    public class Line
+    {
+        public Line(TokenSpan content, List<Line> subLines)
+        {
+            Content = content;
+            SubLines = subLines;
+        }
+
+        public TokenSpan Content { get; }
+        public IReadOnlyList<Line> SubLines { get; }
+        public bool EOS => Content.Count == 1 && Content[0].Lex == Lex.EOF && SubLines.Count == 0;
+
+        public void Write(Writer writer)
+        {
+            Write(writer, 0);
+        }
+
+        private void Write(Writer writer, int level)
+        {
+            writer.WriteLine($"{Content}");
+            writer.Indent(() =>
+            {
+                foreach (var line in SubLines)
+                {
+                    line.Write(writer, level + 1);
+                }
+            });
+            if (level == 0)
+            {
+                writer.WriteLine();
             }
         }
     }
