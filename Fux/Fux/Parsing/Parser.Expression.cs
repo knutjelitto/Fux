@@ -77,6 +77,10 @@ namespace Fux.Parsing
         {
             return cursor.Scope(cursor =>
             {
+                if (cursor.Current.Location.Line == 154)
+                {
+                    Assert(true);
+                }
                 cursor.Swallow(Lex.KwLoop);
 
                 var block = Block(cursor);
@@ -92,14 +96,17 @@ namespace Fux.Parsing
                 //TODO: Sub or Sub2 ?
                 cursor = cursor.SubCursor2();
 
-                if (cursor.Current.Text == "if")
+                if (cursor.Current.Location.Source.Display.Contains("bool"))
                 {
-                    Assert(true);
+                    if (cursor.Current.Text == "if")
+                    {
+                        Assert(true);
+                    }
                 }
             }
 #if true
             var expressions = new List<Expression>();
-            while (cursor.More)
+            while (cursor.IsExpression())
             {
                 var expression = cursor.Scope(cursor =>
                 {
@@ -132,7 +139,7 @@ namespace Fux.Parsing
                         cursor.Swallow(Lex.KwWhen);
 
                         var condition = Parse(cursor);
-                        var then = Block(cursor);
+                        var then = Block(cursor.SubCursor2());
 
                         return new WhenExpression(condition, then);
                     }
@@ -142,14 +149,7 @@ namespace Fux.Parsing
 
                         return Wasm.Parse(cursor);
                     }
-                    if (cursor.IsExpression())
-                    {
-                        return Parse(cursor);
-                    }
-                    else
-                    {
-                        throw Errors.Parser.NotImplementedAt(cursor.Current);
-                    }
+                    return Parse(cursor);
                 });
 
                 expressions.Add(expression);

@@ -18,6 +18,8 @@ namespace Fux.Tree
         public Name Name { get; }
 
         public string Text => Name.Text;
+
+        public override string ToString() => Text;
     }
 
     public class ExpressionReference : Reference, Expression

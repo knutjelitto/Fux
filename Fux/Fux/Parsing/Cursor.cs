@@ -64,9 +64,10 @@ namespace Fux.Parsing
         {
             get
             {
-                Assert(offset > 0);
+                var idx = Tokens.Start + offset - 1;
+                Assert(idx >= 0);
 
-                return Tokens[offset - 1];
+                return Tokens.Tokens[idx];
             }
         }
 

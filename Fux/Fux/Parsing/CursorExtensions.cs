@@ -69,22 +69,7 @@ public static class CursorExtensions
 
     public static bool IsKeyword(this Cursor cursor) => cursor.More && cursor.Current.Lex.IsKeyword;
 
-    public static bool IsExpression(this Cursor cursor)
-    {
-        return cursor.More && Expression(cursor.Current.Lex);
-
-        static bool Expression(Lex lex)
-        {
-            return lex.IsIdentifier
-                || lex.IsLiteral
-                || lex.IsPrefix
-                || lex == Lex.LeftRoundBracket
-                || lex == Lex.KwIf
-                || lex == Lex.KwCase
-                || lex == Lex.KwLoop
-                ;
-        }
-    }
+    public static bool IsExpression(this Cursor cursor) => cursor.More && cursor.Current.Lex.IsAnyExpression;
 
     public static bool IsNot(this Cursor cursor, Lex lex) => cursor.More && cursor.Current.Lex != lex;
 

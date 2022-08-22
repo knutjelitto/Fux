@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Fux.Parsing
+﻿namespace Fux.Parsing
 {
     [Flags]
     public enum LexClass
@@ -21,5 +15,9 @@ namespace Fux.Parsing
 
         Prefix = 1 << 8 | Operator,
         Infix = 1 << 9 | Operator,
+
+        CoreExpression = 1 << 10,
+        StmtExpression = 1 << 11,
+        AnyExpression = CoreExpression | StmtExpression
     }
 }
